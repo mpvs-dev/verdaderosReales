@@ -573,7 +573,11 @@
       "id": 107,
       "text": "¿Prefiere pedir disculpas o esperar a que se calmen las cosas?",
       "type": "multiple",
-      "options": ["Pedir disculpas enseguida", "Esperar", "Depende de la situación"]
+      "options": [
+        "Pedir disculpas enseguida",
+        "Esperar",
+        "Depende de la situación"
+      ]
     },
     {
       "id": 108,
@@ -1068,6 +1072,1608 @@
       "id": 199,
       "text": "¿Cuál es su momento favorito del día?",
       "type": "text"
+    },
+    {
+      "id": 200,
+      "text": "¿Sabe andar en bicicleta?",
+      "type": "boolean"
+    },
+    {
+      "id": 201,
+      "text": "¿Qué idioma extranjero le gustaría aprender a hablar con fluidez?",
+      "type": "text"
+    },
+    {
+      "id": 202,
+      "text": "¿Prefiere asiento de ventana o de pasillo al viajar?",
+      "type": "multiple",
+      "options": ["Ventana", "Pasillo", "Medio"]
+    },
+    {
+      "id": 203,
+      "text": "¿Cree en la existencia de vida extraterrestre?",
+      "type": "boolean"
+    },
+    {
+      "id": 204,
+      "text": "¿Cuál es su festividad o celebración favorita del año?",
+      "type": "text"
+    },
+    {
+      "id": 205,
+      "text": "¿Prefiere leer libros en formato físico o digital?",
+      "type": "multiple",
+      "options": ["Físico", "Digital", "Audiolibro"]
+    },
+    {
+      "id": 206,
+      "text": "¿Ha roto alguna vez un hueso de su cuerpo?",
+      "type": "boolean"
+    },
+    {
+      "id": 207,
+      "text": "¿Qué instrumento musical le encantaría saber tocar?",
+      "type": "text"
+    },
+    {
+      "id": 208,
+      "text": "¿Prefiere bañarse por la mañana o por la noche?",
+      "type": "multiple",
+      "options": ["Por la mañana", "Por la noche"]
+    },
+    {
+      "id": 209,
+      "text": "¿Suele recordar los sueños que tiene al dormir?",
+      "type": "boolean"
+    },
+    {
+      "id": 210,
+      "text": "¿Cuál es su museo favorito o el que más le gustaría visitar?",
+      "type": "text"
+    },
+    {
+      "id": 211,
+      "text": "¿Cuál es su juego de naipes o cartas favorito?",
+      "type": "text"
+    },
+    {
+      "id": 212,
+      "text": "¿Le gusta el arte abstracto?",
+      "type": "boolean"
+    },
+    {
+      "id": 213,
+      "text": "¿Cuál es la tarea doméstica que menos le molesta hacer?",
+      "type": "text"
+    },
+    {
+      "id": 214,
+      "text": "¿Cual de las siguientes prefiere?",
+      "type": "multiple",
+      "options": ["Escaleras", "Ascensor", "Escaleras mecánicas"]
+    },
+    {
+      "id": 215,
+      "text": "¿Alguna vez ha ganado un premio en un sorteo o lotería?",
+      "type": "boolean"
+    },
+    {
+      "id": 216,
+      "text": "¿Cuál es su fruta favorita?",
+      "type": "text"
+    },
+    {
+      "id": 217,
+      "text": "¿Prefiere el agua con gas o sin gas?",
+      "type": "multiple",
+      "options": ["Con gas", "Sin gas"]
+    },
+    {
+      "id": 218,
+      "text": "¿Le gusta el olor a tierra mojada después de llover?",
+      "type": "boolean"
+    },
+    {
+      "id": 219,
+      "text": "¿Qué país de Asia le llama más la atención visitar?",
+      "type": "text"
+    },
+    {
+      "id": 220,
+      "text": "¿Prefiere invertir su dinero en experiencias o en objetos materiales?",
+      "type": "multiple",
+      "options": ["Experiencias", "Objetos materiales", "Un equilibrio"]
+    },
+    {
+      "id": 221,
+      "text": "¿Se muerde las uñas cuando está nervioso?",
+      "type": "boolean"
+    },
+    {
+      "id": 222,
+      "text": "¿Cuál es su vegetal o verdura favorita?",
+      "type": "text"
+    },
+    {
+      "id": 223,
+      "text": "¿Prefiere la comida caliente, tibia o fría?",
+      "type": "multiple",
+      "options": ["Muy caliente", "Tibia", "Fría"]
+    },
+    {
+      "id": 224,
+      "text": "¿Cree en la suerte o el destino?",
+      "type": "boolean"
+    },
+    {
+      "id": 225,
+      "text": "¿Qué figura histórica le hubiese gustado conocer?",
+      "type": "text"
+    },
+    {
+      "id": 226,
+      "text": "¿Prefiere películas de ficción o documentales basados en hechos reales?",
+      "type": "multiple",
+      "options": ["Ficción", "Documentales"]
+    },
+    {
+      "id": 227,
+      "text": "¿Alguna vez ha saltado en paracaídas?",
+      "type": "boolean"
+    },
+    {
+      "id": 228,
+      "text": "¿Cuál es el mejor consejo que le han dado en la vida?",
+      "type": "text"
+    },
+    {
+      "id": 229,
+      "text": "¿Prefiere escribir a mano o teclear en un dispositivo?",
+      "type": "multiple",
+      "options": ["Escribir a mano", "Teclear"]
+    },
+    {
+      "id": 230,
+      "text": "¿Sabe nadar bien?",
+      "type": "boolean"
+    },
+    {
+      "id": 231,
+      "text": "¿Cuál es su raza de perro favorita?",
+      "type": "text"
+    },
+    {
+      "id": 232,
+      "text": "¿Prefiere viajar ligero de equipaje o llevar de todo por si acaso?",
+      "type": "multiple",
+      "options": ["Ligero", "De todo por si acaso"]
+    },
+    {
+      "id": 233,
+      "text": "¿Le gustan los parques de atracciones extremos?",
+      "type": "boolean"
+    },
+    {
+      "id": 234,
+      "text": "¿Qué época del pasado le gustaría visitar si pudiera viajar en el tiempo?",
+      "type": "text"
+    },
+    {
+      "id": 235,
+      "text": "¿Prefiere comprar en tiendas locales o en grandes cadenas de supermercados?",
+      "type": "multiple",
+      "options": ["Tiendas locales", "Grandes cadenas", "Ambas"]
+    },
+    {
+      "id": 236,
+      "text": "¿Ha donado sangre alguna vez?",
+      "type": "boolean"
+    },
+    {
+      "id": 237,
+      "text": "¿Cuál es el postre tradicional que mejor le sale o que más disfruta?",
+      "type": "text"
+    },
+    {
+      "id": 238,
+      "text": "¿Prefiere la luz cálida o la luz blanca/fría para su hogar?",
+      "type": "multiple",
+      "options": ["Luz cálida", "Luz blanca/fría"]
+    },
+    {
+      "id": 239,
+      "text": "¿Se considera una persona supersticiosa?",
+      "type": "boolean"
+    },
+    {
+      "id": 240,
+      "text": "¿Cuál es su tipo de flor favorita?",
+      "type": "text"
+    },
+    {
+      "id": 241,
+      "text": "¿Prefiere escuchar podcasts de entrevistas o narrativos?",
+      "type": "multiple",
+      "options": ["Entrevistas", "Narrativos", "No escucho podcasts"]
+    },
+    {
+      "id": 242,
+      "text": "¿Le gusta la comida agridulce?",
+      "type": "boolean"
+    },
+    {
+      "id": 243,
+      "text": "¿Qué nombre le pondría a un barco si tuviera uno?",
+      "type": "text"
+    },
+    {
+      "id": 244,
+      "text": "¿Prefiere el teatro o el cine?",
+      "type": "multiple",
+      "options": ["Teatro", "Cine"]
+    },
+    {
+      "id": 245,
+      "text": "¿Tiene alguna alergia conocida?",
+      "type": "boolean"
+    },
+    {
+      "id": 246,
+      "text": "¿Cuál es su obra de arte favorita?",
+      "type": "text"
+    },
+    {
+      "id": 247,
+      "text": "¿Prefiere usar zapatos, zapatillas deportivas o andar descalzo en casa?",
+      "type": "multiple",
+      "options": ["Zapatos", "Zapatillas", "Descalzo", "Pantuflas"]
+    },
+    {
+      "id": 248,
+      "text": "¿Sabe coser a mano?",
+      "type": "boolean"
+    },
+    {
+      "id": 249,
+      "text": "¿Qué materia escolar detestaba cuando era niño?",
+      "type": "text"
+    },
+    {
+      "id": 250,
+      "text": "¿Prefiere un masaje relajante o un masaje descontracturante fuerte?",
+      "type": "multiple",
+      "options": ["Relajante", "Descontracturante", "No me gustan los masajes"]
+    },
+    {
+      "id": 251,
+      "text": "¿Alguna vez ha escrito un poema?",
+      "type": "boolean"
+    },
+    {
+      "id": 252,
+      "text": "¿Cuál es el idioma que le suena más romántico?",
+      "type": "text"
+    },
+    {
+      "id": 253,
+      "text": "¿Prefiere la decoración minimalista o la decoración recargada (maximalista)?",
+      "type": "multiple",
+      "options": ["Minimalista", "Maximalista", "Intermedia"]
+    },
+    {
+      "id": 254,
+      "text": "¿colecciona algun objeto?",
+      "type": "boolean"
+    },
+    {
+      "id": 255,
+      "text": "¿Qué objeto de su infancia aún conserva con cariño?",
+      "type": "text"
+    },
+    {
+      "id": 256,
+      "text": "¿Prefiere despertarse con alarma de sonido o con luz natural?",
+      "type": "multiple",
+      "options": ["Alarma de sonido", "Luz natural", "Vibración"]
+    },
+    {
+      "id": 257,
+      "text": "¿Cree que la inteligencia artificial superará a la humana?",
+      "type": "boolean"
+    },
+    {
+      "id": 258,
+      "text": "¿Cuál es el mejor regalo que ha recibido en su vida?",
+      "type": "text"
+    },
+    {
+      "id": 259,
+      "text": "¿Prefiere usar reloj de pulsera tradicional o un reloj inteligente (smartwatch)?",
+      "type": "multiple",
+      "options": ["Tradicional", "Smartwatch", "No uso reloj"]
+    },
+    {
+      "id": 260,
+      "text": "¿Le gusta resolver crucigramas o sudokus?",
+      "type": "boolean"
+    },
+    {
+      "id": 261,
+      "text": "¿Cuál es su queso favorito?",
+      "type": "text"
+    },
+    {
+      "id": 262,
+      "text": "¿Prefiere las películas dobladas a su idioma o en idioma original con subtítulos?",
+      "type": "multiple",
+      "options": ["Dobladas", "Original con subtítulos", "Original sin subtítulos"]
+    },
+    {
+      "id": 263,
+      "text": "¿Tiene buen sentido de la orientación?",
+      "type": "boolean"
+    },
+    {
+      "id": 264,
+      "text": "¿Qué canción le gustaría que sonara en su funeral?",
+      "type": "text"
+    },
+    {
+      "id": 265,
+      "text": "¿Prefiere el pelo largo o el pelo corto?",
+      "type": "multiple",
+      "options": ["Pelo largo", "Pelo corto", "Rapado"]
+    },
+    {
+      "id": 266,
+      "text": "¿Sabe encender una fogata sin usar encendedor?",
+      "type": "boolean"
+    },
+    {
+      "id": 267,
+      "text": "¿Cuál es su escritor o autor favorito?",
+      "type": "text"
+    },
+    {
+      "id": 268,
+      "text": "¿Cuál es el electrodoméstico o aparato del hogar que más le facilita la vida?",
+      "type": "text"
+    },
+    {
+      "id": 269,
+      "text": "¿Es una persona que se marea fácilmente en los viajes?",
+      "type": "boolean"
+    },
+    {
+      "id": 270,
+      "text": "¿Cuál es el monumento famoso que más le ha impresionado?",
+      "type": "text"
+    },
+    {
+      "id": 271,
+      "text": "¿Prefiere la comida picante mexicana o la comida especiada india?",
+      "type": "multiple",
+      "options": ["Mexicana", "India", "Ninguna de las dos"]
+    },
+    {
+      "id": 272,
+      "text": "¿Le gusta la sensación de volar en avión?",
+      "type": "boolean"
+    },
+    {
+      "id": 273,
+      "text": "¿Cuál es el mito o leyenda urbana que más le asustaba de pequeño?",
+      "type": "text"
+    },
+    {
+      "id": 274,
+      "text": "¿Prefiere tener un coche manual o automático?",
+      "type": "multiple",
+      "options": ["Manual", "Automático", "Eléctrico", "No conduzco"]
+    },
+    {
+      "id": 275,
+      "text": "¿Sabe realizar primeros auxilios básicos?",
+      "type": "boolean"
+    },
+    {
+      "id": 276,
+      "text": "¿Qué tipo de arte prefiere: pintura, escultura o fotografía?",
+      "type": "text",
+      "options":["Pintura", "Escultura", "Fotografía"]
+    },
+    {
+      "id": 277,
+      "text": "¿Prefiere los juegos de mesa o los videojuegos de consola?",
+      "type": "multiple",
+      "options": ["Juegos de cartas", "Videojuegos", "Ambos"]
+    },
+    {
+      "id": 278,
+      "text": "¿Alguna vez ha adoptado a un animal callejero?",
+      "type": "boolean"
+    },
+    {
+      "id": 279,
+      "text": "¿Cuál es su sopa o crema favorita?",
+      "type": "text"
+    },
+    {
+      "id": 280,
+      "text": "¿Prefiere la pasta larga (espaguetis) o corta (macarrones)?",
+      "type": "multiple",
+      "options": ["Larga", "Corta"]
+    },
+    {
+      "id": 281,
+      "text": "¿Qué idioma antiguo o muerto le gustaría poder leer y comprender?",
+      "type": "text"
+    },
+    {
+      "id": 282,
+      "text": "¿Qué animal salvaje le gustaría poder domesticar?",
+      "type": "text"
+    },
+    {
+      "id": 283,
+      "text": "¿Prefiere escribir mensajes largos o mensajes cortos?",
+      "type": "multiple",
+      "options": ["Mensajes largos", "Mensajes cortos"]
+    },
+    {
+      "id": 284,
+      "text": "¿Ha participado alguna vez en una maratón o carrera deportiva?",
+      "type": "boolean"
+    },
+    {
+      "id": 285,
+      "text": "¿Cuál es su refrán o proverbio favorito?",
+      "type": "text"
+    },
+    {
+      "id": 286,
+      "text": "¿Prefiere comprar ropa nueva o de segunda mano?",
+      "type": "multiple",
+      "options": ["Nueva", "De segunda mano", "Combinar ambas"]
+    },
+    {
+      "id": 287,
+      "text": "¿Es capaz de tocarse los dedos de los pies sin doblar las rodillas?",
+      "type": "boolean"
+    },
+    {
+      "id": 288,
+      "text": "¿Qué habilidad inútil posee pero le divierte?",
+      "type": "text"
+    },
+    {
+      "id": 289,
+      "text": "¿Prefiere trabajar en un escritorio ordenado o en un 'caos organizado'?",
+      "type": "multiple",
+      "options": ["Ordenado", "Caos organizado"]
+    },
+    {
+      "id": 290,
+      "text": "¿Habla dormido?",
+      "type": "boolean"
+    },
+    {
+      "id": 291,
+      "text": "¿Cuál es la capital del mundo que más le fascina?",
+      "type": "text"
+    },
+    {
+      "id": 292,
+      "text": "¿Prefiere usar gafas de sol grandes o pequeñas?",
+      "type": "multiple",
+      "options": ["Grandes", "Pequeñas", "No uso gafas de sol"]
+    },
+    {
+      "id": 293,
+      "text": "¿Alguna vez ha buceado en el mar?",
+      "type": "boolean"
+    },
+    {
+      "id": 294,
+      "text": "¿Qué ingrediente nunca puede faltar en su cocina?",
+      "type": "text"
+    },
+    {
+      "id": 295,
+      "text": "¿Prefiere el cine de animación 2D clásico o el 3D moderno?",
+      "type": "multiple",
+      "options": ["2D clásico", "3D moderno"]
+    },
+    {
+      "id": 296,
+      "text": "¿Es una persona que llora con facilidad viendo películas?",
+      "type": "boolean"
+    },
+    {
+      "id": 297,
+      "text": "¿Cuál es su pan favorito?",
+      "type": "text"
+    },
+    {
+      "id": 298,
+      "text": "¿Prefiere viajar en crucero o hacer un viaje de mochilero?",
+      "type": "multiple",
+      "options": ["Crucero", "Mochilero"]
+    },
+    {
+      "id": 299,
+      "text": "¿Le gusta el olor a café recién hecho?",
+      "type": "boolean"
+    },
+    {
+      "id": 300,
+      "text": "¿Qué evento histórico le parece más interesante de estudiar?",
+      "type": "text"
+    },
+    {
+      "id": 301,
+      "text": "¿Prefiere usar bolígrafos de tinta azul o negra?",
+      "type": "multiple",
+      "options": ["Azul", "Negra"]
+    },
+    {
+      "id": 302,
+      "text": "¿Cree que la tecnología nos aísla en lugar de conectarnos?",
+      "type": "boolean"
+    },
+    {
+      "id": 303,
+      "text": "¿Cuál es su deporte de invierno favorito (para ver o practicar)?",
+      "type": "text"
+    },
+    {
+      "id": 304,
+      "text": "¿Prefiere las historias de vampiros, hombres lobo o zombis?",
+      "type": "multiple",
+      "options": ["Vampiros", "Hombres lobo", "Zombis"]
+    },
+    {
+      "id": 305,
+      "text": "¿Alguna vez ha hecho una locura por amor?",
+      "type": "boolean"
+    },
+    {
+      "id": 306,
+      "text": "¿Qué invento de la historia le parece el más importante?",
+      "type": "text"
+    },
+    {
+      "id": 307,
+      "text": "¿Prefiere la pizza con masa fina o masa gruesa?",
+      "type": "multiple",
+      "options": ["Masa fina", "Masa gruesa"]
+    },
+    {
+      "id": 308,
+      "text": "¿Le teme a los insectos o arañas?",
+      "type": "boolean"
+    },
+    {
+      "id": 309,
+      "text": "¿Cuál es el plato de comida internacional que más disfruta?",
+      "type": "text"
+    },
+    {
+      "id": 310,
+      "text": "¿Prefiere usar mochilas, bolsos cruzados o maletines?",
+      "type": "multiple",
+      "options": ["Mochilas", "Bolsos cruzados", "Maletines"]
+    },
+    {
+      "id": 311,
+      "text": "¿Es de los que lee el manual de instrucciones antes de usar algo?",
+      "type": "boolean"
+    },
+    {
+      "id": 312,
+      "text": "¿Qué superpoder inútil le gustaría tener?",
+      "type": "text"
+    },
+    {
+      "id": 313,
+      "text": "¿Prefiere bañarse con esponja o solo con jabón y las manos?",
+      "type": "multiple",
+      "options": ["Esponja", "Manos"]
+    },
+    {
+      "id": 314,
+      "text": "¿Prefiere la ropa con estampados, a rayas o de colores lisos?",
+      "type": "multiple",
+      "options": ["Estampados", "A rayas", "Colores lisos"]
+    },
+    {
+      "id": 315,
+      "text": "¿Cuál es el mejor concierto al que ha asistido?",
+      "type": "text"
+    },
+    {
+      "id": 316,
+      "text": "¿Prefiere las reuniones sociales de día o de noche?",
+      "type": "multiple",
+      "options": ["De día", "De noche"]
+    },
+    {
+      "id": 317,
+      "text": "¿Alguna vez ha experimentado un déjà vu?",
+      "type": "boolean"
+    },
+    {
+      "id": 318,
+      "text": "¿Qué idioma le parece el más difícil de aprender?",
+      "type": "text"
+    },
+    {
+      "id": 319,
+      "text": "¿Prefiere comprar libros o pedirlos prestados?",
+      "type": "multiple",
+      "options": ["Comprar", "Prestados", "No lee"]
+    },
+    {
+      "id": 320,
+      "text": "¿Le relaja escuchar el sonido de las olas del mar?",
+      "type": "boolean"
+    },
+    {
+      "id": 321,
+      "text": "¿Cuál es el nombre más hermoso que ha escuchado?",
+      "type": "text"
+    },
+    {
+      "id": 322,
+      "text": "¿Prefiere el clima húmedo y tropical o seco y desértico?",
+      "type": "multiple",
+      "options": ["Húmedo y tropical", "Seco y desértico"]
+    },
+    {
+      "id": 323,
+      "text": "¿Sabe jugar al ajedrez?",
+      "type": "boolean"
+    },
+    {
+      "id": 324,
+      "text": "¿Qué haría si encontrara una cartera llena de dinero en la calle?",
+      "type": "text"
+    },
+    {
+      "id": 325,
+      "text": "¿Prefiere los parques con muchos árboles o las plazas con arquitectura urbana?",
+      "type": "multiple",
+      "options": ["Parques con árboles", "Plazas urbanas"]
+    },
+    {
+      "id": 326,
+      "text": "¿Ha visto alguna vez una estrella fugaz?",
+      "type": "boolean"
+    },
+    {
+      "id": 327,
+      "text": "¿Cuál es su cuento de hadas o fábula favorita?",
+      "type": "text"
+    },
+    {
+      "id": 328,
+      "text": "¿Prefiere hacer regalos útiles o regalos emocionales/simbólicos?",
+      "type": "multiple",
+      "options": ["Útiles", "Emocionales"]
+    },
+    {
+      "id": 329,
+      "text": "¿Se considera una persona que perdona rápido?",
+      "type": "boolean"
+    },
+    {
+      "id": 330,
+      "text": "¿Cuál es la parte de su cuerpo que más le gusta?",
+      "type": "text"
+    },
+    {
+      "id": 331,
+      "text": "¿Prefiere las cortinas o las persianas en las ventanas?",
+      "type": "multiple",
+      "options": ["Cortinas", "Persianas"]
+    },
+    {
+      "id": 332,
+      "text": "¿Le gusta la música clásica?",
+      "type": "boolean"
+    },
+    {
+      "id": 333,
+      "text": "¿Qué profesión le parece la más difícil del mundo?",
+      "type": "text"
+    },
+    {
+      "id": 334,
+      "text": "¿Prefiere comer la fruta entera o en jugo/zumo?",
+      "type": "multiple",
+      "options": ["Entera", "En jugo"]
+    },
+    {
+      "id": 335,
+      "text": "¿Alguna vez ha estado en televisión o radio?",
+      "type": "boolean"
+    },
+    {
+      "id": 336,
+      "text": "¿Qué idioma antiguo o muerto le gustaría poder leer y comprender?",
+      "type": "text"
+    },
+    {
+      "id": 337,
+      "text": "¿Prefiere las alfombras en casa o el suelo descubierto?",
+      "type": "multiple",
+      "options": ["Alfombras", "Suelo descubierto"]
+    },
+    {
+      "id": 338,
+      "text": "¿Le gusta el olor de las páginas de los libros nuevos?",
+      "type": "boolean"
+    },
+    {
+      "id": 339,
+      "text": "¿Cuál es el misterio del universo que más le intriga?",
+      "type": "text"
+    },
+    {
+      "id": 340,
+      "text": "¿Prefiere el pollo a la parrilla, frito o al horno?",
+      "type": "multiple",
+      "options": ["A la parrilla", "Frito", "Al horno", "No como pollo"]
+    },
+    {
+      "id": 341,
+      "text": "¿Es usted zurdo o diestro?",
+      "type": "boolean"
+    },
+    {
+      "id": 342,
+      "text": "¿Qué nombre de banda de música le parece el más original?",
+      "type": "text"
+    },
+    {
+      "id": 343,
+      "text": "¿Prefiere ver películas en pantalla grande (TV/Cine) o en su Movil/laptop?",
+      "type": "multiple",
+      "options": ["Pantalla grande", "Tablet/Laptop"]
+    },
+    {
+      "id": 344,
+      "text": "¿Le gusta hacer manualidades o artesanías?",
+      "type": "boolean"
+    },
+    {
+      "id": 345,
+      "text": "¿Cuál es el olor que automáticamente le transporta a su infancia?",
+      "type": "text"
+    },
+    {
+      "id": 346,
+      "text": "¿Prefiere los zapatos con cordones, velcro o sin cierre?",
+      "type": "multiple",
+      "options": ["Cordones", "Velcro", "sin cierre"]
+    },
+    {
+      "id": 347,
+      "text": "¿Alguna vez ha ganado un trofeo o medalla?",
+      "type": "boolean"
+    },
+    {
+      "id": 348,
+      "text": "¿Cuál es su bebida caliente favorita?",
+      "type": "text"
+    },
+    {
+      "id": 349,
+      "text": "¿Prefiere los chistes de humor negro o el humor blanco?",
+      "type": "multiple",
+      "options": ["Humor negro", "Humor blanco"]
+    },
+    {
+      "id": 350,
+      "text": "¿Se considera fotogénico?",
+      "type": "boolean"
+    },
+    {
+      "id": 351,
+      "text": "¿Qué habilidad le gustaría dominar al 100% (ej. cocina, baile, programación)?",
+      "type": "text"
+    },
+    {
+      "id": 352,
+      "text": "¿Prefiere las ferias de comida, los restaurantes o la comida callejera?",
+      "type": "multiple",
+      "options": ["Ferias", "Restaurantes", "Comida callejera"]
+    },
+    {
+      "id": 353,
+      "text": "¿Le gusta la mermelada de frutas?",
+      "type": "boolean"
+    },
+    {
+      "id": 354,
+      "text": "¿Cuál es su constelación favorita en el cielo nocturno?",
+      "type": "text"
+    },
+    {
+      "id": 355,
+      "text": "¿le gusta el té?",
+      "type": "boolean"
+    },
+    {
+      "id": 356,
+      "text": "¿Alguna vez ha compuesto una canción?",
+      "type": "boolean"
+    },
+    {
+      "id": 357,
+      "text": "¿Cuál es la prenda de vestir más vieja que aún conserva en su armario?",
+      "type": "text"
+    },
+    {
+      "id": 358,
+      "text": "¿Prefiere viajar en asiento trasero o ser el copiloto?",
+      "type": "multiple",
+      "options": ["Asiento trasero", "Copiloto"]
+    },
+    {
+      "id": 359,
+      "text": "¿Cree que los seres humanos llegarán a vivir en Marte?",
+      "type": "boolean"
+    },
+    {
+      "id": 360,
+      "text": "¿Cuál es su corte de carne favorito?",
+      "type": "text"
+    },
+    {
+      "id": 361,
+      "text": "¿Le gusta los frutos secos?",
+      "type": "boolean"
+    },
+    {
+      "id": 362,
+      "text": "¿Tiene alguna cicatriz con una historia interesante?",
+      "type": "boolean"
+    },
+    {
+      "id": 363,
+      "text": "¿Qué deporte le parece el más aburrido de ver en televisión?",
+      "type": "text"
+    },
+    {
+      "id": 364,
+      "text": "¿Prefiere las bufandas tejidas o los gorros para el frío?",
+      "type": "multiple",
+      "options": ["Bufandas", "Gorros"]
+    },
+    {
+      "id": 365,
+      "text": "¿Le gustan los juegos de realidad virtual?",
+      "type": "boolean"
+    },
+    {
+      "id": 366,
+      "text": "¿Cuál es el electrodoméstico o aparato del hogar que más le facilita la vida?",
+      "type": "text"
+    },
+    {
+      "id": 367,
+      "text": "¿Prefiere usar jabón en barra o jabón líquido para bañarse?",
+      "type": "multiple",
+      "options": ["En barra", "Líquido"]
+    },
+    {
+      "id": 368,
+      "text": "¿Alguna vez ha pintado las paredes de su propia casa?",
+      "type": "boolean"
+    },
+    {
+      "id": 369,
+      "text": "¿Cuál es el dialecto o acento regional que más le gusta escuchar?",
+      "type": "text"
+    },
+    {
+      "id": 370,
+      "text": "¿Prefiere usar emojis o stickers en sus conversaciones?",
+      "type": "multiple",
+      "options": ["Emojis", "Stickers", "Texto plano"]
+    },
+    {
+      "id": 371,
+      "text": "¿Le gusta la sensación de la arena en los pies?",
+      "type": "boolean"
+    },
+    {
+      "id": 372,
+      "text": "¿Qué libro le obligaron a leer en la escuela y terminó amando?",
+      "type": "text"
+    },
+    {
+      "id": 373,
+      "text": "¿Prefiere las papas fritas, asadas o en puré?",
+      "type": "multiple",
+      "options": ["Fritas", "Asadas", "Puré"]
+    },
+    {
+      "id": 374,
+      "text": "¿Tiene buena memoria para recordar fechas de cumpleaños?",
+      "type": "boolean"
+    },
+    {
+      "id": 375,
+      "text": "¿Cuál es el peor trabajo que ha tenido o que se imagina teniendo?",
+      "type": "text"
+    },
+    {
+      "id": 376,
+      "text": "¿Prefiere leer noticias en portales de internet o ver los noticieros en televisión?",
+      "type": "multiple",
+      "options": ["Portales de internet", "Noticieros de televisión", "No sigo las noticias"]
+    },
+    {
+      "id": 377,
+      "text": "¿Alguna vez se ha perdido en una ciudad extranjera?",
+      "type": "boolean"
+    },
+    {
+      "id": 378,
+      "text": "¿Cuál es su salsa favorita para acompañar comidas (ej. kétchup, mayonesa)?",
+      "type": "text"
+    },
+    {
+      "id": 379,
+      "text": "¿Prefiere los relojes analógicos o digitales?",
+      "type": "multiple",
+      "options": ["Analógicos", "Digitales"]
+    },
+    {
+      "id": 380,
+      "text": "¿Es capaz de silbar fuerte?",
+      "type": "boolean"
+    },
+    {
+      "id": 381,
+      "text": "¿Qué película ha visto más de cinco veces?",
+      "type": "text"
+    },
+    {
+      "id": 382,
+      "text": "¿Prefiere un jardín lleno de flores o un huerto con vegetales?",
+      "type": "multiple",
+      "options": ["Jardín de flores", "Huerto", "Jardín zen/piedras"]
+    },
+    {
+      "id": 383,
+      "text": "¿Cree que el dinero puede comprar la felicidad?",
+      "type": "boolean"
+    },
+    {
+      "id": 384,
+      "text": "¿Cuál es el mejor documental sobre naturaleza que ha visto?",
+      "type": "text"
+    },
+    {
+      "id": 385,
+      "text": "¿Prefiere usar paraguas o impermeable cuando llueve?",
+      "type": "multiple",
+      "options": ["Paraguas", "Impermeable"]
+    },
+    {
+      "id": 386,
+      "text": "¿Alguna vez ha ido a pescar?",
+      "type": "boolean"
+    },
+    {
+      "id": 387,
+      "text": "¿Cuál es su raza de gato favorita?",
+      "type": "text"
+    },
+    {
+      "id": 388,
+      "text": "¿Prefiere las camas altas o los colchones casi a ras del suelo?",
+      "type": "multiple",
+      "options": ["Camas altas", "A ras del suelo"]
+    },
+    {
+      "id": 389,
+      "text": "¿Le gustan los juegos de escape room (salas de escape)?",
+      "type": "boolean"
+    },
+    {
+      "id": 390,
+      "text": "¿Cuál es el mejor refrán que aplica a su vida diaria?",
+      "type": "text"
+    },
+    {
+      "id": 391,
+      "text": "¿Prefiere comer sándwiches en pan de molde o en pan tipo baguette?",
+      "type": "multiple", 
+      "options": ["Pan de molde", "Baguette"]
+    },
+    {
+      "id": 392,
+      "text": "¿Ha cantado alguna vez en un coro?",
+      "type": "boolean"
+    },
+    {
+      "id": 393,
+      "text": "¿Qué canción le gustaría saber cantar a la perfección?",
+      "type": "text"
+    },
+    {
+      "id": 394,
+      "text": "¿Prefiere tener un calendario físico en la pared o digital en su celular?",
+      "type": "multiple",
+      "options": ["Físico", "Digital"]
+    },
+    {
+      "id": 395,
+      "text": "¿Le gusta la sensación de velocidad en los vehículos?",
+      "type": "boolean"
+    },
+    {
+      "id": 396,
+      "text": "¿Qué costumbre de otra cultura le gustaría que se adoptara en su país?",
+      "type": "text"
+    },
+    {
+      "id": 397,
+      "text": "¿Prefiere la luz del sol directa o la sombra fresca bajo un árbol?",
+      "type": "multiple",
+      "options": ["Sol directo", "Sombra"]
+    },
+    {
+      "id": 398,
+      "text": "¿Sabe hacer malabares?",
+      "type": "boolean"
+    },
+    {
+      "id": 399,
+      "text": "¿Cuál es el nombre de su estrella o galaxia preferida?",
+      "type": "text"
+    },
+    {
+      "id": 400,
+      "text": "¿Prefiere los libros de historia o de filosofía?",
+      "type": "multiple",
+      "options": ["Historia", "Filosofía"]
+    },
+    {
+      "id": 401,
+      "text": "¿Alguna vez ha encontrado un trébol de cuatro hojas?",
+      "type": "boolean"
+    },
+    {
+      "id": 402,
+      "text": "¿Qué fruta considera que es la más difícil de pelar?",
+      "type": "text"
+    },
+    {
+      "id": 403,
+      "text": "¿Prefiere el diseño de interiores rústico o industrial?",
+      "type": "multiple",
+      "options": ["Rústico", "Industrial"]
+    },
+    {
+      "id": 404,
+      "text": "¿Le gusta el acento británico en inglés?",
+      "type": "boolean"
+    },
+    {
+      "id": 405,
+      "text": "¿Cuál es su tipo de ensalada favorita?",
+      "type": "text"
+    },
+    {
+      "id": 406,
+      "text": "¿Prefiere cocinar postres horneados o fríos (sin horno)?",
+      "type": "multiple",
+      "options": ["Horneados", "Fríos", "Comprarlos hechos"]
+    },
+    {
+      "id": 407,
+      "text": "¿Tiene alguna planta viva en su habitación?",
+      "type": "boolean"
+    },
+    {
+      "id": 408,
+      "text": "¿Qué animal considera que es su 'animal espiritual'?",
+      "type": "text"
+    },
+    {
+      "id": 409,
+      "text": "¿Prefiere los zapatos de colores neutros o de colores llamativos?",
+      "type": "multiple",
+      "options": ["Neutros", "Llamativos"]
+    },
+    {
+      "id": 410,
+      "text": "¿Cree en el karma?",
+      "type": "boolean"
+    },
+    {
+      "id": 411,
+      "text": "¿Cuál es el programa de concurso de televisión en el que le gustaría participar?",
+      "type": "text"
+    },
+    {
+      "id": 412,
+      "text": "¿Prefiere el jamón serrano o el jamón cocido (York)?",
+      "type": "multiple",
+      "options": ["Serrano/Curado", "Cocido", "No como carne"]
+    },
+    {
+      "id": 413,
+      "text": "¿Sabe utilizar los palillos chinos para comer?",
+      "type": "boolean"
+    },
+    {
+      "id": 414,
+      "text": "¿Qué mito histórico le desilusionó saber que era falso?",
+      "type": "text"
+    },
+    {
+      "id": 415,
+      "text": "¿Prefiere los chicles de menta o de frutas?",
+      "type": "multiple",
+      "options": ["Menta", "Frutas"]
+    },
+    {
+      "id": 416,
+      "text": "¿Le gusta caminar descalzo por el césped?",
+      "type": "boolean"
+    },
+    {
+      "id": 417,
+      "text": "¿Cuál es el plato que cocina cuando quiere impresionar a alguien?",
+      "type": "text"
+    },
+    {
+      "id": 418,
+      "text": "¿Prefiere lavar los platos a mano o usar el lavavajillas?",
+      "type": "multiple",
+      "options": ["A mano", "Lavavajillas"]
+    },
+    {
+      "id": 419,
+      "text": "¿Alguna vez ha leído un libro de más de 1000 páginas?",
+      "type": "boolean"
+    },
+    {
+      "id": 420,
+      "text": "¿Qué nombre de país le parece el más sonoro o bonito?",
+      "type": "text"
+    },
+    {
+      "id": 421,
+      "text": "¿Prefiere hacer compras por la mañana temprano o a última hora de la tarde?",
+      "type": "multiple",
+      "options": ["Mañana temprano", "Última hora"]
+    },
+    {
+      "id": 422,
+      "text": "¿Es una persona que ronca al dormir?",
+      "type": "boolean"
+    },
+    {
+      "id": 423,
+      "text": "¿Cuál es su tipo de pasta italiana favorita (ej. carbonara, pesto, boloñesa)?",
+      "type": "text"
+    },
+    {
+      "id": 424,
+      "text": "¿Prefiere los relojes de correa de cuero o metálica?",
+      "type": "multiple",
+      "options": ["Cuero", "Metálica", "Silicona/Goma"]
+    },
+    {
+      "id": 425,
+      "text": "¿Alguna vez se ha subido a un helicóptero?",
+      "type": "boolean"
+    },
+    {
+      "id": 426,
+      "text": "¿Qué instrumento de percusión le gusta más?",
+      "type": "text"
+    },
+    {
+      "id": 427,
+      "text": "¿Prefiere el queso derretido o en trozos sólidos?",
+      "type": "multiple",
+      "options": ["Derretido", "Sólido"]
+    },
+    {
+      "id": 428,
+      "text": "¿Ha llorado de risa alguna vez?",
+      "type": "boolean"
+    },
+    {
+      "id": 429,
+      "text": "¿Cuál es su festival de música favorito en el mundo?",
+      "type": "text"
+    },
+    {
+      "id": 430,
+      "text": "¿Prefiere la pintura al óleo o las acuarelas?",
+      "type": "multiple",
+      "options": ["Óleo", "Acuarelas"]
+    },
+    {
+      "id": 431,
+      "text": "¿Le gustan los documentales sobre crímenes reales (True Crime)?",
+      "type": "boolean"
+    },
+    {
+      "id": 432,
+      "text": "¿Qué animal mitológico le gustaría que existiera?",
+      "type": "text"
+    },
+    {
+      "id": 433,
+      "text": "¿Cual de los masajes prefiere?",
+      "type": "multiple",
+      "options": ["Espalda", "Pies", "Cuello/Cabeza"]
+    },
+    {
+      "id": 434,
+      "text": "¿Alguna vez ha plantado un árbol?",
+      "type": "boolean"
+    },
+    {
+      "id": 435,
+      "text": "¿Qué personaje histórico considera un héroe incomprendido?",
+      "type": "text"
+    },
+    {
+      "id": 436,
+      "text": "¿Prefiere las historias contadas en primera persona o en tercera persona?",
+      "type": "multiple",
+      "options": ["Primera persona", "Tercera persona"]
+    },
+    {
+      "id": 437,
+      "text": "¿Le gusta la sensación de crujir sus nudillos?",
+      "type": "boolean"
+    },
+    {
+      "id": 438,
+      "text": "¿Cuál es el mejor consejo financiero que ha escuchado?",
+      "type": "text"
+    },
+    {
+      "id": 439,
+      "text": "¿Prefiere tener la temperatura de la habitación fresca y usar mantas, o cálida sin usar mantas?",
+      "type": "multiple",
+      "options": ["Fresca con mantas", "Cálida sin mantas"]
+    },
+    {
+      "id": 440,
+      "text": "¿A armado un lego?",
+      "type": "boolean"
+    },
+    {
+      "id": 441,
+      "text": "¿Qué deporte olímpico le gustaría dominar?",
+      "type": "text"
+    },
+    {
+      "id": 442,
+      "text": "¿Prefiere las casas de un solo piso o de varios pisos?",
+      "type": "multiple",
+      "options": ["Un piso", "Varios pisos"]
+    },
+    {
+      "id": 443,
+      "text": "¿Alguna vez se ha cortado el cabello a sí mismo?",
+      "type": "boolean"
+    },
+    {
+      "id": 444,
+      "text": "¿Cuál es su tipo de panadería dulce favorita (ej. cruasán, dona)?",
+      "type": "text"
+    },
+    {
+      "id": 445,
+      "text": "¿Prefiere las tormentas eléctricas o la lluvia silenciosa?",
+      "type": "multiple",
+      "options": ["Tormentas eléctricas", "Lluvia silenciosa"]
+    },
+    {
+      "id": 446,
+      "text": "¿Cree en las almas gemelas?",
+      "type": "boolean"
+    },
+    {
+      "id": 447,
+      "text": "¿Cuál es su canal de televisión documental favorito (ej. NatGeo, Discovery)?",
+      "type": "text"
+    },
+    {
+      "id": 448,
+      "text": "¿Prefiere los muebles de madera clara o de madera oscura?",
+      "type": "multiple",
+      "options": ["Madera clara", "Madera oscura"]
+    },
+    {
+      "id": 449,
+      "text": "¿Le gusta hacer crucigramas en papel?",
+      "type": "boolean"
+    },
+    {
+      "id": 450,
+      "text": "¿Qué habilidad social considera que es su punto fuerte?",
+      "type": "text"
+    },
+    {
+      "id": 451,
+      "text": "¿Prefiere viajar en grupo organizado o explorar por su cuenta?",
+      "type": "multiple",
+      "options": ["Grupo organizado", "Por mi cuenta", "Grupos pequeños de amigos"]
+    },
+    {
+      "id": 452,
+      "text": "¿Ha estado alguna vez en un globo aerostático?",
+      "type": "boolean"
+    },
+    {
+      "id": 453,
+      "text": "¿A armado un rompecabezas?",
+      "type": "boolean"
+    },
+    {
+      "id": 454,
+      "text": "¿Prefiere los anillos, los collares o las pulseras?",
+      "type": "multiple",
+      "options": ["Anillos", "Collares", "Pulseras"]
+    },
+    {
+      "id": 455,
+      "text": "¿Le gusta la sensación del agua fría después de hacer ejercicio?",
+      "type": "boolean"
+    },
+    {
+      "id": 456,
+      "text": "¿Cuál es el libro de no-ficción que más ha impactado su forma de pensar?",
+      "type": "text"
+    },
+    {
+      "id": 457,
+      "text": "¿Prefiere ver películas en versión extendida (Director's cut) o la versión de cine regular?",
+      "type": "multiple",
+      "options": ["Versión extendida", "Versión de cine", "Me da igual"]
+    },
+    {
+      "id": 458,
+      "text": "¿Se considera hábil para negociar precios o regatear?",
+      "type": "boolean"
+    },
+    {
+      "id": 459,
+      "text": "¿Qué estilo arquitectónico le fascina más (ej. Gótico, Modernista, Colonial)?",
+      "type": "text"
+    },
+    {
+      "id": 460,
+      "text": "¿Prefiere comer en platos hondos o llanos?",
+      "type": "multiple",
+      "options": ["Hondos", "Llanos"]
+    },
+    {
+      "id": 461,
+      "text": "¿Alguna vez ha donado cabello?",
+      "type": "boolean"
+    },
+    {
+      "id": 462,
+      "text": "¿Qué raza de caballo le parece la más majestuosa?",
+      "type": "text"
+    },
+    {
+      "id": 463,
+      "text": "¿Prefiere las libretas con hojas de rayas, cuadrícula o en blanco?",
+      "type": "multiple",
+      "options": ["Rayas", "Cuadrícula", "En blanco"]
+    },
+    {
+      "id": 464,
+      "text": "¿Sabe encender carbón para una parrillada (asado)?",
+      "type": "boolean"
+    },
+    {
+      "id": 465,
+      "text": "¿Cuál es el acento en español que más le divierte o le gusta?",
+      "type": "text"
+    },
+    {
+      "id": 466,
+      "text": "¿Prefiere los parques acuáticos o los parques de trampolines?",
+      "type": "multiple",
+      "options": ["Parques acuáticos", "Parques de trampolines", "Ninguno"]
+    },
+    {
+      "id": 467,
+      "text": "¿Alguna vez ha cabalgado a caballo en la playa?",
+      "type": "boolean"
+    },
+    {
+      "id": 468,
+      "text": "¿Qué ingrediente de la pizza no soporta?",
+      "type": "text"
+    },
+    {
+      "id": 469,
+      "text": "¿Prefiere el yogurt natural, dulce o con trozos de fruta?",
+      "type": "multiple",
+      "options": ["Natural", "Dulce/Saborizado", "Con trozos de fruta"]
+    },
+    {
+      "id": 470,
+      "text": "¿Le relaja ver videos de ASMR?",
+      "type": "boolean"
+    },
+    {
+      "id": 471,
+      "text": "¿Cuál es su revista favorita (física o digital)?",
+      "type": "text"
+    },
+    {
+      "id": 472,
+      "text": "¿Prefiere hacer ejercicios con pesas o usar su propio peso corporal (calistenia)?",
+      "type": "multiple",
+      "options": ["Pesas", "Peso corporal"]
+    },
+    {
+      "id": 473,
+      "text": "¿Alguna vez ha encontrado un mensaje en una botella o escrito uno?",
+      "type": "boolean"
+    },
+    {
+      "id": 474,
+      "text": "¿Qué teoría de conspiración le resulta más entretenida (aunque no la crea)?",
+      "type": "text"
+    },
+    {
+      "id": 475,
+      "text": "¿Prefiere las bodas grandes y lujosas o íntimas y sencillas?",
+      "type": "multiple",
+      "options": ["Grandes", "Íntimas"]
+    },
+    {
+      "id": 476,
+      "text": "¿Ha aprendido alguna vez algo útil viendo tutoriales en internet?",
+      "type": "boolean"
+    },
+    {
+      "id": 477,
+      "text": "¿Cuál es su marca o sabor de chocolate en barra preferido?",
+      "type": "text"
+    },
+    {
+      "id": 478,
+      "text": "¿Prefiere las toallas de baño muy ásperas o muy suaves?",
+      "type": "multiple",
+      "options": ["Ásperas", "Suaves"]
+    },
+    {
+      "id": 479,
+      "text": "¿Se considera un experto armando tiendas de campaña?",
+      "type": "boolean"
+    },
+    {
+      "id": 480,
+      "text": "¿Qué palabra en otro idioma le gustaría que existiera en español?",
+      "type": "text"
+    },
+    {
+      "id": 481,
+      "text": "¿Alguna vez ha practicado esquí o snowboard?",
+      "type": "boolean"
+    },
+    {
+      "id": 482,
+      "text": "¿Le gusta el diseño de ropa con estampados florales?",
+      "type": "boolean"
+    },
+    {
+      "id": 483,
+      "text": "¿Cuál es la tarea de jardinería que más le gusta (ej. regar, podar)?",
+      "type": "text"
+    },
+    {
+      "id": 484,
+      "text": "¿Prefiere las películas de zombies o las de alienígenas?",
+      "type": "multiple",
+      "options": ["Zombies", "Alienígenas"]
+    },
+    {
+      "id": 485,
+      "text": "¿Ha escrito alguna vez un diario personal?",
+      "type": "boolean"
+    },
+    {
+      "id": 486,
+      "text": "¿Qué tipo de madera prefiere para el olor (ej. pino, cedro, roble)?",
+      "type": "text"
+    },
+    {
+      "id": 487,
+      "text": "¿Prefiere usar audífonos de diadema (grandes) o intrauditivos (pequeños)?",
+      "type": "multiple",
+      "options": ["De diadema", "Intrauditivos"]
+    },
+    {
+      "id": 488,
+      "text": "¿Le gusta el ruido blanco para concentrarse?",
+      "type": "boolean"
+    },
+    {
+      "id": 489,
+      "text": "¿Cuál es la constelación o planeta que más rápido reconoce en el cielo?",
+      "type": "text"
+    },
+    {
+      "id": 490,
+      "text": "¿Prefiere el arte hiperrealista o el impresionista?",
+      "type": "multiple",
+      "options": ["Hiperrealista", "Impresionista"]
+    },
+    {
+      "id": 491,
+      "text": "¿Alguna vez ha cocinado sobre fuego de leña?",
+      "type": "boolean"
+    },
+    {
+      "id": 492,
+      "text": "¿Qué insecto le parece el más fascinante por su comportamiento?",
+      "type": "text"
+    },
+    {
+      "id": 493,
+      "text": "¿Prefiere los juegos de mesa colaborativos o competitivos?",
+      "type": "multiple",
+      "options": ["Colaborativos", "Competitivos"]
+    },
+    {
+      "id": 494,
+      "text": "¿Le gusta la sensación de la ropa recién salida de la secadora?",
+      "type": "boolean"
+    },
+    {
+      "id": 495,
+      "text": "¿Cuál es su fuente o tipografía favorita (ej. Arial, Times New Roman, Comic Sans)?",
+      "type": "text"
+    },
+    {
+      "id": 496,
+      "text": "¿Prefiere las piscinas con agua climatizada o agua a temperatura ambiente?",
+      "type": "multiple",
+      "options": ["Climatizada", "Temperatura ambiente"]
+    },
+    {
+      "id": 497,
+      "text": "¿Alguna vez ha ganado un torneo deportivo, por pequeño que sea?",
+      "type": "boolean"
+    },
+    {
+      "id": 498,
+      "text": "¿Qué ruido cotidiano le resulta más molesto (ej. tráfico, obras, masticar)?",
+      "type": "text"
+    },
+    {
+      "id": 499,
+      "text": "¿Prefiere el olor a vainilla, a lavanda o a cítricos para su hogar?",
+      "type": "multiple",
+      "options": ["Vainilla", "Lavanda", "Cítricos"]
+    },
+    {
+      "id": 500,
+      "text": "¿Se considera una persona que sabe guardar un secreto?",
+      "type": "boolean"
     }
   ]
 }

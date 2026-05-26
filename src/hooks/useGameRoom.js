@@ -1,233 +1,223 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import questionsData from "../assets/questions_es.json";
 import storage from "../services/storage.js";
+import { roomApi } from "../services/roomApi.js";
+import {
+  GAME_STATE,
+  ROOM_STATUS,
+  PLAYER_ROLE,
+  GAME_MODE,
+  DEFAULT_GAME_CONFIG,
+  POLLING_INTERVAL_MS,
+  TOAST_DURATION_MS,
+  ROOM_TTL_SECONDS,
+} from "../constants/game.js";
+import {
+  saveSession,
+  clearSession,
+  saveAnsweredQuestions,
+  loadAnsweredQuestions,
+} from "../utils/session.js";
+import {
+  shuffleArray,
+  generateRoomCode,
+  generateId,
+  derivePlayerRole,
+  isPlayerInRoom,
+  buildInitialScoresAndAnswers,
+} from "../utils/room.js";
 
 const GENERIC_QUESTIONS = questionsData.genericas;
 
-const BASE_URL = import.meta.env.VITE_SERVER_URL
-  ? `${import.meta.env.VITE_SERVER_URL}/api/room`
-  : "/api/room";
-
-// ─── Sesión persistente ───────────────────────────────────────────────────────
-const SESSION_KEY = "vr_session";
-const ANSWERED_KEY = "vr_answered";
-
-function saveSession(data) {
-  try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch (_) {}
+function buildRoomKey(code) {
+  return `room_${code}`;
 }
 
-function loadSession() {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (_) { return null; }
-}
-
-function clearSession() {
-  try {
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem(ANSWERED_KEY);
-  } catch (_) {}
-}
-
-function saveAnsweredQuestions(roomCode, set) {
-  try {
-    localStorage.setItem(
-      `${ANSWERED_KEY}_${roomCode}`,
-      JSON.stringify([...set])
-    );
-  } catch (_) {}
-}
-
-function loadAnsweredQuestions(roomCode) {
-  try {
-    const raw = localStorage.getItem(`${ANSWERED_KEY}_${roomCode}`);
-    return raw ? new Set(JSON.parse(raw)) : new Set();
-  } catch (_) { return new Set(); }
-}
-
-export const DEFAULT_CONFIG = {
-  rounds: 10,
-  pointsPerAnswer: 1,
-  penaltyEnabled: false,
-  customPointsEnabled: false,
-  mode: "generic",
-};
-
-function shuffleArray(array) {
-  const out = [...array];
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-function generateRoomCode() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-async function apiPost(path, body) {
-  const res = await fetch(`${BASE_URL}/${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || res.statusText);
-  }
-  return res.json();
+function selectQuestions(config) {
+  if (config.mode === GAME_MODE.CUSTOM) return [];
+  return shuffleArray(GENERIC_QUESTIONS).slice(0, config.rounds);
 }
 
 export default function useGameRoom() {
-  const [gameState, setGameState]                 = useState("menu");
-  const [roomCode, setRoomCode]                   = useState("");
-  const [playerName, setPlayerName]               = useState("");
-  const [playerRole, setPlayerRole]               = useState(null);
-  const [currentRoom, setCurrentRoom]             = useState(null);
-  const [loading, setLoading]                     = useState(false);
+  const [gameState, setGameState] = useState(GAME_STATE.MENU);
+  const [roomCode, setRoomCode] = useState("");
+  const [playerName, setPlayerName] = useState("");
+  const [playerRole, setPlayerRole] = useState(null);
+  const [currentRoom, setCurrentRoom] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
-  const [gameConfig, setGameConfig]               = useState(DEFAULT_CONFIG);
-  const [reconnecting, setReconnecting]           = useState(false);
-  // Toast error state
-  const [errorMsg, setErrorMsg]                   = useState(null);
+  const [gameConfig, setGameConfig] = useState(DEFAULT_GAME_CONFIG);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  function showError(msg) {
+  // Stable refs so polling callbacks don't need to be recreated
+  const stateRef = useRef({
+    roomCode: "",
+    currentRoom: null,
+    gameState: GAME_STATE.MENU,
+    playerRole: null,
+    playerName: "",
+  });
+
+  useEffect(() => { stateRef.current.roomCode = roomCode; }, [roomCode]);
+  useEffect(() => { stateRef.current.currentRoom = currentRoom; }, [currentRoom]);
+  useEffect(() => { stateRef.current.gameState = gameState; }, [gameState]);
+  useEffect(() => { stateRef.current.playerRole = playerRole; }, [playerRole]);
+  useEffect(() => { stateRef.current.playerName = playerName; }, [playerName]);
+
+  const showError = useCallback((msg) => {
     setErrorMsg(msg);
-    setTimeout(() => setErrorMsg(null), 4000);
-  }
+    setTimeout(() => setErrorMsg(null), TOAST_DURATION_MS);
+  }, []);
 
-  const refs = {
-    roomCode:    useRef(roomCode),
-    currentRoom: useRef(currentRoom),
-    gameState:   useRef(gameState),
-    playerRole:  useRef(playerRole),
-    playerName:  useRef(playerName),
-  };
-  useEffect(() => { refs.roomCode.current    = roomCode;    }, [roomCode]);
-  useEffect(() => { refs.currentRoom.current = currentRoom; }, [currentRoom]);
-  useEffect(() => { refs.gameState.current   = gameState;   }, [gameState]);
-  useEffect(() => { refs.playerRole.current  = playerRole;  }, [playerRole]);
-  useEffect(() => { refs.playerName.current  = playerName;  }, [playerName]);
-
-  // ── Polling: dependencias estables via refs ──────────────────────────────
+  // ── Polling ──────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (gameState === "menu" || !roomCode) return;
-    const timer = setInterval(loadRoom, 3000);
+    if (gameState === GAME_STATE.MENU || !roomCode) return;
+    const timer = setInterval(pollRoom, POLLING_INTERVAL_MS);
     return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, roomCode]);
 
-  async function loadRoom() {
-    const code = refs.roomCode.current;
+  async function pollRoom() {
+    const { roomCode: code, gameState: gs, playerRole: role, playerName: name } =
+      stateRef.current;
     if (!code) return;
+
     try {
-      const result = await storage.get(`room_${code}`);
-      const room   = JSON.parse(result.value);
+      const result = await storage.get(buildRoomKey(code));
+      const room = JSON.parse(result.value);
       setCurrentRoom(room);
-
-      const gs   = refs.gameState.current;
-      let   role = refs.playerRole.current;
-      const name = refs.playerName.current;
-
-      if (gs === "menu") return;
-
-      // ── Detectar sala cerrada por el admin ──────────────────────────────
-      // Si el jugador no es admin y la sala volvió a "waiting" estando en juego,
-      // pero el jugador ya no está en la lista de participantes → fue removido o sala reseteada
-      if (room.status === "waiting" && gs !== "lobby" && gs !== "results") {
-        const isInRoom =
-          room.admin?.name === name ||
-          (room.aspirants || []).some((a) => a.name === name) ||
-          room.king?.name === name;
-        if (!isInRoom) {
-          // Sala cerrada / jugador removido
-          clearSession();
-          setGameState("menu");
-          setCurrentRoom(null);
-          setRoomCode("");
-          setPlayerRole(null);
-          showError("La sala fue cerrada por el administrador.");
-          return;
-        }
-      }
-
-      // ── Calcular rol efectivo ─────────────────────────────────────────
-      let effectiveRole = role;
-      if (room.status === "waiting") {
-        effectiveRole = (role === "king" || role === "admin_king")
-          ? (role === "admin_king" ? "admin" : "aspirant")
-          : role;
-        if (effectiveRole !== role) {
-          setPlayerRole(effectiveRole);
-          role = effectiveRole;
-        }
-      }
-
-      if (room.king && room.status !== "waiting" && room.status !== "picking_king") {
-        if (room.king.name === name && role === "admin")    { setPlayerRole("admin_king"); role = "admin_king"; }
-        if (room.king.name === name && role === "aspirant") { setPlayerRole("king");       role = "king";       }
-      }
-
-      // ── Transiciones de gameState ────────────────────────────────────
-      if (room.status === "picking_king" && gs === "lobby") { setGameState("picking_king"); return; }
-      if (room.status === "king_reveal" && gs === "picking_king") { setGameState("king_reveal"); return; }
-      if (room.status === "answering" && (gs === "lobby" || gs === "picking_king" || gs === "king_reveal")) {
-        setGameState("playing"); return;
-      }
-      if (room.mode === "custom" && room.status === "waiting_question" &&
-          (gs === "picking_king" || gs === "king_reveal" || gs === "playing" || gs === "waiting_question")) {
-        const isKingRole = role === "king" || role === "admin_king";
-        setGameState(isKingRole ? "creating_question" : "waiting_question");
-        return;
-      }
-      if (room.mode === "custom" && room.status === "answering" && gs === "waiting_question") {
-        setGameState("playing"); return;
-      }
-      if (room.status === "finished" && gs !== "results") { setGameState("results"); return; }
-      if (room.status === "waiting" && gs === "results") {
-        // Revancha: limpiar answered local para que la nueva partida empiece limpia
-        setAnsweredQuestions(new Set());
-        saveAnsweredQuestions(code, new Set());
-        setGameState("lobby");
-        return;
-      }
-
+      handleRoomTransition(room, gs, role, name, code);
     } catch (err) {
-      console.error("loadRoom:", err);
+      console.error("pollRoom:", err);
     }
   }
 
+  function handleRoomTransition(room, gs, role, name, code) {
+    // Detect room closed by admin
+    if (
+      room.status === ROOM_STATUS.WAITING &&
+      gs !== GAME_STATE.LOBBY &&
+      gs !== GAME_STATE.RESULTS &&
+      !isPlayerInRoom(room, name)
+    ) {
+      clearSession();
+      setGameState(GAME_STATE.MENU);
+      setCurrentRoom(null);
+      setRoomCode("");
+      setPlayerRole(null);
+      showError("La sala fue cerrada por el administrador.");
+      return;
+    }
+
+    // Resolve effective role considering resets
+    let effectiveRole = role;
+    if (room.status === ROOM_STATUS.WAITING) {
+      if (role === PLAYER_ROLE.ADMIN_KING) effectiveRole = PLAYER_ROLE.ADMIN;
+      else if (role === PLAYER_ROLE.KING) effectiveRole = PLAYER_ROLE.ASPIRANT;
+      if (effectiveRole !== role) setPlayerRole(effectiveRole);
+    }
+
+    // Update role if king is now set
+    if (room.king && room.status !== ROOM_STATUS.WAITING && room.status !== ROOM_STATUS.PICKING_KING) {
+      if (room.king.name === name && role === PLAYER_ROLE.ADMIN) {
+        setPlayerRole(PLAYER_ROLE.ADMIN_KING);
+        effectiveRole = PLAYER_ROLE.ADMIN_KING;
+      }
+      if (room.king.name === name && role === PLAYER_ROLE.ASPIRANT) {
+        setPlayerRole(PLAYER_ROLE.KING);
+        effectiveRole = PLAYER_ROLE.KING;
+      }
+    }
+
+    const isKingRole = effectiveRole === PLAYER_ROLE.KING || effectiveRole === PLAYER_ROLE.ADMIN_KING;
+
+    // State transitions map
+    const transitions = [
+      {
+        from: [GAME_STATE.LOBBY],
+        status: ROOM_STATUS.PICKING_KING,
+        to: GAME_STATE.PICKING_KING,
+      },
+      {
+        from: [GAME_STATE.PICKING_KING],
+        status: ROOM_STATUS.KING_REVEAL,
+        to: GAME_STATE.KING_REVEAL,
+      },
+      {
+        from: [GAME_STATE.LOBBY, GAME_STATE.PICKING_KING, GAME_STATE.KING_REVEAL],
+        status: ROOM_STATUS.ANSWERING,
+        to: GAME_STATE.PLAYING,
+      },
+      {
+        from: [
+          GAME_STATE.PICKING_KING,
+          GAME_STATE.KING_REVEAL,
+          GAME_STATE.PLAYING,
+          GAME_STATE.WAITING_QUESTION,
+        ],
+        status: ROOM_STATUS.WAITING_QUESTION,
+        mode: GAME_MODE.CUSTOM,
+        to: isKingRole ? GAME_STATE.CREATING_QUESTION : GAME_STATE.WAITING_QUESTION,
+      },
+      {
+        from: [GAME_STATE.WAITING_QUESTION],
+        status: ROOM_STATUS.ANSWERING,
+        mode: GAME_MODE.CUSTOM,
+        to: GAME_STATE.PLAYING,
+      },
+      {
+        from: null, // any state
+        status: ROOM_STATUS.FINISHED,
+        to: GAME_STATE.RESULTS,
+        condition: () => gs !== GAME_STATE.RESULTS,
+      },
+      {
+        from: [GAME_STATE.RESULTS],
+        status: ROOM_STATUS.WAITING,
+        to: GAME_STATE.LOBBY,
+        onTransition: () => {
+          setAnsweredQuestions(new Set());
+          saveAnsweredQuestions(code, new Set());
+        },
+      },
+    ];
+
+    for (const t of transitions) {
+      const fromMatch = t.from === null || t.from.includes(gs);
+      const statusMatch = room.status === t.status;
+      const modeMatch = !t.mode || room.mode === t.mode;
+      const conditionMatch = !t.condition || t.condition();
+
+      if (fromMatch && statusMatch && modeMatch && conditionMatch) {
+        t.onTransition?.();
+        setGameState(t.to);
+        return;
+      }
+    }
+  }
+
+  // ── Session reconnect ────────────────────────────────────────────────────
   async function reconnectSession(session) {
     const { code, name } = session;
     if (!code || !name) { clearSession(); return; }
 
     setReconnecting(true);
     try {
-      const result = await storage.get(`room_${code}`);
-      const room   = JSON.parse(result.value);
+      const result = await storage.get(buildRoomKey(code));
+      const room = JSON.parse(result.value);
+
+      const role = derivePlayerRole(room, name);
 
       setRoomCode(code);
       setPlayerName(name);
       setCurrentRoom(room);
+      setPlayerRole(role);
 
-      const isAdmin = room.admin?.name === name;
-      const isKing  = room.king?.name  === name;
-
-      let effectiveRole;
-      if (isAdmin && isKing)       effectiveRole = "admin_king";
-      else if (isAdmin)            effectiveRole = "admin";
-      else if (isKing)             effectiveRole = "king";
-      else                         effectiveRole = "aspirant";
-
-      setPlayerRole(effectiveRole);
-
-      // ── Restaurar answeredQuestions desde sesión y sala ───────────────
+      // Restore answered questions from storage + room history
       const savedAnswered = loadAnsweredQuestions(code);
-      // Derivar desde room.answers: cada entrada guardada tiene questionId;
-      // lo cruzamos con room.questions para obtener el índice real de la pregunta
-      const myId =
-        (room.aspirants || []).find((a) => a.name === name)?.id ||
-        (room.admin?.name === name ? room.admin.id : null) ||
-        (room.king?.name === name ? room.king.id : null);
+      const myId = findPlayerId(room, name);
+
       if (myId && room.answers?.[myId] && room.questions) {
         room.answers[myId].forEach((entry) => {
           const idx = room.questions.findIndex(
@@ -238,21 +228,8 @@ export default function useGameRoom() {
       }
       setAnsweredQuestions(savedAnswered);
 
-      let gs = "lobby";
-      if (room.status === "waiting")           gs = "lobby";
-      else if (room.status === "picking_king") gs = "picking_king";
-      else if (room.status === "king_reveal")  gs = "king_reveal";
-      else if (room.status === "answering")    gs = "playing";
-      else if (room.status === "waiting_question") {
-        gs = (effectiveRole === "king" || effectiveRole === "admin_king")
-          ? "creating_question"
-          : "waiting_question";
-      }
-      else if (room.status === "finished")     gs = "results";
-
-      setGameState(gs);
-      saveSession({ code, name, role: effectiveRole });
-
+      setGameState(deriveGameState(room, role));
+      saveSession({ code, name, role });
     } catch (_) {
       clearSession();
     } finally {
@@ -260,17 +237,41 @@ export default function useGameRoom() {
     }
   }
 
+  function findPlayerId(room, name) {
+    return (
+      (room.aspirants || []).find((a) => a.name === name)?.id ||
+      (room.admin?.name === name ? room.admin.id : null) ||
+      (room.king?.name === name ? room.king.id : null)
+    );
+  }
+
+  function deriveGameState(room, role) {
+    const isKingRole = role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING;
+
+    const statusMap = {
+      [ROOM_STATUS.WAITING]: GAME_STATE.LOBBY,
+      [ROOM_STATUS.PICKING_KING]: GAME_STATE.PICKING_KING,
+      [ROOM_STATUS.KING_REVEAL]: GAME_STATE.KING_REVEAL,
+      [ROOM_STATUS.ANSWERING]: GAME_STATE.PLAYING,
+      [ROOM_STATUS.FINISHED]: GAME_STATE.RESULTS,
+      [ROOM_STATUS.WAITING_QUESTION]: isKingRole
+        ? GAME_STATE.CREATING_QUESTION
+        : GAME_STATE.WAITING_QUESTION,
+    };
+
+    return statusMap[room.status] ?? GAME_STATE.LOBBY;
+  }
+
+  // ── Room actions ─────────────────────────────────────────────────────────
   async function createRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
 
-    const isCustom  = gameConfig.mode === "custom";
-    const questions = isCustom
-      ? []
-      : shuffleArray(GENERIC_QUESTIONS).slice(0, gameConfig.rounds);
+    const adminId = generateId();
+    const code = generateRoomCode();
+    const questions = selectQuestions(gameConfig);
+    const { scores, answers } = buildInitialScoresAndAnswers([adminId]);
 
-    const adminId = Date.now().toString();
-    const code    = generateRoomCode();
-    const room    = {
+    const room = {
       code,
       mode: gameConfig.mode,
       config: gameConfig,
@@ -281,9 +282,9 @@ export default function useGameRoom() {
       currentQuestionIndex: 0,
       currentAnswers: [],
       answeredAspirants: [],
-      status: "waiting",
-      scores: {},
-      answers: {},
+      status: ROOM_STATUS.WAITING,
+      scores,
+      answers,
       createdAt: new Date().toISOString(),
       startedAt: null,
       finishedAt: null,
@@ -291,12 +292,12 @@ export default function useGameRoom() {
 
     try {
       setLoading(true);
-      await storage.set(`room_${code}`, JSON.stringify(room));
+      await storage.set(buildRoomKey(code), JSON.stringify(room));
       setRoomCode(code);
-      setPlayerRole("admin");
+      setPlayerRole(PLAYER_ROLE.ADMIN);
       setCurrentRoom(room);
-      setGameState("lobby");
-      saveSession({ code, name: playerName, role: "admin" });
+      setGameState(GAME_STATE.LOBBY);
+      saveSession({ code, name: playerName, role: PLAYER_ROLE.ADMIN });
     } catch (err) {
       showError("Error al crear la sala: " + err.message);
     } finally {
@@ -312,32 +313,25 @@ export default function useGameRoom() {
     setLoading(true);
 
     try {
-      // Verificar existencia de la sala primero
       let existingRoom = null;
       try {
-        const result = await storage.get(`room_${code}`);
+        const result = await storage.get(buildRoomKey(code));
         existingRoom = JSON.parse(result.value);
       } catch (_) {
-        setLoading(false);
         return showError("Sala no encontrada. Verifica el código.");
       }
 
-      if (existingRoom) {
-        const isAdmin    = existingRoom.admin?.name === playerName;
-        const isKing     = existingRoom.king?.name  === playerName;
-        const isAspirant = (existingRoom.aspirants || []).some((a) => a.name === playerName);
-
-        if (isAdmin || isKing || isAspirant) {
-          await reconnectSession({ code, name: playerName, role: isAdmin ? "admin" : "aspirant" });
-          return;
-        }
+      // Reconnect if already in the room
+      if (isPlayerInRoom(existingRoom, playerName)) {
+        await reconnectSession({ code, name: playerName });
+        return;
       }
 
-      const { room } = await apiPost("join", { roomCode: code, playerName });
-      setPlayerRole("aspirant");
+      const { room } = await roomApi.join(code, playerName);
+      setPlayerRole(PLAYER_ROLE.ASPIRANT);
       setCurrentRoom(room);
-      setGameState("lobby");
-      saveSession({ code, name: playerName, role: "aspirant" });
+      setGameState(GAME_STATE.LOBBY);
+      saveSession({ code, name: playerName, role: PLAYER_ROLE.ASPIRANT });
     } catch (err) {
       showError("Error al unirse: " + err.message);
     } finally {
@@ -347,14 +341,12 @@ export default function useGameRoom() {
 
   async function startGame() {
     try {
-      const room = {
+      await persistRoom({
         ...currentRoom,
-        status: "picking_king",
+        status: ROOM_STATUS.PICKING_KING,
         startedAt: new Date().toISOString(),
-      };
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
-      setGameState("picking_king");
+      });
+      setGameState(GAME_STATE.PICKING_KING);
     } catch (err) {
       showError("Error al iniciar: " + err.message);
     }
@@ -363,45 +355,51 @@ export default function useGameRoom() {
   async function pickKing(personId) {
     try {
       const everyone = [currentRoom.admin, ...(currentRoom.aspirants || [])];
-      const chosen   = everyone.find((p) => p.id === personId);
+      const chosen = everyone.find((p) => p.id === personId);
       if (!chosen) return;
 
-      const isCustom      = currentRoom.mode === "custom";
-      const aspirants     = currentRoom.aspirants.filter((a) => a.id !== personId);
-      const finalAspirants = aspirants;
+      const aspirants = currentRoom.aspirants.filter((a) => a.id !== personId);
 
-      const scores  = { ...currentRoom.scores };
+      // Rebuild scores/answers ensuring all active players are present
+      const allPlayerIds = [
+        currentRoom.admin?.id,
+        ...aspirants.map((a) => a.id),
+        personId,
+      ].filter(Boolean);
+
+      const scores = { ...currentRoom.scores };
       const answers = { ...currentRoom.answers };
 
-      if (!scores[personId])  scores[personId]  = 0;
-      if (!answers[personId]) answers[personId] = [];
-
-      scores[currentRoom.admin.id]  = scores[currentRoom.admin.id]  ?? 0;
-      answers[currentRoom.admin.id] = answers[currentRoom.admin.id] ?? [];
-
-      finalAspirants.forEach((a) => {
-        if (!scores[a.id])  scores[a.id]  = 0;
-        if (!answers[a.id]) answers[a.id] = [];
+      allPlayerIds.forEach((id) => {
+        if (scores[id] === undefined) scores[id] = 0;
+        if (!answers[id]) answers[id] = [];
       });
 
       const room = {
         ...currentRoom,
         king: chosen,
-        aspirants: finalAspirants,
+        aspirants,
         scores,
         answers,
-        status: "king_reveal",
-        pendingStatus: isCustom ? "waiting_question" : "answering",
+        status: ROOM_STATUS.KING_REVEAL,
+        pendingStatus:
+          currentRoom.mode === GAME_MODE.CUSTOM
+            ? ROOM_STATUS.WAITING_QUESTION
+            : ROOM_STATUS.ANSWERING,
       };
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
 
-      if (personId === currentRoom.admin.id) setPlayerRole("admin_king");
+      await persistRoom(room);
 
-      setGameState("king_reveal");
+      if (personId === currentRoom.admin.id) setPlayerRole(PLAYER_ROLE.ADMIN_KING);
+
+      setGameState(GAME_STATE.KING_REVEAL);
     } catch (err) {
       showError("Error al elegir líder: " + err.message);
     }
+  }
+
+  async function pickRandomKing(personId) {
+    await pickKing(personId);
   }
 
   async function confirmKingAndStart() {
@@ -411,57 +409,57 @@ export default function useGameRoom() {
         status: currentRoom.pendingStatus,
         pendingStatus: null,
       };
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
 
-      const role     = refs.playerRole.current;
-      const isCustom = room.mode === "custom";
+      await persistRoom(room);
 
-      if (role === "king" || role === "admin_king") {
-        setGameState(isCustom ? "creating_question" : "playing");
-      } else {
-        setGameState(isCustom ? "waiting_question" : "playing");
-      }
+      const role = stateRef.current.playerRole;
+      const isKingRole = role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING;
+      const isCustom = room.mode === GAME_MODE.CUSTOM;
+
+      setGameState(
+        isKingRole && isCustom
+          ? GAME_STATE.CREATING_QUESTION
+          : isCustom
+            ? GAME_STATE.WAITING_QUESTION
+            : GAME_STATE.PLAYING
+      );
     } catch (err) {
       showError("Error al iniciar: " + err.message);
     }
-  }
-
-  async function pickRandomKing(personId) {
-    await pickKing(personId);
   }
 
   async function submitCustomQuestion(question) {
     try {
       const questions = [...(currentRoom.questions || [])];
       questions[currentRoom.currentQuestionIndex] = question;
-      const room = {
+
+      await persistRoom({
         ...currentRoom,
         questions,
-        status: "answering",
+        status: ROOM_STATUS.ANSWERING,
         currentAnswers: [],
         answeredAspirants: [],
-      };
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
-      setGameState("playing");
+      });
+
+      setGameState(GAME_STATE.PLAYING);
     } catch (err) {
       showError("Error al enviar pregunta: " + err.message);
     }
   }
 
   async function submitAnswer(answer) {
-    const question   = currentRoom.questions[currentRoom.currentQuestionIndex];
-    const aspirantId =
-      currentRoom.aspirants.find((a) => a.name === playerName)?.id ||
-      (currentRoom.admin?.name === playerName ? currentRoom.admin.id : undefined);
+    const question = currentRoom.questions[currentRoom.currentQuestionIndex];
+    const aspirantId = findPlayerId(currentRoom, playerName);
 
-    const newAnswered = new Set(answeredQuestions).add(currentRoom.currentQuestionIndex);
+    // Optimistically mark as answered to prevent double-submit
+    const newAnswered = new Set(answeredQuestions).add(
+      currentRoom.currentQuestionIndex
+    );
     setAnsweredQuestions(newAnswered);
     saveAnsweredQuestions(roomCode, newAnswered);
 
     try {
-      const { room } = await apiPost("answer", {
+      const { room } = await roomApi.submitAnswer({
         roomCode,
         aspirantId,
         aspirantName: playerName,
@@ -476,22 +474,26 @@ export default function useGameRoom() {
 
   async function validateAnswer(aspirantId, isCorrect) {
     try {
-      const pointsPerAnswer  = currentRoom.config?.pointsPerAnswer ?? 1;
-      const penaltyEnabled   = currentRoom.config?.penaltyEnabled  ?? false;
-      const { room } = await apiPost("validate", {
+      const { room } = await roomApi.validate({
         roomCode,
         aspirantId,
         isCorrect,
-        pointsPerAnswer,
-        penaltyEnabled,
+        pointsPerAnswer: currentRoom.config?.pointsPerAnswer ?? 1,
+        penaltyEnabled: currentRoom.config?.penaltyEnabled ?? false,
       });
+
       setCurrentRoom(room);
 
-      if (room.status === "finished") {
-        setGameState("results");
-      } else if (room.mode === "custom" && room.status === "waiting_question") {
-        const role = refs.playerRole.current;
-        if (role === "king" || role === "admin_king") setGameState("creating_question");
+      if (room.status === ROOM_STATUS.FINISHED) {
+        setGameState(GAME_STATE.RESULTS);
+        return;
+      }
+
+      if (room.mode === GAME_MODE.CUSTOM && room.status === ROOM_STATUS.WAITING_QUESTION) {
+        const role = stateRef.current.playerRole;
+        if (role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING) {
+          setGameState(GAME_STATE.CREATING_QUESTION);
+        }
       }
     } catch (err) {
       showError("Error al validar: " + err.message);
@@ -500,13 +502,13 @@ export default function useGameRoom() {
 
   async function updateRoomConfig(newConfig) {
     try {
-      const isCustom  = newConfig.mode === "custom";
-      const questions = isCustom
-        ? []
-        : shuffleArray(GENERIC_QUESTIONS).slice(0, newConfig.rounds);
-      const room = { ...currentRoom, mode: newConfig.mode, config: newConfig, questions };
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
+      const room = {
+        ...currentRoom,
+        mode: newConfig.mode,
+        config: newConfig,
+        questions: selectQuestions(newConfig),
+      };
+      await persistRoom(room);
       setGameConfig(newConfig);
     } catch (err) {
       showError("Error al actualizar configuración: " + err.message);
@@ -515,42 +517,42 @@ export default function useGameRoom() {
 
   async function rematch() {
     try {
-      const isCustom  = currentRoom.config?.mode === "custom";
-      const questions = isCustom
-        ? []
-        : shuffleArray(GENERIC_QUESTIONS).slice(0, currentRoom.config?.rounds ?? 10);
+      const config = currentRoom.config ?? DEFAULT_GAME_CONFIG;
 
-      const activeIds  = new Set(Object.keys(currentRoom.scores || {}));
-      const playerMap  = new Map();
+      // Collect all previously active players (excluding king who was removed from aspirants)
+      const activeIds = new Set(Object.keys(currentRoom.scores || {}));
+      const playerMap = new Map();
 
       (currentRoom.aspirants || []).forEach((p) => {
         if (p.id !== currentRoom.admin?.id && activeIds.has(p.id))
           playerMap.set(p.id, p);
       });
 
-      if (currentRoom.king && currentRoom.king.id !== currentRoom.admin?.id
-          && activeIds.has(currentRoom.king.id)) {
+      if (
+        currentRoom.king &&
+        currentRoom.king.id !== currentRoom.admin?.id &&
+        activeIds.has(currentRoom.king.id)
+      ) {
         playerMap.set(currentRoom.king.id, currentRoom.king);
       }
 
       const allPlayers = Array.from(playerMap.values());
-      const scores  = {};
-      const answers = {};
-      allPlayers.forEach((p) => { scores[p.id] = 0; answers[p.id] = []; });
-      if (currentRoom.admin) {
-        scores[currentRoom.admin.id]  = 0;
-        answers[currentRoom.admin.id] = [];
-      }
+      const allPlayerIds = [
+        ...(currentRoom.admin ? [currentRoom.admin.id] : []),
+        ...allPlayers.map((p) => p.id),
+      ];
+
+      const { scores, answers } = buildInitialScoresAndAnswers(allPlayerIds);
 
       const room = {
         ...currentRoom,
         king: null,
         aspirants: allPlayers,
-        questions,
+        questions: selectQuestions(config),
         currentQuestionIndex: 0,
         currentAnswers: [],
         answeredAspirants: [],
-        status: "waiting",
+        status: ROOM_STATUS.WAITING,
         scores,
         answers,
         pickingAnimation: null,
@@ -558,55 +560,59 @@ export default function useGameRoom() {
         finishedAt: null,
       };
 
-      await storage.set(`room_${roomCode}`, JSON.stringify(room));
-      setCurrentRoom(room);
+      await persistRoom(room);
       setAnsweredQuestions(new Set());
       saveAnsweredQuestions(roomCode, new Set());
-      setPlayerRole("admin");
-      setGameState("lobby");
+      setPlayerRole(PLAYER_ROLE.ADMIN);
+      setGameState(GAME_STATE.LOBBY);
     } catch (err) {
       showError("Error al iniciar revancha: " + err.message);
     }
   }
 
   async function resetGame() {
-    const code = refs.roomCode.current;
-    const room = refs.currentRoom.current;
-    const role = refs.playerRole.current;
-    const name = refs.playerName.current;
+    const { roomCode: code, currentRoom: room, playerRole: role, playerName: name } =
+      stateRef.current;
 
-    if (code && room && role !== "admin" && role !== "admin_king") {
-      try {
-        const myId =
-          (room.aspirants || []).find((a) => a.name === name)?.id ||
-          (room.king?.name === name ? room.king.id : null);
-
-        const updated = {
-          ...room,
-          aspirants: (room.aspirants || []).filter((a) => a.name !== name),
-        };
-
-        if (myId) {
-          delete updated.scores?.[myId];
-          delete updated.answers?.[myId];
-          updated.currentAnswers = (updated.currentAnswers || []).filter(
-            (a) => a.aspirantId !== myId
-          );
-          updated.answeredAspirants = (updated.answeredAspirants || []).filter(
-            (id) => id !== myId
-          );
-        }
-
-        await storage.set(`room_${code}`, JSON.stringify(updated));
-      } catch (_) {}
+    if (code && room && role !== PLAYER_ROLE.ADMIN && role !== PLAYER_ROLE.ADMIN_KING) {
+      await removePlayerFromRoom(room, code, name);
     }
 
     clearSession();
-    setGameState("menu");
+    setGameState(GAME_STATE.MENU);
     setCurrentRoom(null);
     setAnsweredQuestions(new Set());
     setRoomCode("");
     setPlayerRole(null);
+  }
+
+  async function removePlayerFromRoom(room, code, name) {
+    try {
+      const myId = findPlayerId(room, name);
+      const updated = {
+        ...room,
+        aspirants: (room.aspirants || []).filter((a) => a.name !== name),
+      };
+
+      if (myId) {
+        delete updated.scores?.[myId];
+        delete updated.answers?.[myId];
+        updated.currentAnswers = (updated.currentAnswers || []).filter(
+          (a) => a.aspirantId !== myId
+        );
+        updated.answeredAspirants = (updated.answeredAspirants || []).filter(
+          (id) => id !== myId
+        );
+      }
+
+      await storage.set(buildRoomKey(code), JSON.stringify(updated));
+    } catch (_) {}
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  async function persistRoom(room) {
+    await storage.set(buildRoomKey(roomCode), JSON.stringify(room));
+    setCurrentRoom(room);
   }
 
   return {
@@ -619,6 +625,7 @@ export default function useGameRoom() {
     answeredQuestions,
     gameConfig,
     errorMsg,
+    reconnecting,
     setRoomCode,
     setPlayerName,
     setGameConfig,
@@ -631,7 +638,6 @@ export default function useGameRoom() {
     submitCustomQuestion,
     validateAnswer,
     updateRoomConfig,
-    reconnecting,
     confirmKingAndStart,
     rematch,
     resetGame,

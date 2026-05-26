@@ -1,19 +1,33 @@
-import { X, Settings, Zap, Star } from "lucide-react";
 import { useState } from "react";
+import { X, Settings, Zap, Star, Check } from "lucide-react";
 
 const MODE_OPTIONS = [
-  { value: "generic", label: "Preguntas Genéricas", desc: "Se usan preguntas predefinidas al azar" },
-  { value: "custom",  label: "Modo Personalizado",  desc: "El King escribe cada pregunta en vivo" },
+  { value: "generic", label: "🎲 Genéricas", desc: "Preguntas predefinidas al azar" },
+  { value: "custom",  label: "✏️ Custom",    desc: "El Líder escribe cada pregunta" },
 ];
 
 function Toggle({ enabled, onClick, color = "purple" }) {
   const bg = enabled
-    ? color === "red" ? "bg-red-500" : "bg-purple-600"
-    : "bg-gray-300";
+    ? color === "red" ? "#EF4444" : "#7C3AED"
+    : "rgba(255,255,255,0.12)";
   return (
-    <div onClick={onClick}
-      className={`w-11 h-6 rounded-full transition-colors flex-shrink-0 relative cursor-pointer ${bg}`}>
-      <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${enabled ? "left-5" : "left-0.5"}`} />
+    <div
+      onClick={onClick}
+      style={{
+        width: 44, height: 24, borderRadius: 999,
+        background: bg, position: "relative", cursor: "pointer",
+        flexShrink: 0, transition: "background 0.2s",
+        border: `1.5px solid ${enabled ? "transparent" : "rgba(255,255,255,0.2)"}`,
+      }}
+    >
+      <div style={{
+        position: "absolute", top: 2,
+        left: enabled ? 20 : 2,
+        width: 16, height: 16,
+        background: "#fff", borderRadius: "50%",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
+        transition: "left 0.2s",
+      }} />
     </div>
   );
 }
@@ -25,170 +39,218 @@ export default function GameConfigModal({ config, onClose, onSave }) {
     ...config,
   });
 
-  const isCustomMode = local.mode === "custom";
+  const isCustom = local.mode === "custom";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+    /* Backdrop */
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 50,
+      background: "rgba(0,0,0,0.7)",
+      backdropFilter: "blur(6px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 16,
+    }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Modal card */}
+      <div style={{
+        width: "100%", maxWidth: 440,
+        background: "#16082e",
+        border: "1.5px solid rgba(139,92,246,0.35)",
+        borderRadius: 24,
+        padding: 22,
+        maxHeight: "90vh",
+        overflowY: "auto",
+        display: "flex", flexDirection: "column", gap: 18,
+        boxShadow: "0 24px 60px rgba(0,0,0,0.6)",
+      }}>
 
-        <div className="flex justify-between items-center mb-5">
-          <div className="flex items-center gap-2">
-            <Settings className="w-6 h-6 text-purple-600" />
-            <h2 className="text-xl font-bold text-gray-800">Configuración de Partida</h2>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: "rgba(109,40,217,0.35)",
+              border: "1.5px solid rgba(139,92,246,0.4)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <Settings size={18} color="#A78BFA" />
+            </div>
+            <span style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>
+              Configuración
+            </span>
           </div>
-          <button onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 active:scale-95 transition-all border-0">
-            <X className="w-5 h-5 text-gray-500" />
+          <button onClick={onClose} style={{
+            background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: 8, padding: 6, cursor: "pointer",
+            display: "flex", alignItems: "center",
+          }}>
+            <X size={16} color="rgba(255,255,255,0.6)" />
           </button>
         </div>
 
-        {/* Modo de juego */}
-        <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Modo de juego</label>
-          <div className="space-y-2">
-            {MODE_OPTIONS.map((m) => (
-              <button key={m.value}
-                onClick={() => setLocal((p) => ({ ...p, mode: m.value }))}
-                className={`w-full p-3 rounded-xl text-left transition-all border-2 active:scale-95
-                  ${local.mode === m.value
-                    ? "border-purple-500 bg-purple-50"
-                    : "border-gray-200 bg-gray-50 hover:border-purple-300"}`}>
-                <p className={`font-bold text-sm ${local.mode === m.value ? "text-purple-700" : "text-gray-700"}`}>{m.label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{m.desc}</p>
-              </button>
-            ))}
+        {/* Mode selector */}
+        <div>
+          <div className="t-label" style={{ marginBottom: 8 }}>Modo de juego</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {MODE_OPTIONS.map((m) => {
+              const active = local.mode === m.value;
+              return (
+                <div key={m.value} onClick={() => setLocal((p) => ({ ...p, mode: m.value }))}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    background: active ? "rgba(109,40,217,0.3)" : "rgba(255,255,255,0.05)",
+                    border: `1.5px solid ${active ? "rgba(139,92,246,0.6)" : "rgba(255,255,255,0.1)"}`,
+                    borderRadius: 14, padding: "12px 14px", cursor: "pointer",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  <div style={{
+                    width: 20, height: 20, borderRadius: "50%",
+                    border: `2px solid ${active ? "#7C3AED" : "rgba(255,255,255,0.25)"}`,
+                    background: active ? "#7C3AED" : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, transition: "all 0.15s",
+                  }}>
+                    {active && <Check size={11} color="#fff" strokeWidth={3} />}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: active ? "#fff" : "rgba(255,255,255,0.7)" }}>
+                      {m.label}
+                    </div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginTop: 1 }}>
+                      {m.desc}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Rondas — slider */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-semibold text-gray-700">Número de rondas</label>
-            <span className="text-2xl font-bold text-purple-600 leading-none">{local.rounds}</span>
+        {/* Rounds slider */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <div className="t-label">Número de rondas</div>
+            <span className="t-display" style={{ fontSize: 26, color: "var(--c-gold)" }}>{local.rounds}</span>
           </div>
           <input
             type="range" min={2} max={20} step={1}
             value={local.rounds}
             onChange={(e) => setLocal((p) => ({ ...p, rounds: Number(e.target.value) }))}
-            className="w-full h-2 rounded-full appearance-none cursor-pointer"
-            style={{ accentColor: "#7c3aed" }}
+            style={{ width: "100%", accentColor: "var(--c-gold)" }}
           />
-          <div className="flex justify-between text-xs text-gray-400 mt-1">
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>
             <span>2</span>
-            <span className="text-gray-500">
-              {isCustomMode
-                ? `El King escribirá ${local.rounds} preguntas`
-                : `Se elegirán ${local.rounds} preguntas al azar`}
+            <span style={{ color: "rgba(255,255,255,0.45)" }}>
+              {isCustom ? `El Líder escribe ${local.rounds} preguntas` : `${local.rounds} preguntas al azar`}
             </span>
             <span>20</span>
           </div>
         </div>
 
-        {/* Puntos por acierto — slider (solo si customPoints no está activo) */}
+        {/* Points per answer (hidden when customPoints active) */}
         {!local.customPointsEnabled && (
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-sm font-semibold text-gray-700">Puntos por respuesta correcta</label>
-              <span className="text-2xl font-bold text-purple-600 leading-none">{local.pointsPerAnswer}</span>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div className="t-label">Puntos por acierto</div>
+              <span className="t-display" style={{ fontSize: 26, color: "#A78BFA" }}>{local.pointsPerAnswer}</span>
             </div>
             <input
               type="range" min={1} max={10} step={1}
               value={local.pointsPerAnswer}
               onChange={(e) => setLocal((p) => ({ ...p, pointsPerAnswer: Number(e.target.value) }))}
-              className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ accentColor: "#7c3aed" }}
+              style={{ width: "100%", accentColor: "#7C3AED" }}
             />
-            <div className="flex justify-between text-xs text-gray-400 mt-1">
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>
               <span>1</span>
-              <span className="text-gray-500">Cada acierto suma {local.pointsPerAnswer} punto{local.pointsPerAnswer > 1 ? "s" : ""}</span>
+              <span style={{ color: "rgba(255,255,255,0.45)" }}>Cada acierto suma {local.pointsPerAnswer} pt{local.pointsPerAnswer > 1 ? "s" : ""}</span>
               <span>10</span>
             </div>
           </div>
         )}
 
-        {/* Puntuación por pregunta — solo en modo custom */}
-        {isCustomMode && (
-          <div className="mb-6">
-            <div
-              onClick={() => setLocal((p) => ({ ...p, customPointsEnabled: !p.customPointsEnabled }))}
-              className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all select-none
-                ${local.customPointsEnabled
-                  ? "border-purple-500 bg-purple-50"
-                  : "border-gray-200 bg-gray-50 hover:border-purple-300"}`}>
-              <div className="flex items-center gap-3">
-                <Star className={`w-5 h-5 flex-shrink-0 ${local.customPointsEnabled ? "text-purple-500" : "text-gray-400"}`} />
-                <div>
-                  <p className={`font-bold text-sm ${local.customPointsEnabled ? "text-purple-700" : "text-gray-700"}`}>
-                    Puntuación por pregunta
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    El King define cuánto vale cada pregunta al crearla
-                  </p>
-                </div>
+        {/* Custom points toggle (custom mode only) */}
+        {isCustom && (
+          <div
+            onClick={() => setLocal((p) => ({ ...p, customPointsEnabled: !p.customPointsEnabled }))}
+            style={{
+              display: "flex", alignItems: "center", gap: 12,
+              background: local.customPointsEnabled ? "rgba(109,40,217,0.2)" : "rgba(255,255,255,0.05)",
+              border: `1.5px solid ${local.customPointsEnabled ? "rgba(139,92,246,0.45)" : "rgba(255,255,255,0.1)"}`,
+              borderRadius: 14, padding: "12px 14px", cursor: "pointer",
+              transition: "all 0.15s",
+            }}
+          >
+            <Star size={18} color={local.customPointsEnabled ? "#A78BFA" : "rgba(255,255,255,0.35)"} style={{ flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: local.customPointsEnabled ? "#fff" : "rgba(255,255,255,0.65)" }}>
+                Puntuación por pregunta
               </div>
-              <Toggle
-                enabled={local.customPointsEnabled}
-                onClick={() => setLocal((p) => ({ ...p, customPointsEnabled: !p.customPointsEnabled }))}
-              />
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.38)", marginTop: 1 }}>
+                El Líder define cuánto vale cada pregunta
+              </div>
             </div>
-            {local.customPointsEnabled && (
-              <p className="text-xs text-purple-600 mt-2 px-1">
-                El valor por defecto de cada pregunta será <span className="font-bold">{local.pointsPerAnswer} pt{local.pointsPerAnswer > 1 ? "s" : ""}</span>. El King podrá cambiarlo al crear cada pregunta.
-              </p>
-            )}
+            <Toggle
+              enabled={local.customPointsEnabled}
+              onClick={() => setLocal((p) => ({ ...p, customPointsEnabled: !p.customPointsEnabled }))}
+            />
           </div>
         )}
 
-        {/* Castigo — toggle */}
-        <div className="mb-6">
-          <div
-            onClick={() => setLocal((p) => ({ ...p, penaltyEnabled: !p.penaltyEnabled }))}
-            className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all select-none
-              ${local.penaltyEnabled
-                ? "border-red-400 bg-red-50"
-                : "border-gray-200 bg-gray-50 hover:border-red-300"}`}>
-            <div className="flex items-center gap-3">
-              <Zap className={`w-5 h-5 flex-shrink-0 ${local.penaltyEnabled ? "text-red-500" : "text-gray-400"}`} />
-              <div>
-                <p className={`font-bold text-sm ${local.penaltyEnabled ? "text-red-700" : "text-gray-700"}`}>
-                  Castigo por fallo
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  {local.customPointsEnabled
-                    ? "Responder mal resta los puntos definidos en cada pregunta"
-                    : `Responder mal resta ${local.pointsPerAnswer} punto${local.pointsPerAnswer > 1 ? "s" : ""} (igual que el acierto)`}
-                </p>
-              </div>
+        {/* Penalty toggle */}
+        <div
+          onClick={() => setLocal((p) => ({ ...p, penaltyEnabled: !p.penaltyEnabled }))}
+          style={{
+            display: "flex", alignItems: "center", gap: 12,
+            background: local.penaltyEnabled ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.05)",
+            border: `1.5px solid ${local.penaltyEnabled ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.1)"}`,
+            borderRadius: 14, padding: "12px 14px", cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          <Zap size={18} color={local.penaltyEnabled ? "#EF4444" : "rgba(255,255,255,0.35)"} style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: local.penaltyEnabled ? "#FCA5A5" : "rgba(255,255,255,0.65)" }}>
+              Castigo por fallo
             </div>
-            <Toggle enabled={local.penaltyEnabled} color="red"
-              onClick={() => setLocal((p) => ({ ...p, penaltyEnabled: !p.penaltyEnabled }))} />
+            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.38)", marginTop: 1 }}>
+              {local.customPointsEnabled
+                ? "Responder mal resta los puntos definidos en cada pregunta"
+                : `Responder mal resta ${local.pointsPerAnswer} pt${local.pointsPerAnswer > 1 ? "s" : ""}`}
+            </div>
           </div>
+          <Toggle enabled={local.penaltyEnabled} color="red"
+            onClick={() => setLocal((p) => ({ ...p, penaltyEnabled: !p.penaltyEnabled }))}
+          />
         </div>
 
-        {/* Resumen */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 mb-5">
-          <p className="text-sm text-purple-800 font-medium text-center">
-            {isCustomMode ? "Personalizado" : "Genérico"} ·{" "}
-            <span className="font-bold">{local.rounds} rondas</span>
-            {local.customPointsEnabled
-              ? <span> · puntos <span className="font-bold">por pregunta</span></span>
-              : <> · +{local.pointsPerAnswer} por acierto</>
-            }
-            {local.penaltyEnabled && !local.customPointsEnabled && (
-              <span className="text-red-600"> · -{local.pointsPerAnswer} por fallo</span>
-            )}
-            {local.penaltyEnabled && local.customPointsEnabled && (
-              <span className="text-red-600"> · castigo activo</span>
-            )}
-            {!local.customPointsEnabled && (
-              <> · Máximo <span className="font-bold">{local.rounds * local.pointsPerAnswer} pts</span></>
-            )}
-          </p>
+        {/* Summary pill */}
+        <div style={{
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 12, padding: "10px 14px",
+          display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center",
+        }}>
+          <div className="pill pill-purple">{local.mode === "custom" ? "Custom" : "Genérico"}</div>
+          <div className="pill pill-gold">{local.rounds} rondas</div>
+          {!local.customPointsEnabled && (
+            <div className="pill pill-purple">+{local.pointsPerAnswer} acierto</div>
+          )}
+          {local.penaltyEnabled && !local.customPointsEnabled && (
+            <div className="pill pill-red">-{local.pointsPerAnswer} fallo</div>
+          )}
+          {local.customPointsEnabled && (
+            <div className="pill pill-purple">pts por pregunta</div>
+          )}
+          {local.penaltyEnabled && local.customPointsEnabled && (
+            <div className="pill pill-red">castigo activo</div>
+          )}
         </div>
 
-        <button onClick={() => onSave(local)}
-          className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-purple-700 active:scale-95 transition-all border-0">
-          Guardar configuración
+        {/* Save button */}
+        <button className="btn btn-gold" onClick={() => onSave(local)} style={{ fontSize: 15 }}>
+          <Check size={17} /> Guardar configuración
         </button>
 
       </div>

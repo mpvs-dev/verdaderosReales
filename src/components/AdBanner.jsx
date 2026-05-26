@@ -1,15 +1,17 @@
-export default function AdBanner({ slot = "bottom", className = "" }) {
+/**
+ * AdBanner — espacio publicitario.
+ * slot: "top" | "bottom"
+ * onDark: true cuando el fondo es oscuro (lobby/partida), false en menú
+ */
+export default function AdBanner({ slot = "bottom", onDark = false }) {
   return (
     <div
-      className={`w-full h-16 flex items-center justify-center bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl ${className}`}
+      className={`ad-banner ${onDark ? "" : "ad-banner-inner"}`}
+      style={{ width: "100%", padding: "6px" }}
       aria-label="Espacio publicitario"
     >
-      {/*
-        codigo de publicidad
-      */}
-      <span className="text-xs text-gray-400 font-medium tracking-widest select-none uppercase">
-        Publicidad
-      </span>
+      {/* Coloca aquí tu código de publicidad */}
+      <span>Publicidad</span>
     </div>
   );
 }

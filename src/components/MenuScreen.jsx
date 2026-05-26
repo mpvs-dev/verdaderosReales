@@ -1,59 +1,85 @@
 import { Crown, LogIn } from "lucide-react";
-import AdBanner from "./AdBanner";
+import { ScreenWrapper } from "./Layout.jsx";
 
 export default function MenuScreen({ playerName, setPlayerName, roomCode, setRoomCode, createRoom, joinRoom, loading }) {
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="screen" style={{
+      background: "radial-gradient(ellipse at 30% 60%, #3B0764 0%, #1a0a3e 50%, #0f0520 100%)",
+      minHeight: "100vh",
+    }}>
+      {/* Top ad */}
+      <div style={{ width: "100%", maxWidth: 480, padding: "10px 16px 0" }}>
+        <div className="ad-banner"><span>Publicidad</span></div>
+      </div>
 
-      <div className="w-full p-3"><AdBanner slot="top" /></div>
+      <div className="screen-inner" style={{ justifyContent: "center", flex: 1 }}>
 
-      <div className="flex-1 w-full p-4 flex flex-col items-center">
-        <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-5">
-          <div className="text-center mb-6">
-            <Crown className="w-16 h-16 mx-auto mb-3 text-yellow-500" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-1">Verdaderos Reales</h1>
-            <p className="text-gray-600">¿Qué tan bien te conocen tus amigos?</p>
+        {/* Logo */}
+        <div style={{ textAlign: "center", paddingBottom: 8 }}>
+          <div className="anim-float" style={{ fontSize: 52, display: "inline-block", marginBottom: 8 }}>
+            👑
+          </div>
+          <h1 className="t-display" style={{ fontSize: 36, color: "#fff", textShadow: "0 4px 0 rgba(0,0,0,0.3)", marginBottom: 6 }}>
+            Verdaderos <span style={{ color: "var(--c-gold)" }}>Reales</span>
+          </h1>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>
+            ¿Qué tan bien te conocen tus amigos?
+          </p>
+        </div>
+
+        {/* Form */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div>
+            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>Tu nombre</label>
+            <input
+              className="input"
+              type="text"
+              placeholder="Escribe tu nombre..."
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              maxLength={20}
+            />
           </div>
 
-          <input
-            type="text"
-            placeholder="Tu nombre"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            className="w-full p-4 border-2 border-gray-300 rounded-xl mb-4 text-lg focus:border-purple-500 focus:outline-none"
-          />
-
           <button
+            className="btn btn-gold"
             onClick={createRoom}
-            disabled={loading}
-            className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-purple-700 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mb-5"
+            disabled={loading || !playerName.trim()}
           >
-            <Crown className="w-6 h-6 flex-shrink-0" />
+            <Crown size={17} />
             Crear Sala
           </button>
 
-          <div className="border-t-2 pt-5">
+          <div className="divider">o únete con un código</div>
+
+          <div>
+            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>Código de sala</label>
             <input
+              className="input"
               type="text"
-              placeholder="Código de sala"
+              placeholder="ABC12X"
               value={roomCode}
               onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              className="w-full p-4 border-2 border-gray-300 rounded-xl mb-3 text-lg focus:border-purple-500 focus:outline-none uppercase tracking-widest"
               maxLength={6}
+              style={{ letterSpacing: 5, textAlign: "center", fontSize: 20, fontFamily: "var(--font-display)" }}
             />
-            <button
-              onClick={joinRoom}
-              disabled={loading}
-              className="w-full bg-green-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-green-700 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <LogIn className="w-6 h-6 flex-shrink-0" />
-              Unirse a la Sala
-            </button>
           </div>
+
+          <button
+            className="btn btn-ghost"
+            onClick={joinRoom}
+            disabled={loading || !playerName.trim() || !roomCode.trim()}
+          >
+            <LogIn size={17} />
+            Unirse a la Sala
+          </button>
         </div>
       </div>
 
-      <div className="w-full p-3"><AdBanner slot="bottom" /></div>
+      {/* Bottom ad */}
+      <div style={{ width: "100%", maxWidth: 480, padding: "0 16px 16px" }}>
+        <div className="ad-banner"><span>Publicidad</span></div>
+      </div>
     </div>
   );
 }

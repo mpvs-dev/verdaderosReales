@@ -1,42 +1,39 @@
+import "./styles/game.css";
 import useGameRoom from "./hooks/useGameRoom";
 import MenuScreen from "./components/MenuScreen";
 import LobbyScreen from "./components/LobbyScreen";
 import PlayingScreen from "./components/PlayingScreen";
-import ResultsScreen from "./components/ResultsScreen";
 import CreateQuestionScreen from "./components/CreateQuestionScreen";
-import WaitingForQuestionScreen from "./components/WaitingForQuestionScreen";
-import KingPickScreen from "./components/KingPickScreen";
-import KingRevealScreen from "./components/KingRevealScreen";
+import { KingPickScreen, KingRevealScreen } from "./components/KingScreens";
+import { ResultsScreen, WaitingForQuestionScreen } from "./components/EndScreens";
 import Toast from "./components/Toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { GAME_STATE, PLAYER_ROLE } from "./constants/game.js";
 
-const VerdaderosReales = () => {
-  const gameRoom = useGameRoom();
+export default function App() {
+  const room = useGameRoom();
 
-  const effectiveRole = gameRoom.playerRole === "admin_king" ? "king" : gameRoom.playerRole;
+  const effectiveRole =
+    room.playerRole === PLAYER_ROLE.ADMIN_KING ? PLAYER_ROLE.KING : room.playerRole;
+
+  const screens = {
+    [GAME_STATE.MENU]:              <MenuScreen             {...room} />,
+    [GAME_STATE.LOBBY]:             <LobbyScreen            {...room} />,
+    [GAME_STATE.PICKING_KING]:      <KingPickScreen         {...room} />,
+    [GAME_STATE.KING_REVEAL]:       <KingRevealScreen       {...room} />,
+    [GAME_STATE.PLAYING]:           <PlayingScreen          {...room} playerRole={effectiveRole} />,
+    [GAME_STATE.RESULTS]:           <ResultsScreen          {...room} />,
+    [GAME_STATE.CREATING_QUESTION]: <CreateQuestionScreen   {...room} playerRole={effectiveRole} />,
+    [GAME_STATE.WAITING_QUESTION]:  <WaitingForQuestionScreen {...room} />,
+  };
 
   return (
-    <div className="font-sans">
+    <>
       <Analytics />
       <SpeedInsights />
-
-      {/* Toast global de errores */}
-      <Toast
-        message={gameRoom.errorMsg}
-        onClose={() => {}}
-      />
-
-      {gameRoom.gameState === "menu"             && <MenuScreen {...gameRoom} />}
-      {gameRoom.gameState === "lobby"            && <LobbyScreen {...gameRoom} />}
-      {gameRoom.gameState === "picking_king"     && <KingPickScreen {...gameRoom} />}
-      {gameRoom.gameState === "king_reveal"      && <KingRevealScreen {...gameRoom} />}
-      {gameRoom.gameState === "playing"          && <PlayingScreen {...gameRoom} playerRole={effectiveRole} />}
-      {gameRoom.gameState === "results"          && <ResultsScreen {...gameRoom} />}
-      {gameRoom.gameState === "creating_question" && <CreateQuestionScreen {...gameRoom} playerRole={effectiveRole} />}
-      {gameRoom.gameState === "waiting_question"  && <WaitingForQuestionScreen {...gameRoom} />}
-    </div>
+      <Toast message={room.errorMsg} onClose={() => {}} />
+      {screens[room.gameState] ?? null}
+    </>
   );
-};
-
-export default VerdaderosReales;
+}

@@ -1,186 +1,219 @@
 import { useState, useEffect, useRef } from "react";
-import { Crown, Shuffle, User } from "lucide-react";
+import { Shuffle } from "lucide-react";
 import AdBanner from "./AdBanner";
+import Avatar from "./Avatar";
+import GameBackground from "./GameBackground";
 import storage from "../services/storage.js";
+import { PLAYER_ROLE, KING_PICK_ANIMATION } from "../constants/game.js";
+import { getEveryone } from "../utils/room.js";
+import { assignAvatars } from "../assets/avatars.js";
+
+const { BASE_STEPS, RANDOM_EXTRA_STEPS, FAST_DELAY_MS, SLOW_DELAY_MULTIPLIER, SLOW_START_RATIO } =
+  KING_PICK_ANIMATION;
+
+function computeAnimationDuration(totalSteps) {
+  const slowStart = Math.floor(totalSteps * SLOW_START_RATIO);
+  return slowStart * FAST_DELAY_MS + (totalSteps - slowStart) * totalSteps * SLOW_DELAY_MULTIPLIER + 1200;
+}
 
 export default function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKing, roomCode }) {
   const [highlighted, setHighlighted] = useState(null);
-  const [winner, setWinner]           = useState(null);
-  const [spinning, setSpinning]       = useState(false);
-  const spinRef                        = useRef(false);
+  const [winner, setWinner] = useState(null);
+  const [spinning, setSpinning] = useState(false);
+  const isAnimatingRef = useRef(false);
 
-  const isAdmin = playerRole === "admin";
+  const isAdmin = playerRole === PLAYER_ROLE.ADMIN;
+  const everyone = getEveryone(currentRoom);
+  const avatarMap = assignAvatars(everyone);
 
-  const everyone = [
-    currentRoom.admin,
-    ...(currentRoom.aspirants || []),
-  ];
-
-  // No-admin: esperar a que aparezca winnerId en la sala, luego animar
   useEffect(() => {
-    if (isAdmin || spinRef.current) return;
+    if (isAdmin) return;
     const timer = setInterval(async () => {
+      if (isAnimatingRef.current) return;
       try {
         const result = await storage.get(`room_${roomCode}`);
-        const room   = JSON.parse(result.value);
+        const room = JSON.parse(result.value);
         const winnerId = room.pickingAnimation?.winnerId;
-        if (winnerId && !spinRef.current) {
-          clearInterval(timer);
-          const chosen = everyone.find((p) => p.id === winnerId);
-          if (chosen) runAnimation(chosen);
-        }
+        if (!winnerId) return;
+        clearInterval(timer);
+        const chosen = everyone.find((p) => p.id === winnerId);
+        if (chosen) runAnimation(chosen);
       } catch (_) {}
     }, 500);
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin]);
 
   function runAnimation(chosen) {
-    if (spinRef.current) return;
-    spinRef.current = true;
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
     setSpinning(true);
     setWinner(null);
-
-    const totalSteps = 24 + Math.floor(Math.random() * 8);
+    const totalSteps = BASE_STEPS + Math.floor(Math.random() * RANDOM_EXTRA_STEPS);
     let step = 0;
-
     function tick() {
       setHighlighted(everyone[step % everyone.length].id);
       step++;
-
-      const delay = step < totalSteps * 0.6
-        ? 100
-        : 100 + (step - totalSteps * 0.6) * 35;
-
-      if (step < totalSteps) {
-        setTimeout(tick, delay);
-      } else {
+      const slowStart = Math.floor(totalSteps * SLOW_START_RATIO);
+      const delay = step < slowStart ? FAST_DELAY_MS : FAST_DELAY_MS + (step - slowStart) * SLOW_DELAY_MULTIPLIER;
+      if (step < totalSteps) setTimeout(tick, delay);
+      else {
         setHighlighted(chosen.id);
         setWinner(chosen);
         setSpinning(false);
-        spinRef.current = false;
+        isAnimatingRef.current = false;
       }
     }
     tick();
   }
 
   async function handleRandom() {
-    if (spinRef.current) return;
-
-    // 1. Elegir ganador
+    if (isAnimatingRef.current) return;
     const chosen = everyone[Math.floor(Math.random() * everyone.length)];
-
-    // 2. Persistir ganador para que los demás lo lean y animen
     try {
-      const snap = { ...currentRoom, pickingAnimation: { winnerId: chosen.id } };
-      await storage.set(`room_${roomCode}`, JSON.stringify(snap));
+      await storage.set(`room_${roomCode}`, JSON.stringify({ ...currentRoom, pickingAnimation: { winnerId: chosen.id } }));
     } catch (_) {}
-
-    // 3. Animar localmente en el admin
     runAnimation(chosen);
-
-    // 4. Tras la animación, confirmar el líder
-    const animDuration = (24 * 100) + (12 * 35) + 1200;
-    setTimeout(() => pickRandomKing(chosen.id), animDuration);
+    setTimeout(() => pickRandomKing(chosen.id), computeAnimationDuration(BASE_STEPS + RANDOM_EXTRA_STEPS));
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full p-3"><AdBanner slot="top" /></div>
+    <GameBackground>
+      <div className="screen">
+        <div style={{ width: "100%", maxWidth: 560, padding: "10px 16px 0" }}>
+          <AdBanner slot="top" onDark />
+        </div>
 
-      <div className="flex-1 w-full p-4 flex flex-col items-center">
-        <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-5">
-
-          <div className="text-center mb-6">
-            <Crown className="w-14 h-14 mx-auto mb-2 text-yellow-500" />
-            <h2 className="text-2xl font-bold text-gray-800">¿Quién es el Líder?</h2>
-            <p className="text-gray-500 text-sm mt-1">
+        <div className="screen-content">
+          {/* Header */}
+          <div style={{ textAlign: "center" }}>
+            <div className="anim-float" style={{ fontSize: 52, display: "inline-block", marginBottom: 6 }}>
+              👑
+            </div>
+            <h2
+              className="text-display"
+              style={{ fontSize: 32, color: "#fff", textShadow: "0 4px 0 rgba(0,0,0,0.2)", marginBottom: 4 }}
+            >
+              ¿Quién es el Líder?
+            </h2>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontWeight: 700, fontSize: 14 }}>
               {isAdmin
                 ? "Elige tú o deja que el azar decida"
                 : `${currentRoom?.admin?.name} está eligiendo al Líder`}
             </p>
           </div>
 
-          {/* Grilla — visible para todos */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          {/* Player grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
             {everyone.map((person) => {
               const isHighlighted = highlighted === person.id;
-              const isWinner      = winner?.id === person.id;
+              const isWinner = winner?.id === person.id;
               return (
-                <div key={person.id}
-                  className={`p-4 rounded-xl border-2 text-center transition-all duration-100
-                    ${isWinner
-                      ? "bg-yellow-100 border-yellow-400 scale-105"
+                <div
+                  key={person.id}
+                  style={{
+                    background: isWinner
+                      ? "rgba(245,158,11,0.3)"
                       : isHighlighted
-                        ? "bg-purple-200 border-purple-500 scale-105"
-                        : "bg-gray-50 border-gray-200"}`}>
-                  <div className={`w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center
-                    ${isWinner ? "bg-yellow-400" : isHighlighted ? "bg-purple-400" : "bg-gray-200"}`}>
-                    {isWinner
-                      ? <Crown className="w-5 h-5 text-white" />
-                      : <User className={`w-5 h-5 ${isHighlighted ? "text-white" : "text-gray-500"}`} />}
+                      ? "rgba(139,92,246,0.4)"
+                      : "rgba(255,255,255,0.1)",
+                    border: isWinner
+                      ? "2.5px solid #F59E0B"
+                      : isHighlighted
+                      ? "2.5px solid #8B5CF6"
+                      : "1.5px solid rgba(255,255,255,0.15)",
+                    borderRadius: 16,
+                    padding: "14px 8px",
+                    textAlign: "center",
+                    backdropFilter: "blur(8px)",
+                    transform: isWinner || isHighlighted ? "scale(1.05)" : "scale(1)",
+                    transition: "all 0.12s ease",
+                    boxShadow: isWinner ? "0 0 20px rgba(245,158,11,0.4)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                    <Avatar
+                      avatar={avatarMap[person.id]}
+                      size="sm"
+                      crown={isWinner}
+                      pulse={isHighlighted}
+                    />
                   </div>
-                  <p className="font-semibold text-gray-800 truncate text-sm">{person.name}</p>
+                  <div className="truncate" style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}>
+                    {person.name}
+                  </div>
                   {person.id === currentRoom.admin?.id && (
-                    <span className="text-xs text-purple-500 font-medium">Admin</span>
+                    <div style={{ fontSize: 10, color: "rgba(245,158,11,0.9)", fontWeight: 800, marginTop: 2 }}>
+                      Admin
+                    </div>
                   )}
                 </div>
               );
             })}
           </div>
 
-          {/* Controles — solo admin */}
+          {/* Controls — admin only */}
           {isAdmin && !winner && (
-            <>
-              <button
-                onClick={handleRandom}
-                disabled={spinning}
-                className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-purple-700 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60 mb-3 border-0">
-                <Shuffle className="w-5 h-5" />
-                {spinning ? "Eligiendo..." : "Líder Random"}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button className="btn btn-gold" onClick={handleRandom} disabled={spinning} style={{ fontSize: 17 }}>
+                <Shuffle size={18} />
+                {spinning ? "Eligiendo..." : "Líder al Azar"}
               </button>
 
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-xs text-gray-400 font-medium">o elige manualmente</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
+              <div className="divider">o elige manualmente</div>
 
-              <div className="space-y-2">
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {everyone.map((person) => (
-                  <button key={person.id}
+                  <button
+                    key={person.id}
+                    className="btn btn-outline"
                     onClick={() => pickKing(person.id)}
                     disabled={spinning}
-                    className="w-full bg-gray-50 border-2 border-gray-200 text-gray-800 p-3 rounded-xl font-semibold hover:border-purple-400 hover:bg-purple-50 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                      <User className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <span className="truncate">{person.name}</span>
+                    style={{ justifyContent: "flex-start", gap: 12 }}
+                  >
+                    <Avatar avatar={avatarMap[person.id]} size="sm" />
+                    <span>{person.name}</span>
                     {person.id === currentRoom.admin?.id && (
-                      <span className="ml-auto text-xs text-purple-500 font-medium flex-shrink-0">Admin</span>
+                      <span style={{ marginLeft: "auto", fontSize: 11, color: "#8B5CF6", fontWeight: 800 }}>
+                        Admin
+                      </span>
                     )}
                   </button>
                 ))}
               </div>
-            </>
+            </div>
           )}
 
           {!isAdmin && !winner && !spinning && (
-            <p className="text-center text-sm text-gray-400 animate-pulse mt-2">
+            <p style={{ textAlign: "center", color: "rgba(255,255,255,0.5)", fontWeight: 700, fontSize: 14 }}>
               Esperando decisión del administrador...
             </p>
           )}
 
           {winner && (
-            <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 text-center mt-2">
-              <Crown className="w-8 h-8 text-yellow-500 mx-auto mb-1" />
-              <p className="font-bold text-gray-800 text-lg">{winner.name} es el Líder</p>
+            <div
+              className="anim-pop"
+              style={{
+                background: "rgba(245,158,11,0.2)",
+                border: "2.5px solid #F59E0B",
+                borderRadius: 20,
+                padding: 20,
+                textAlign: "center",
+                boxShadow: "0 0 30px rgba(245,158,11,0.3)",
+              }}
+            >
+              <div style={{ fontSize: 40, marginBottom: 6 }}>🎉</div>
+              <p style={{ fontWeight: 800, color: "#fff", fontSize: 20 }}>
+                {winner.name} es el Líder
+              </p>
             </div>
           )}
+        </div>
 
+        <div style={{ width: "100%", maxWidth: 560, padding: "0 16px 16px" }}>
+          <AdBanner slot="bottom" onDark />
         </div>
       </div>
-
-      <div className="w-full p-3"><AdBanner slot="bottom" /></div>
-    </div>
+    </GameBackground>
   );
 }

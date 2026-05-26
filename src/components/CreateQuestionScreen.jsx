@@ -1,252 +1,216 @@
 import { useState } from "react";
 import { Plus, X, Send, Zap } from "lucide-react";
-import AdBanner from "./AdBanner";
-
-const MAX_QUESTION_LENGTH = 200;
-const MAX_OPTION_LENGTH   = 80;
+import { ScreenWrapper, Avatar } from "./Layout.jsx";
+import { MAX_QUESTION_LENGTH, MAX_OPTION_LENGTH, MAX_OPTIONS, MIN_OPTIONS } from "../constants/game.js";
+import { getAllPlayers, getEveryone } from "../utils/room.js";
+import { assignAvatars } from "../assets/avatars.js";
 
 const TYPES = [
-  { value: "text",     label: "Texto libre" },
-  { value: "boolean",  label: "Sí / No" },
-  { value: "multiple", label: "Opción múltiple" },
+  { value: "text",     label: "✏️ Texto"    },
+  { value: "boolean",  label: "✅ Sí / No"  },
+  { value: "multiple", label: "🔢 Múltiple" },
 ];
 
-function Scoreboard({ currentRoom }) {
-  const adminIsKing = currentRoom.admin?.id === currentRoom.king?.id;
-  const allPlayers  = [
-    ...(currentRoom.aspirants || []),
-    ...(!adminIsKing && currentRoom.admin ? [currentRoom.admin] : []),
-  ];
-
-  const sorted = [...allPlayers].sort(
-    (a, b) => (currentRoom.scores?.[b.id] || 0) - (currentRoom.scores?.[a.id] || 0)
-  );
-
-  if (!sorted.length) return null;
-
-  return (
-    <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Puntajes</p>
-      <div className="grid grid-cols-2 gap-2">
-        {sorted.map((p, i) => (
-          <div key={p.id} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-gray-100">
-            <span className="text-xs text-gray-400 font-bold w-4">#{i + 1}</span>
-            <span className="flex-1 text-sm font-semibold text-gray-700 truncate">{p.name}</span>
-            <span className="text-sm font-bold text-purple-600">{currentRoom.scores?.[p.id] || 0}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default function CreateQuestionScreen({ currentRoom, playerName, submitCustomQuestion }) {
+export default function CreateQuestionScreen({ currentRoom, submitCustomQuestion, resetGame }) {
   const defaultPoints  = currentRoom?.config?.pointsPerAnswer ?? 1;
   const penaltyEnabled = currentRoom?.config?.penaltyEnabled  ?? false;
-  const defaultPenalty = defaultPoints; // misma magnitud que los puntos por defecto
 
-  const [text, setText]         = useState("");
-  const [type, setType]         = useState("text");
-  const [options, setOptions]   = useState(["", ""]);
-  const [points, setPoints]     = useState(defaultPoints);
-  const [penalty, setPenalty]   = useState(defaultPenalty);
-  const [sending, setSending]   = useState(false);
+  const [text, setText]       = useState("");
+  const [type, setType]       = useState("text");
+  const [options, setOptions] = useState(["", ""]);
+  const [points, setPoints]   = useState(defaultPoints);
+  const [penalty, setPenalty] = useState(defaultPoints);
+  const [sending, setSending] = useState(false);
 
   const roundNum    = (currentRoom?.currentQuestionIndex ?? 0) + 1;
   const totalRounds = currentRoom?.config?.rounds ?? 10;
 
-  function addOption() {
-    if (options.length < 6) setOptions([...options, ""]);
-  }
+  const everyone  = getEveryone(currentRoom);
+  const avatarMap = assignAvatars(everyone);
+  const players   = getAllPlayers(currentRoom);
+  const sorted    = [...players].sort(
+    (a, b) => (currentRoom?.scores?.[b.id] || 0) - (currentRoom?.scores?.[a.id] || 0)
+  );
 
-  function removeOption(i) {
-    if (options.length <= 2) return;
-    setOptions(options.filter((_, idx) => idx !== i));
-  }
-
-  function updateOption(i, val) {
-    const next = [...options];
-    next[i] = val.slice(0, MAX_OPTION_LENGTH);
-    setOptions(next);
+  function addOption()       { if (options.length < MAX_OPTIONS) setOptions([...options, ""]); }
+  function removeOption(i)   { if (options.length > MIN_OPTIONS) setOptions(options.filter((_, idx) => idx !== i)); }
+  function updateOption(i, v) {
+    const next = [...options]; next[i] = v.slice(0, MAX_OPTION_LENGTH); setOptions(next);
   }
 
   async function handleSend() {
     if (!text.trim() || sending) return;
-    if (type === "multiple" && options.filter(o => o.trim()).length < 2) return;
+    if (type === "multiple" && options.filter((o) => o.trim()).length < MIN_OPTIONS) return;
     setSending(true);
-    const question = {
-      id: Date.now(),
-      text: text.trim(),
-      type,
-      options:  type === "multiple" ? options.filter(o => o.trim()) : undefined,
-      points,
-      penalty:  penaltyEnabled ? penalty : 0,
-    };
-    await submitCustomQuestion(question);
+    await submitCustomQuestion({
+      id: Date.now(), text: text.trim(), type,
+      options: type === "multiple" ? options.filter((o) => o.trim()) : undefined,
+      points, penalty: penaltyEnabled ? penalty : 0,
+    });
     setSending(false);
   }
 
-  const multipleValid = type !== "multiple" || options.filter(o => o.trim()).length >= 2;
-  const canSend = text.trim().length > 0 && multipleValid && !sending;
+  const canSend = text.trim().length > 0
+    && (type !== "multiple" || options.filter((o) => o.trim()).length >= MIN_OPTIONS)
+    && !sending;
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full p-3"><AdBanner slot="top" /></div>
+    <ScreenWrapper withBg onExit={resetGame}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2 className="t-display" style={{ fontSize: 24, color: "#fff" }}>Crear Pregunta</h2>
+        <div className="pill pill-purple">Ronda {roundNum}/{totalRounds}</div>
+      </div>
 
-      <div className="flex-1 w-full p-4 flex flex-col items-center">
-        <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-5">
-
-          <div className="flex justify-between items-center mb-5">
-            <h2 className="text-2xl font-bold text-gray-800">Crear Pregunta</h2>
-            <span className="text-purple-600 font-bold">Ronda {roundNum}/{totalRounds}</span>
-          </div>
-
-          <Scoreboard currentRoom={currentRoom} />
-
-          {/* Tipo */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo de pregunta</label>
-            <div className="grid grid-cols-3 gap-2">
-              {TYPES.map((t) => (
-                <button key={t.value}
-                  onClick={() => setType(t.value)}
-                  className={`p-3 rounded-xl font-semibold text-sm transition-all border-0 active:scale-95
-                    ${type === t.value
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-purple-100"}`}>
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Texto de la pregunta */}
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Pregunta</label>
-            <div className="relative">
-              <textarea
-                rows={3}
-                placeholder="Escribe la pregunta sobre ti..."
-                value={text}
-                onChange={(e) => setText(e.target.value.slice(0, MAX_QUESTION_LENGTH))}
-                maxLength={MAX_QUESTION_LENGTH}
-                className="w-full p-4 pb-7 border-2 border-gray-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none resize-none"
-              />
-              <span className={`absolute right-3 bottom-2 text-xs ${text.length >= MAX_QUESTION_LENGTH ? "text-red-400 font-bold" : "text-gray-400"}`}>
-                {text.length}/{MAX_QUESTION_LENGTH}
-              </span>
-            </div>
-          </div>
-
-          {/* Opciones múltiple */}
-          {type === "multiple" && (
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Opciones de respuesta</label>
-              <div className="space-y-2">
-                {options.map((opt, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <div className="relative flex-1">
-                      <input
-                        type="text"
-                        placeholder={`Opción ${i + 1}`}
-                        value={opt}
-                        onChange={(e) => updateOption(i, e.target.value)}
-                        maxLength={MAX_OPTION_LENGTH}
-                        className="w-full p-3 pr-14 border-2 border-gray-300 rounded-xl focus:border-purple-500 focus:outline-none"
-                      />
-                      <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs ${opt.length >= MAX_OPTION_LENGTH ? "text-red-400 font-bold" : "text-gray-400"}`}>
-                        {opt.length}/{MAX_OPTION_LENGTH}
-                      </span>
-                    </div>
-                    <button onClick={() => removeOption(i)}
-                      disabled={options.length <= 2}
-                      className="p-2 rounded-lg bg-red-100 text-red-500 hover:bg-red-200 disabled:opacity-30 border-0 active:scale-95 transition-all flex-shrink-0">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+      {/* Scoreboard mini */}
+      {sorted.length > 0 && (
+        <div className="glass">
+          <div className="t-label" style={{ marginBottom: 10 }}>Puntajes</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+            {sorted.map((p, i) => (
+              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "var(--c-w45)", minWidth: 20 }}>#{i + 1}</span>
+                <Avatar avatar={avatarMap[p.id]} size="sm" />
+                <span className="truncate" style={{ flex: 1, fontSize: 13, fontWeight: 800, color: "#fff" }}>{p.name}</span>
+                <span className="t-display" style={{ fontSize: 18, color: "var(--c-gold)" }}>
+                  {currentRoom?.scores?.[p.id] || 0}
+                </span>
               </div>
-              {options.length < 6 && (
-                <button onClick={addOption}
-                  className="mt-2 flex items-center gap-1 text-sm text-purple-600 font-semibold hover:text-purple-800 border-0 bg-transparent active:scale-95 transition-all">
-                  <Plus className="w-4 h-4" /> Agregar opción
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Puntuación de esta pregunta */}
-          <div className={`rounded-xl border-2 p-4 mb-4 ${penaltyEnabled ? "border-gray-200 bg-gray-50" : "border-purple-100 bg-purple-50"}`}>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Puntuación de esta pregunta</p>
-
-            {/* Puntos por acierto */}
-            <div className="mb-3">
-              <div className="flex justify-between items-center mb-1">
-                <label className="text-sm font-semibold text-gray-700">Puntos por acierto</label>
-                <span className="text-xl font-bold text-purple-600">{points}</span>
-              </div>
-              <input
-                type="range" min={1} max={10} step={1}
-                value={points}
-                onChange={(e) => setPoints(Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                style={{ accentColor: "#7c3aed" }}
-              />
-              <div className="flex justify-between text-xs text-gray-400 mt-0.5">
-                <span>1</span>
-                <span className="text-gray-400">por defecto: {defaultPoints}</span>
-                <span>10</span>
-              </div>
-            </div>
-
-            {/* Puntos de castigo — solo si está habilitado globalmente */}
-            {penaltyEnabled && (
-              <div className="pt-3 border-t border-gray-200">
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                    <Zap className="w-3.5 h-3.5 text-red-500" /> Puntos de castigo
-                  </label>
-                  <span className="text-xl font-bold text-red-500">{penalty}</span>
-                </div>
-                <input
-                  type="range" min={1} max={10} step={1}
-                  value={penalty}
-                  onChange={(e) => setPenalty(Number(e.target.value))}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                  style={{ accentColor: "#ef4444" }}
-                />
-                <div className="flex justify-between text-xs text-gray-400 mt-0.5">
-                  <span>1</span>
-                  <span className="text-gray-400">por defecto: {defaultPenalty}</span>
-                  <span>10</span>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
+        </div>
+      )}
 
-          {/* Resumen de la pregunta */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 mb-4 flex items-center justify-center gap-3 text-sm">
-            <span className="text-green-600 font-bold">+{points} acierto</span>
-            {penaltyEnabled && (
-              <>
-                <span className="text-gray-300">·</span>
-                <span className="text-red-500 font-bold">-{penalty} fallo</span>
-              </>
-            )}
-          </div>
-
-          <button
-            onClick={handleSend}
-            disabled={!canSend}
-            className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-purple-700 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed border-0">
-            <Send className="w-5 h-5" />
-            {sending ? "Enviando..." : "Enviar pregunta"}
-          </button>
-
+      {/* Type tabs */}
+      <div>
+        <div className="t-label" style={{ marginBottom: 8 }}>Tipo de pregunta</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+          {TYPES.map((t) => (
+            <button key={t.value} onClick={() => setType(t.value)} style={{
+              background: type === t.value ? "var(--c-primary-mid)" : "var(--c-w12)",
+              border: type === t.value ? "1.5px solid rgba(139,92,246,0.5)" : "1.5px solid var(--c-w18)",
+              borderRadius: "var(--r-md)", padding: "10px 6px",
+              fontFamily: "var(--font-body)", fontWeight: 800, fontSize: 12,
+              color: type === t.value ? "#fff" : "var(--c-w60)",
+              cursor: "pointer",
+              boxShadow: type === t.value ? "0 4px 0 var(--c-primary-dark)" : "none",
+              transition: "all 0.12s",
+            }}>
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="w-full p-3"><AdBanner slot="bottom" /></div>
-    </div>
+      {/* Question textarea */}
+      <div>
+        <div className="t-label" style={{ marginBottom: 8 }}>Pregunta</div>
+        <div style={{ position: "relative" }}>
+          <textarea
+            rows={3} placeholder="Escribe la pregunta sobre ti..."
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, MAX_QUESTION_LENGTH))}
+            maxLength={MAX_QUESTION_LENGTH}
+            className="input"
+            style={{ paddingBottom: 28 }}
+          />
+          <span style={{
+            position: "absolute", right: 10, bottom: 9, fontSize: 10, fontWeight: 700,
+            color: text.length >= MAX_QUESTION_LENGTH ? "var(--c-danger)" : "var(--c-w45)",
+          }}>
+            {text.length}/{MAX_QUESTION_LENGTH}
+          </span>
+        </div>
+      </div>
+
+      {/* Multiple options */}
+      {type === "multiple" && (
+        <div>
+          <div className="t-label" style={{ marginBottom: 8 }}>Opciones</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {options.map((opt, i) => (
+              <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ position: "relative", flex: 1 }}>
+                  <input
+                    type="text" placeholder={`Opción ${i + 1}`} value={opt}
+                    onChange={(e) => updateOption(i, e.target.value)}
+                    maxLength={MAX_OPTION_LENGTH}
+                    className="input" style={{ paddingRight: 48, fontSize: 14 }}
+                  />
+                  <span style={{
+                    position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+                    fontSize: 10, fontWeight: 700,
+                    color: opt.length >= MAX_OPTION_LENGTH ? "var(--c-danger)" : "var(--c-w45)",
+                  }}>
+                    {opt.length}/{MAX_OPTION_LENGTH}
+                  </span>
+                </div>
+                <button onClick={() => removeOption(i)} disabled={options.length <= MIN_OPTIONS} style={{
+                  background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)",
+                  borderRadius: "var(--r-sm)", padding: "10px", cursor: "pointer",
+                  display: "flex", alignItems: "center", flexShrink: 0,
+                  opacity: options.length <= MIN_OPTIONS ? 0.3 : 1,
+                }}>
+                  <X size={15} color="#EF4444" />
+                </button>
+              </div>
+            ))}
+          </div>
+          {options.length < MAX_OPTIONS && (
+            <button onClick={addOption} style={{
+              marginTop: 8, background: "transparent", border: "none",
+              color: "#8B5CF6", fontWeight: 800, fontSize: 13,
+              fontFamily: "inherit", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 5, padding: 0,
+            }}>
+              <Plus size={14} /> Agregar opción
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Points config */}
+      <div className="glass">
+        <div className="t-label" style={{ marginBottom: 12 }}>Puntuación</div>
+
+        <div style={{ marginBottom: penaltyEnabled ? 14 : 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)" }}>Acierto</span>
+            <span className="t-display" style={{ fontSize: 22, color: "var(--c-gold)" }}>{points}</span>
+          </div>
+          <input type="range" min={1} max={10} step={1} value={points}
+            onChange={(e) => setPoints(Number(e.target.value))}
+            style={{ width: "100%", accentColor: "var(--c-gold)" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--c-w45)", marginTop: 3 }}>
+            <span>1</span><span>Por defecto: {defaultPoints}</span><span>10</span>
+          </div>
+        </div>
+
+        {penaltyEnabled && (
+          <div style={{ paddingTop: 12, borderTop: "1px solid var(--c-w12)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)", display: "flex", alignItems: "center", gap: 5 }}>
+                <Zap size={13} color="#EF4444" /> Castigo
+              </span>
+              <span className="t-display" style={{ fontSize: 22, color: "#EF4444" }}>{penalty}</span>
+            </div>
+            <input type="range" min={1} max={10} step={1} value={penalty}
+              onChange={(e) => setPenalty(Number(e.target.value))}
+              style={{ width: "100%", accentColor: "#EF4444" }} />
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 6, marginTop: 12, justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="pill pill-purple">+{points} acierto</div>
+          {penaltyEnabled && <div className="pill pill-red">-{penalty} fallo</div>}
+        </div>
+      </div>
+
+      {/* Send */}
+      <button className="btn btn-gold" onClick={handleSend} disabled={!canSend} style={{ fontSize: 16 }}>
+        <Send size={17} />
+        {sending ? "Enviando..." : "Enviar Pregunta"}
+      </button>
+    </ScreenWrapper>
   );
 }

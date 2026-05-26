@@ -1,99 +1,131 @@
 # Changelog — Verdaderos Reales
 
-Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/).
-
 ---
 
 ## [Sin publicar]
 
 ---
 
-## [0.1.0] - 2026-05-14
+## [1.2] - 2026-05-25
 
-### Añadido
-- Castigo por fallo: resta puntos al fallar (puede resultar en puntaje negativo).
-- Puntuación por pregunta en modo personalizado: el King define puntos de acierto y castigo al crear cada pregunta.
-- Badge de valor de pregunta en la pantalla de juego (acierto y castigo).
-- Scoreboard en `CreateQuestionScreen` y `WaitingForQuestionScreen`.
-- Toast global de errores (reemplaza `alert()`).
-- Detección de sala cerrada: jugadores son redirigidos al menú si el admin resetea.
-- `answeredQuestions` persiste en `localStorage` y se restaura al reconectarse.
+### Nuevo
+- Botón de salida disponible en todas las pantallas del juego. Muestra una confirmación antes de salir para evitar cierres accidentales.
+
+### Rediseño visual completo
+- Nuevo estilo caricaturesco y colorido en todas las pantallas.
+- Avatares asignados automáticamente a cada jugador al entrar a la sala.
+- Pantalla del menú con gradiente oscuro y logo animado.
+- Sala de espera con código de sala destacado y jugadores en cuadrícula con avatar.
+- Pantalla de selección del Líder con animación visual para todos los jugadores.
+- Pantalla de partida con marcador de puntajes compacto y preguntas destacadas.
+- Pantalla de resultados con medallas, tarjeta del ganador y tabla final.
+- Modal de configuración rediseñado con el mismo estilo del juego.
+- El juego se adapta correctamente a móvil, tablet y escritorio.
+
+---
+
+## [1.1] - 2026-05-17
+
+### Arreglado
+- La animación de selección del Líder podía ejecutarse dos veces en algunos casos.
+- El tiempo de espera antes de confirmar el Líder era incorrecto y causaba desfases.
+- Las preguntas respondidas no se limpiaban correctamente al terminar una partida.
+- Al reconectarse, algunos jugadores podían aparecer con el rol equivocado.
+- En ciertos casos la respuesta de un jugador no quedaba guardada correctamente.
+- Al unirse de nuevo a una sala, algunos jugadores no eran reconocidos como participantes existentes.
 
 ### Cambiado
-- Controles de rondas y puntos cambiaron de botones a sliders (rondas: 2–20, puntos: 1–10).
-- Scoreboard unificado en todas las pantallas: lista ordenada con indicador de estado por ronda.
-- Polling de sala estabilizado (sin intervals zombies).
-
-### Corregido
-- Doble submit en respuestas de texto libre.
-- Límite de caracteres faltante en `CreateQuestionScreen`.
-- `answeredQuestions` no se limpiaba al hacer revancha para los aspirantes.
-- Reconexión restauraba índices incorrectos de preguntas respondidas.
+- El código del juego fue reorganizado internamente para ser más fácil de mantener y menos propenso a errores. Esto no cambia nada visible para el jugador.
 
 ---
 
-## [0.0.6] - 2026-04-28
-### Añadido
-- Agregado el modo personalizado.
-- creado la pantalla de creación de preguntas.
-- creado la pantalla de espera mientras se crea la pregunta.
-- creado la pantalla de selección del rey.
-- añadido un nuevo rol que maneja toda la sala (admin).
-- añadido el boton de revancha para volver a jugar en la misma sala.
+## [1.0] - 2026-05-14
 
-
----
-
-## [0.0.5] - 2026-04-18
-### Añadido
-- Modal de configuración para selección de rondas y puntajes.
-- las respuestas pueden tener diferentes valores.
-- selección entre diferentes opciones de numero de preguntas y puntos.
-
----
-
-## [0.0.4] - 2026-03-05
-### Añadido
-- Límite de caracteres en respuestas de texto.
-- Tabla final de resultados ordenada por puntaje con desglose de respuestas.
-- Duración de partida calculada desde `startedAt` hasta `finishedAt`.
-- Instrucciones para el rey visibles durante la partida.
-
-### Corregido
-- Estados de participantes no cargaban si no habían respondido.
-- Visualización incorrecta de respuestas de los reales.
-
----
-
-## [0.0.3] — 2026-03-04
-### Añadido
-- Espacios publicitarios (`AdBanner`) en la parte superior e inferior de todas las pantallas.
-- 101 preguntas genéricas nuevas (total: 199).
+### Nuevo
+- Castigo por respuesta incorrecta: fallar puede restar puntos (el puntaje puede quedar en negativo).
+- En el modo personalizado, el Líder puede definir cuánto vale cada pregunta individualmente.
+- Se muestra el valor de cada pregunta durante la partida (puntos por acierto y castigo).
+- Tabla de puntajes visible también en la pantalla de creación de pregunta y en la de espera.
+- Los errores del juego ahora aparecen como mensajes en pantalla en vez de ventanas emergentes.
+- Si el administrador cierra la sala, los jugadores son redirigidos al menú automáticamente.
+- Las preguntas respondidas se recuerdan aunque el jugador cierre y vuelva a abrir la app.
 
 ### Cambiado
-- Pantallas adaptadas a móvil, tablet y desktop con ancho máximo en contenedores.
+- Los controles de rondas y puntos cambiaron de botones a barras deslizantes (rondas: 2–20, puntos: 1–10).
+- La tabla de puntajes ahora muestra el estado de cada jugador en la ronda actual.
+- El juego ya no crea intervalos de actualización duplicados en segundo plano.
+
+### Arreglado
+- Era posible enviar la misma respuesta dos veces en preguntas de texto.
+- El límite de caracteres no se aplicaba en la pantalla de creación de preguntas.
+- Al hacer revancha, las preguntas respondidas no se reiniciaban para todos los jugadores.
+- Al reconectarse, el índice de la última pregunta respondida podía quedar desfasado.
 
 ---
 
-## [0.0.2] — 2026-03-03
-### Añadido
-- Estados visuales de respuesta por jugador en el scoreboard: azul (respondió), verde (correcto), rojo (incorrecto).
-- Historial de respuestas por jugador visible durante la partida.
-- Historial de respuestas con detalle de pregunta, respuesta y resultado en pantalla de resultados.
+## [0.6] - 2026-04-28
+
+### Nuevo
+- Modo personalizado: el Líder escribe cada pregunta en vivo durante la partida.
+- Pantalla de espera mientras el Líder redacta la pregunta de la ronda.
+- Pantalla de selección del Líder con animación antes de iniciar la partida.
+- Nuevo rol de administrador que controla el flujo completo de la sala.
+- Botón de revancha para volver a jugar en la misma sala sin salir.
+
+---
+
+## [0.5] - 2026-04-18
+
+### Nuevo
+- Ventana de configuración para elegir el número de rondas y puntos por acierto antes de iniciar.
+- Las respuestas pueden tener distinto valor según la pregunta.
+
+---
+
+## [0.4] - 2026-03-05
+
+### Nuevo
+- Límite de caracteres en las respuestas de texto.
+- Pantalla de resultados al final con tabla ordenada por puntaje y detalle de cada respuesta.
+- Duración total de la partida visible en los resultados.
+- Instrucciones para el Líder visibles mientras la partida está en curso.
+
+### Arreglado
+- Los jugadores que no habían respondido no aparecían en el marcador.
+- Las respuestas de los jugadores no se mostraban correctamente en pantalla.
+
+---
+
+## [0.3] - 2026-03-04
+
+### Nuevo
+- Espacios para publicidad en la parte superior e inferior de todas las pantallas.
+- 101 preguntas genéricas nuevas (total: 199 preguntas disponibles).
 
 ### Cambiado
-- Optimización general del código base.
+- Las pantallas ahora se ven bien en celular, tablet y computadora.
 
 ---
 
-## [0.0.1] — 2026-02-17
-### Añadido
-- Flujo completo de partida: menú → lobby → juego → resultados.
-- Creación y unión a salas con código de 6 caracteres.
-- Modo genérico: 99 preguntas predefinidas en español mezcladas aleatoriamente.
-- Sistema de validación: el King marca cada respuesta como correcta o incorrecta.
-- Scoreboard en tiempo real actualizado tras cada validación.
+## [0.2] - 2026-03-03
+
+### Nuevo
+- Indicadores de color en el marcador: azul (respondió), verde (correcto), rojo (incorrecto).
+- Historial de respuestas visible durante la partida.
+- Detalle de preguntas, respuestas y resultados en la pantalla final.
+
+### Cambiado
+- Mejoras generales de rendimiento y estabilidad.
+
+---
+
+## [0.1] - 2026-02-17
+
+### Nuevo
+- Flujo completo de partida: menú → sala de espera → juego → resultados.
+- Crear y unirse a salas con un código de 6 caracteres.
+- Modo genérico con 99 preguntas predefinidas en español mezcladas aleatoriamente.
+- El Líder marca cada respuesta como correcta o incorrecta.
+- Tabla de puntajes actualizada en tiempo real tras cada validación.
 - Configuración de partida: número de rondas y puntos por acierto.
-- Soporte multijugador en tiempo real vía polling cada 3 segundos.
-- API serverless en Vercel con endpoints: `join`, `answer`, `validate`.
-
+- Multijugador en tiempo real: los cambios se sincronizan entre jugadores automáticamente.

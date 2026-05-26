@@ -1,52 +1,94 @@
-import { Crown, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import AdBanner from "./AdBanner";
+import Avatar from "./Avatar";
+import GameBackground from "./GameBackground";
+import { PLAYER_ROLE } from "../constants/game.js";
+import { getEveryone } from "../utils/room.js";
+import { assignAvatars } from "../assets/avatars.js";
 
 export default function KingRevealScreen({ currentRoom, playerRole, playerName, confirmKingAndStart }) {
-  const king    = currentRoom?.king;
-  const isAdmin = playerRole === "admin" || playerRole === "admin_king";
-  const isKing  = king?.name === playerName;
+  const king = currentRoom?.king;
+  const isAdmin = playerRole === PLAYER_ROLE.ADMIN || playerRole === PLAYER_ROLE.ADMIN_KING;
+  const isKing = king?.name === playerName;
+
+  const everyone = getEveryone(currentRoom);
+  const avatarMap = assignAvatars(everyone);
+  const kingAvatar = avatarMap[king?.id];
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full p-3"><AdBanner slot="top" /></div>
+    <GameBackground>
+      <div className="screen" style={{ justifyContent: "center" }}>
+        <div style={{ width: "100%", maxWidth: 560, padding: "10px 16px 0" }}>
+          <AdBanner slot="top" onDark />
+        </div>
 
-      <div className="flex-1 w-full p-4 flex flex-col items-center justify-center">
-        <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-8 text-center">
+        <div className="screen-content" style={{ justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+          {/* Crown animation */}
+          <div className="anim-float" style={{ fontSize: 60, marginBottom: -8 }}>👑</div>
 
-          <Crown className="w-20 h-20 mx-auto mb-4 text-yellow-500" />
+          {/* King avatar */}
+          <div className="anim-pop" style={{ display: "flex", justifyContent: "center" }}>
+            <Avatar avatar={kingAvatar} size="lg" crown />
+          </div>
 
-          <p className="text-gray-500 text-sm mb-2 uppercase tracking-widest font-semibold">El Líder es</p>
-          <h2 className="text-4xl font-bold text-gray-800 mb-2">{king?.name}</h2>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.55)", fontWeight: 800, fontSize: 12, letterSpacing: 2, textTransform: "uppercase", marginBottom: 6 }}>
+              El Líder es
+            </p>
+            <h2
+              className="text-display"
+              style={{ fontSize: 38, color: "#fff", textShadow: "0 5px 0 rgba(0,0,0,0.25)" }}
+            >
+              {king?.name}
+            </h2>
+          </div>
 
-          {isKing && (
-            <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl p-3 mt-3 mb-4">
-              <p className="text-yellow-800 font-semibold">¡Eres el Líder! Las preguntas son sobre ti 👑</p>
+          {isKing ? (
+            <div
+              style={{
+                background: "rgba(245,158,11,0.2)",
+                border: "2px solid rgba(245,158,11,0.5)",
+                borderRadius: 16,
+                padding: "14px 20px",
+                width: "100%",
+              }}
+            >
+              <p style={{ color: "#FDE68A", fontWeight: 800, fontSize: 15 }}>
+                ¡Eres el Líder! Las preguntas son sobre ti 👑
+              </p>
             </div>
-          )}
-
-          {!isKing && (
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-3 mt-3 mb-4">
-              <p className="text-purple-700 font-semibold">Las preguntas serán sobre {king?.name}</p>
+          ) : (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1.5px solid rgba(255,255,255,0.2)",
+                borderRadius: 16,
+                padding: "14px 20px",
+                width: "100%",
+              }}
+            >
+              <p style={{ color: "rgba(255,255,255,0.8)", fontWeight: 700, fontSize: 14 }}>
+                Las preguntas serán sobre <strong style={{ color: "#fff" }}>{king?.name}</strong>
+              </p>
             </div>
           )}
 
           {isAdmin ? (
-            <button
-              onClick={confirmKingAndStart}
-              className="w-full bg-green-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-green-700 active:scale-95 transition-all flex items-center justify-center gap-2 border-0 mt-4">
-              <Play className="w-5 h-5" />
+            <button className="btn btn-green" onClick={confirmKingAndStart} style={{ fontSize: 17, width: "100%" }}>
+              <Play size={20} />
               Iniciar Partida
             </button>
           ) : (
-            <p className="text-gray-400 text-sm animate-pulse mt-4">
+            <p style={{ color: "rgba(255,255,255,0.45)", fontWeight: 700, fontSize: 14 }}>
               Esperando que el administrador inicie...
             </p>
           )}
+        </div>
 
+        <div style={{ width: "100%", maxWidth: 560, padding: "0 16px 16px" }}>
+          <AdBanner slot="bottom" onDark />
         </div>
       </div>
-
-      <div className="w-full p-3"><AdBanner slot="bottom" /></div>
-    </div>
+    </GameBackground>
   );
 }

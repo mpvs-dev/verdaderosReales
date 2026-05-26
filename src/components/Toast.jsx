@@ -14,19 +14,28 @@ export default function Toast({ message, onClose }) {
   if (!message) return null;
 
   return (
-    <div
-      className={`fixed top-4 left-1/2 z-[9999] transition-all duration-300
-        ${visible ? "opacity-100 -translate-x-1/2 translate-y-0" : "opacity-0 -translate-x-1/2 -translate-y-4"}`}
-      style={{ maxWidth: "90vw", width: "360px" }}
-    >
-      <div className="bg-red-600 text-white rounded-xl shadow-lg px-4 py-3 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-        <p className="flex-1 text-sm font-medium leading-snug">{message}</p>
-        <button
-          onClick={() => { setVisible(false); setTimeout(onClose, 300); }}
-          className="flex-shrink-0 p-0 bg-transparent border-0 text-white opacity-70 hover:opacity-100 active:scale-95 transition-all"
-        >
-          <X className="w-4 h-4" />
+    <div style={{
+      position: "fixed", top: 16, left: "50%", zIndex: 9999,
+      transform: `translateX(-50%) translateY(${visible ? 0 : -16}px)`,
+      opacity: visible ? 1 : 0,
+      transition: "all 0.25s ease",
+      width: "calc(100% - 32px)", maxWidth: 400,
+      pointerEvents: visible ? "auto" : "none",
+    }}>
+      <div style={{
+        background: "#7F1D1D", border: "1.5px solid #EF4444",
+        borderRadius: "var(--r-lg)", padding: "12px 14px",
+        display: "flex", alignItems: "flex-start", gap: 10,
+        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+      }}>
+        <AlertCircle size={18} color="#FCA5A5" style={{ flexShrink: 0, marginTop: 1 }} />
+        <p style={{ flex: 1, fontSize: 14, fontWeight: 700, color: "#FEE2E2", lineHeight: 1.4 }}>{message}</p>
+        <button onClick={() => { setVisible(false); setTimeout(onClose, 300); }} style={{
+          background: "transparent", border: "none", cursor: "pointer",
+          padding: 0, display: "flex", color: "rgba(255,255,255,0.5)",
+          flexShrink: 0,
+        }}>
+          <X size={16} />
         </button>
       </div>
     </div>

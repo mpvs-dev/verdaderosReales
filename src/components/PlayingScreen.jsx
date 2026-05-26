@@ -1,110 +1,64 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Check, X, CheckCircle } from "lucide-react";
-import AdBanner from "./AdBanner";
+import { ScreenWrapper, Avatar } from "./Layout.jsx";
+import { PLAYER_ROLE, MAX_ANSWER_LENGTH } from "../constants/game.js";
+import { getAllPlayers, getEveryone } from "../utils/room.js";
+import { assignAvatars } from "../assets/avatars.js";
 
-const MAX_ANSWER_LENGTH = 120;
+const S = { CORRECT: "correct", INCORRECT: "incorrect", ANSWERED: "answered", PENDING: "pending" };
 
-const STATE_DOT = {
-  correct:   "bg-green-500",
-  incorrect: "bg-red-500",
-  answered:  "bg-blue-500",
-  pending:   "bg-gray-300",
+const DOT_COLOR = {
+  correct:   "#10B981",
+  incorrect: "#EF4444",
+  answered:  "#3B82F6",
+  pending:   "rgba(255,255,255,0.2)",
 };
 
-function Scoreboard({ currentRoom, getState }) {
-  const adminIsKing = currentRoom.admin?.id === currentRoom.king?.id;
-  const allPlayers  = [
-    ...(currentRoom.aspirants || []),
-    ...(!adminIsKing && currentRoom.admin ? [currentRoom.admin] : []),
-  ];
-
-  const sorted = [...allPlayers].sort(
-    (a, b) => (currentRoom.scores?.[b.id] || 0) - (currentRoom.scores?.[a.id] || 0)
-  );
-
+/* ─── Scoreboard ─────────────────────────────────────────────────────────── */
+function Scoreboard({ currentRoom, getState, avatarMap }) {
+  const players = getAllPlayers(currentRoom);
+  const sorted  = [...players].sort((a, b) => (currentRoom.scores?.[b.id] || 0) - (currentRoom.scores?.[a.id] || 0));
   if (!sorted.length) return null;
-
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Puntajes</p>
-      <div className="grid grid-cols-2 gap-2">
-        {sorted.map((p, i) => {
-          const state = getState(p.id);
-          return (
-            <div key={p.id} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-gray-100">
-              <span className="text-xs text-gray-400 font-bold w-4">#{i + 1}</span>
-              <span className="flex-1 text-sm font-semibold text-gray-700 truncate">{p.name}</span>
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATE_DOT[state]}`} />
-              <span className="text-sm font-bold text-purple-600">{currentRoom.scores?.[p.id] || 0}</span>
-            </div>
-          );
-        })}
-      </div>
+    <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 2 }}>
+      {sorted.map((p) => (
+        <div key={p.id} className="score-chip">
+          <Avatar avatar={avatarMap[p.id]} size="sm" />
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#fff" }} className="truncate">{p.name}</span>
+          <span style={{ width: 7, height: 7, borderRadius: "50%", background: DOT_COLOR[getState(p.id)] ?? DOT_COLOR.pending, flexShrink: 0 }} />
+          <span style={{ fontSize: 12, fontWeight: 800, color: "var(--c-gold)" }}>
+            {currentRoom.scores?.[p.id] || 0}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
-function AnswerHistory({ entries, questions }) {
-  if (!entries.length) return null;
-  return (
-    <div className="mt-5">
-      <h3 className="font-bold text-gray-700 mb-3">Mis respuestas anteriores:</h3>
-      <div className="space-y-2">
-        {entries.map((entry, i) => {
-          const question = questions?.find((q) => String(q.id) === String(entry.questionId));
-          return (
-            <div key={i} className={`rounded-xl p-3 flex justify-between items-center ${entry.isCorrect ? "bg-green-50 border border-green-300" : "bg-red-50 border border-red-300"}`}>
-              <div className="flex-1 min-w-0 mr-3">
-                <p className="text-xs text-gray-500 truncate">{question?.text}</p>
-                <p className="text-sm font-semibold text-gray-800 truncate">{entry.answer || "—"}</p>
-              </div>
-              {entry.isCorrect ? (
-                <div className="flex items-center gap-1 text-green-600 flex-shrink-0">
-                  <Check className="w-4 h-4" /><span className="text-xs font-bold">Correcto</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 text-red-600 flex-shrink-0">
-                  <X className="w-4 h-4" /><span className="text-xs font-bold">Incorrecto</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+/* ─── Answer options ─────────────────────────────────────────────────────── */
+const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
 function AnswerOptions({ question, onSubmit }) {
   const [sending, setSending] = useState(false);
-  const [textVal, setTextVal] = useState("");
+  const [text, setText]       = useState("");
 
-  async function handleText() {
-    const val = textVal.trim();
+  const submit = useCallback(async (val) => {
     if (!val || sending) return;
     setSending(true);
-    await onSubmit(val);
-    setSending(false);
-  }
-
-  async function handleChoice(option) {
-    if (sending) return;
-    setSending(true);
-    await onSubmit(option);
-    setSending(false);
-  }
+    try { await onSubmit(val); } finally { setSending(false); }
+  }, [onSubmit, sending]);
 
   if (!question) return null;
 
   if (question.type === "multiple") {
     return (
-      <div className="space-y-3">
-        {question.options?.map((option) => (
-          <button key={option}
-            onClick={() => handleChoice(option)}
-            disabled={sending}
-            className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            {option}
+      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+        {question.options?.map((opt, i) => (
+          <button key={opt} className="answer-btn anim-slide" disabled={sending}
+            style={{ animationDelay: `${i * 50}ms` }}
+            onClick={() => submit(opt)}>
+            <div className="answer-letter">{LETTERS[i]}</div>
+            <span>{opt}</span>
           </button>
         ))}
       </div>
@@ -113,297 +67,271 @@ function AnswerOptions({ question, onSubmit }) {
 
   if (question.type === "boolean") {
     return (
-      <div className="grid grid-cols-2 gap-3">
-        <button onClick={() => handleChoice("Sí")} disabled={sending}
-          className="w-full bg-green-600 text-white p-4 rounded-xl font-bold hover:bg-green-700 active:scale-95 transition-all disabled:opacity-50">
-          Sí / Verdadero
-        </button>
-        <button onClick={() => handleChoice("No")} disabled={sending}
-          className="w-full bg-red-600 text-white p-4 rounded-xl font-bold hover:bg-red-700 active:scale-95 transition-all disabled:opacity-50">
-          No / Falso
-        </button>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <button className="btn btn-green" disabled={sending} onClick={() => submit("Sí")} style={{ fontSize: 16 }}>✅ Sí</button>
+        <button className="btn btn-red"   disabled={sending} onClick={() => submit("No")} style={{ fontSize: 16 }}>❌ No</button>
       </div>
     );
   }
 
-  if (question.type === "text") {
-    return (
-      <div>
-        <div className="relative mb-3">
-          <input
-            type="text"
-            placeholder="Escribe tu respuesta"
-            value={textVal}
-            onChange={(e) => setTextVal(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
-            onKeyDown={(e) => { if (e.key === "Enter") handleText(); }}
-            maxLength={MAX_ANSWER_LENGTH}
-            disabled={sending}
-            className="w-full p-4 border-2 border-gray-300 rounded-xl text-lg focus:border-purple-500 focus:outline-none pr-16 disabled:opacity-50"
-          />
-          <span className={`absolute right-3 bottom-3 text-xs ${textVal.length >= MAX_ANSWER_LENGTH ? "text-red-400 font-bold" : "text-gray-400"}`}>
-            {textVal.length}/{MAX_ANSWER_LENGTH}
-          </span>
-        </div>
-        <button
-          onClick={handleText}
-          disabled={!textVal.trim() || sending}
-          className="w-full bg-purple-600 text-white p-4 rounded-xl font-bold hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-          {sending ? "Enviando..." : "Enviar Respuesta"}
-        </button>
-      </div>
-    );
-  }
-  return null;
-}
-
-function Screen({ children }) {
   return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full p-3"><AdBanner slot="top" /></div>
-      <div className="flex-1 w-full p-4 flex flex-col items-center">
-        <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-5">
-          {children}
-        </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ position: "relative" }}>
+        <input
+          className="input"
+          type="text"
+          placeholder="Escribe tu respuesta..."
+          value={text}
+          onChange={(e) => setText(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
+          onKeyDown={(e) => { if (e.key === "Enter") submit(text.trim()); }}
+          maxLength={MAX_ANSWER_LENGTH}
+          disabled={sending}
+          style={{ paddingRight: 52 }}
+        />
+        <span style={{
+          position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+          fontSize: 11, fontWeight: 700,
+          color: text.length >= MAX_ANSWER_LENGTH ? "var(--c-danger)" : "var(--c-w45)",
+        }}>
+          {text.length}/{MAX_ANSWER_LENGTH}
+        </span>
       </div>
-      <div className="w-full p-3"><AdBanner slot="bottom" /></div>
+      <button className="btn btn-purple" disabled={!text.trim() || sending} onClick={() => submit(text.trim())} style={{ fontSize: 15 }}>
+        {sending ? "Enviando..." : "Enviar Respuesta"}
+      </button>
     </div>
   );
 }
 
-export default function PlayingScreen({ currentRoom, playerRole, playerName, submitAnswer, validateAnswer, answeredQuestions }) {
+/* ─── Answer feedback ────────────────────────────────────────────────────── */
+function AnswerFeedback({ state, answer, question, config }) {
+  const gp  = config?.pointsPerAnswer ?? 1;
+  const pen = config?.penaltyEnabled  ?? false;
+  const show = config?.customPointsEnabled || gp !== 1 || pen;
+  const pts  = question?.points  ?? gp;
+  const pnt  = question?.penalty ?? gp;
+
+  const cfg = {
+    [S.CORRECT]:   { cls: "feedback-correct",   icon: "✅", title: "¡Correcto!",       titleColor: "#6EE7B7" },
+    [S.INCORRECT]: { cls: "feedback-incorrect",  icon: "❌", title: "Incorrecto",        titleColor: "#FCA5A5" },
+    [S.ANSWERED]:  { cls: "feedback-waiting",    icon: "⏳", title: "Respuesta enviada", titleColor: "#93C5FD" },
+  }[state] ?? {};
+
+  return (
+    <div className={`feedback ${cfg.cls} anim-pop`}>
+      <div style={{ fontSize: 40, marginBottom: 8 }}>{cfg.icon}</div>
+      <p style={{ fontWeight: 800, color: cfg.titleColor, fontSize: 18, marginBottom: 6 }}>{cfg.title}</p>
+
+      {show && state === S.CORRECT && (
+        <div className="pill pill-green" style={{ display: "inline-flex", marginBottom: 6 }}>+{pts} pts</div>
+      )}
+      {show && state === S.INCORRECT && pen && (
+        <div className="pill pill-red" style={{ display: "inline-flex", marginBottom: 6 }}>-{pnt} pts</div>
+      )}
+      {show && state === S.ANSWERED && (
+        <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 6 }}>
+          <div className="pill pill-purple">+{pts} si aciertas</div>
+          {pen && <div className="pill pill-red">-{pnt} si fallas</div>}
+        </div>
+      )}
+      {answer && (
+        <p style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>
+          Tu respuesta: <strong style={{ color: "#fff" }}>{answer}</strong>
+        </p>
+      )}
+      {state === S.ANSWERED && (
+        <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginTop: 6 }}>
+          Esperando validación del Líder...
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Value pills (for king view) ────────────────────────────────────────── */
+function ValuePills({ question, config }) {
+  const gp   = config?.pointsPerAnswer ?? 1;
+  const pen  = config?.penaltyEnabled  ?? false;
+  const show = config?.customPointsEnabled || gp !== 1 || pen;
+  if (!show) return null;
+  const pts = question?.points ?? gp;
+  const pnt = question?.penalty ?? gp;
+  return (
+    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
+      <div className="pill pill-purple">+{pts} acierto</div>
+      {pen && <div className="pill pill-red">-{pnt} fallo</div>}
+    </div>
+  );
+}
+
+/* ─── History ─────────────────────────────────────────────────────────────── */
+function AnswerHistory({ entries, questions }) {
+  if (!entries.length) return null;
+  return (
+    <div>
+      <div className="t-label" style={{ marginBottom: 8 }}>Mis respuestas anteriores</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+        {entries.map((e, i) => {
+          const q = questions?.find((q) => String(q.id) === String(e.questionId));
+          return (
+            <div key={i} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              background: e.isCorrect ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)",
+              border: `1px solid ${e.isCorrect ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.28)"}`,
+              borderRadius: "var(--r-md)", padding: "9px 12px",
+            }}>
+              <span style={{ fontSize: 15, flexShrink: 0 }}>{e.isCorrect ? "✅" : "❌"}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="truncate" style={{ fontSize: 11, color: "var(--c-w45)", fontWeight: 700 }}>{q?.text}</div>
+                <div className="truncate" style={{ fontSize: 13, color: "#fff", fontWeight: 800 }}>{e.answer}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main ────────────────────────────────────────────────────────────────── */
+export default function PlayingScreen({ currentRoom, playerRole, playerName, submitAnswer, validateAnswer, answeredQuestions, resetGame }) {
   const [validating, setValidating] = useState(new Set());
 
-  const currentQuestion   = currentRoom.questions[currentRoom.currentQuestionIndex];
-  const currentQuestionId = currentQuestion?.id;
-  const me                = currentRoom.aspirants?.find((a) => a.name === playerName)
-                         || (currentRoom.admin?.name === playerName ? currentRoom.admin : null);
+  const q          = currentRoom.questions[currentRoom.currentQuestionIndex];
+  const qId        = q?.id;
+  const allPlayers = getAllPlayers(currentRoom);
+  const everyone   = getEveryone(currentRoom);
+  const avatarMap  = assignAvatars(everyone);
+  const totalR     = currentRoom.config?.rounds ?? currentRoom.questions.length;
+  const progress   = `${currentRoom.currentQuestionIndex + 1} / ${totalR}`;
 
-  const adminIsKing = currentRoom.admin?.id === currentRoom.king?.id;
-  const allPlayers  = [
-    ...(currentRoom.aspirants || []),
-    ...(!adminIsKing && currentRoom.admin ? [currentRoom.admin] : []),
-  ];
+  const me = allPlayers.find((p) => p.name === playerName)
+          ?? (currentRoom.admin?.name === playerName ? currentRoom.admin : null);
 
-  const totalQuestions = currentRoom.mode === "custom"
-    ? (currentRoom.config?.rounds ?? 10)
-    : currentRoom.questions.length;
+  function stateOf(id) {
+    const rec = currentRoom.answers?.[id]?.find((h) => String(h.questionId) === String(qId));
+    if (rec) return rec.isCorrect ? S.CORRECT : S.INCORRECT;
+    if (currentRoom.currentAnswers?.some((a) => String(a.aspirantId) === String(id))) return S.ANSWERED;
+    return S.PENDING;
+  }
 
-  const questionProgress = `Pregunta ${currentRoom.currentQuestionIndex + 1}/${totalQuestions}`;
+  function myState() {
+    const rec = currentRoom.answers?.[me?.id]?.find((h) => String(h.questionId) === String(qId));
+    if (rec) return rec.isCorrect ? S.CORRECT : S.INCORRECT;
+    if (answeredQuestions.has(currentRoom.currentQuestionIndex)) return S.ANSWERED;
+    return S.PENDING;
+  }
 
-  // ── Valores de puntuación de esta pregunta ────────────────────────────────
-  const globalPoints       = currentRoom.config?.pointsPerAnswer    ?? 1;
-  const penaltyEnabled     = currentRoom.config?.penaltyEnabled     ?? false;
-  const customPointsActive = currentRoom.config?.customPointsEnabled ?? false;
-  const questionPoints     = currentQuestion?.points  ?? globalPoints;
-  const questionPenalty    = currentQuestion?.penalty ?? globalPoints;
-  const showValueBadge     = customPointsActive || globalPoints !== 1 || penaltyEnabled;
-
-  const myCurrentAnswer    = currentRoom.currentAnswers?.find(
-    (a) => a.aspirantName === playerName && String(a.questionId) === String(currentQuestionId)
+  const myCurrentAnswer = currentRoom.currentAnswers?.find(
+    (a) => a.aspirantName === playerName && String(a.questionId) === String(qId)
   );
-  const myAlreadyValidated = currentRoom.answeredAspirants?.includes(me?.id);
-  const hasAnswered = !!myCurrentAnswer || myAlreadyValidated || answeredQuestions.has(currentRoom.currentQuestionIndex);
 
   const totalExpected = allPlayers.length;
   const totalAnswered = currentRoom.currentAnswers?.length ?? 0;
   const allAnswered   = totalAnswered >= totalExpected && totalExpected > 0;
 
-  function getState(aspirantId) {
-    const record = currentRoom.answers?.[aspirantId]?.find(
-      (h) => String(h.questionId) === String(currentQuestionId)
-    );
-    if (record) return record.isCorrect ? "correct" : "incorrect";
-    if (currentRoom.currentAnswers?.some((a) => String(a.aspirantId) === String(aspirantId))) return "answered";
-    return "pending";
-  }
-
-  function getMyState() {
-    const record = currentRoom.answers?.[me?.id]?.find(
-      (h) => String(h.questionId) === String(currentQuestionId)
-    );
-    if (record) return record.isCorrect ? "correct" : "incorrect";
-    if (myCurrentAnswer || answeredQuestions.has(currentRoom.currentQuestionIndex)) return "answered";
-    return "pending";
-  }
-
-  function getStateForBoard(aspirantId) {
-    if (aspirantId === me?.id) return getMyState();
-    return getState(aspirantId);
-  }
-
   async function handleValidate(aspirantId, isCorrect) {
     if (validating.has(aspirantId)) return;
     setValidating((prev) => new Set(prev).add(aspirantId));
-    await validateAnswer(aspirantId, isCorrect);
-    setValidating((prev) => { const s = new Set(prev); s.delete(aspirantId); return s; });
+    try { await validateAnswer(aspirantId, isCorrect); }
+    finally { setValidating((prev) => { const s = new Set(prev); s.delete(aspirantId); return s; }); }
   }
 
-  // Badge pills de valor de pregunta
-  function ValuePills({ small = false }) {
-    if (!showValueBadge) return null;
-    const base = small ? "text-xs px-2 py-0.5" : "text-xs px-2 py-1";
-    return (
-      <div className="flex items-center gap-2 flex-wrap mt-2">
-        <span className={`inline-flex items-center bg-purple-100 text-purple-700 font-bold rounded-full ${base}`}>
-          +{questionPoints} pt{questionPoints > 1 ? "s" : ""} por acierto
+  const Header = () => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Avatar avatar={avatarMap[currentRoom.king?.id]} size="sm" crown />
+        <span style={{ fontSize: 13, fontWeight: 800, color: "rgba(255,255,255,0.7)" }}>
+          {currentRoom.king?.name}
         </span>
-        {penaltyEnabled && (
-          <span className={`inline-flex items-center bg-red-100 text-red-600 font-bold rounded-full ${base}`}>
-            -{questionPenalty} pt{questionPenalty > 1 ? "s" : ""} por fallo
-          </span>
-        )}
       </div>
-    );
-  }
+      <div className="pill pill-purple">Ronda {progress}</div>
+    </div>
+  );
 
-  // ── Vista King ─────────────────────────────────────────────────────────────
-  if (playerRole === "king") {
+  /* ── King view ─────────────────────────────────────────────────────────── */
+  if (playerRole === PLAYER_ROLE.KING) {
     return (
-      <Screen>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Vista del Lider</h2>
-          <span className="text-purple-600 font-bold">{questionProgress}</span>
+      <ScreenWrapper withBg onExit={resetGame}>
+        <Header />
+        <Scoreboard currentRoom={currentRoom} getState={stateOf} avatarMap={avatarMap} />
+
+        <div className="question-box">
+          <div className="question-over">Tu pregunta</div>
+          <div className="question-text">{q?.text}</div>
+          <ValuePills question={q} config={currentRoom.config} />
         </div>
 
-        <div className="bg-purple-100 border-2 border-purple-400 rounded-xl p-4 mb-4">
-          <p className="text-xl font-bold text-gray-800">{currentQuestion?.text}</p>
-          <ValuePills />
-        </div>
-
-        <Scoreboard currentRoom={currentRoom} getState={getState} />
-
+        {/* Progress */}
         {allAnswered ? (
-          <div className="flex items-center gap-2 bg-green-50 border-2 border-green-400 rounded-xl p-3 mb-4">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-            <p className="font-bold text-green-700 text-sm">¡Todos respondieron! Valida las respuestas.</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(16,185,129,0.14)", border: "1.5px solid rgba(16,185,129,0.35)", borderRadius: "var(--r-lg)", padding: "11px 14px" }}>
+            <CheckCircle size={16} color="#10B981" />
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#6EE7B7" }}>¡Todos respondieron! Valida las respuestas.</span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl p-3 mb-4">
-            <span className="text-sm text-gray-500">
-              Esperando respuestas:{" "}
-              <span className="font-bold text-gray-700">{totalAnswered}/{totalExpected}</span>
+          <div className="glass">
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w60)" }}>
+              Esperando: <strong style={{ color: "#fff" }}>{totalAnswered}/{totalExpected}</strong>
             </span>
           </div>
         )}
 
-        <h3 className="font-bold text-gray-700 mb-3">Respuestas Recibidas:</h3>
-        {currentRoom.currentAnswers?.length ? (
-          <div className="space-y-3">
-            {currentRoom.currentAnswers.map((answer) => (
-              <div key={answer.aspirantId} className="bg-gray-50 border-2 border-gray-300 rounded-xl p-4 flex justify-between items-center gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-gray-800 truncate">{answer.aspirantName}</p>
-                  <p className="text-lg text-gray-700 break-words">{answer.answer}</p>
-                  {showValueBadge && (
-                    <div className="flex gap-1 mt-1">
-                      <span className="text-xs bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded-full">
-                        +{questionPoints} acierto
-                      </span>
-                      {penaltyEnabled && (
-                        <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded-full">
-                          -{questionPenalty} fallo
-                        </span>
-                      )}
-                    </div>
-                  )}
+        {/* Answers to validate */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+          {currentRoom.currentAnswers?.length ? (
+            currentRoom.currentAnswers.map((ans) => (
+              <div key={ans.aspirantId} style={{
+                display: "flex", alignItems: "center", gap: 12,
+                background: "rgba(255,255,255,0.07)", border: "1px solid var(--c-w12)",
+                borderRadius: "var(--r-lg)", padding: "12px 14px",
+              }}>
+                <Avatar avatar={avatarMap[ans.aspirantId]} size="sm" />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: "var(--c-w60)" }} className="truncate">{ans.aspirantName}</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", wordBreak: "break-word" }}>{ans.answer}</div>
+                  <ValuePills question={q} config={currentRoom.config} />
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => handleValidate(answer.aspirantId, true)}
-                    disabled={validating.has(answer.aspirantId)}
-                    className="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 active:scale-95 transition-all disabled:opacity-50">
-                    <Check className="w-5 h-5" />
+                <div style={{ display: "flex", gap: 7, flexShrink: 0 }}>
+                  <button onClick={() => handleValidate(ans.aspirantId, true)}  disabled={validating.has(ans.aspirantId)}
+                    style={{ background: "var(--c-success)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 var(--c-success-dark)", display: "flex", alignItems: "center" }}>
+                    <Check size={17} color="#fff" />
                   </button>
-                  <button onClick={() => handleValidate(answer.aspirantId, false)}
-                    disabled={validating.has(answer.aspirantId)}
-                    className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 active:scale-95 transition-all disabled:opacity-50">
-                    <X className="w-5 h-5" />
+                  <button onClick={() => handleValidate(ans.aspirantId, false)} disabled={validating.has(ans.aspirantId)}
+                    style={{ background: "var(--c-danger)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 #991B1B", display: "flex", alignItems: "center" }}>
+                    <X size={17} color="#fff" />
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500 text-center">Esperando respuestas...</p>
-        )}
-      </Screen>
+            ))
+          ) : (
+            <p style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>Esperando respuestas...</p>
+          )}
+        </div>
+      </ScreenWrapper>
     );
   }
 
-  // ── Vista Aspirante ────────────────────────────────────────────────────────
-  const myHistory = currentRoom.answers?.[me?.id] || [];
+  /* ── Aspirant view ─────────────────────────────────────────────────────── */
+  const state   = myState();
+  const history = currentRoom.answers?.[me?.id] || [];
 
   return (
-    <Screen>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Tu Turno</h2>
-        <span className="text-purple-600 font-bold">{questionProgress}</span>
+    <ScreenWrapper withBg onExit={resetGame}>
+      <Header />
+      <Scoreboard currentRoom={currentRoom} getState={(id) => id === me?.id ? state : stateOf(id)} avatarMap={avatarMap} />
+
+      <div className="question-box">
+        <div className="question-over">Sobre {currentRoom.king?.name}</div>
+        <div className="question-text">{q?.text}</div>
+        <ValuePills question={q} config={currentRoom.config} />
       </div>
 
-      <Scoreboard currentRoom={currentRoom} getState={getStateForBoard} />
+      {state !== S.PENDING
+        ? <AnswerFeedback state={state} answer={myCurrentAnswer?.answer} question={q} config={currentRoom.config} />
+        : <AnswerOptions question={q} onSubmit={submitAnswer} />
+      }
 
-      <div className="bg-purple-100 border-2 border-purple-400 rounded-xl p-4 mb-5">
-        <p className="text-xl font-bold text-gray-800 mb-1">{currentQuestion?.text}</p>
-        <p className="text-sm text-gray-600">Sobre: {currentRoom.king.name}</p>
-        <ValuePills />
-      </div>
-
-      {hasAnswered ? (() => {
-        const myState = getMyState();
-        if (myState === "correct") return (
-          <div className="bg-green-100 border-2 border-green-500 rounded-xl p-4 text-center">
-            <Check className="w-12 h-12 text-green-600 mx-auto mb-2" />
-            <p className="font-bold text-green-700 text-lg">¡Correcto!</p>
-            {showValueBadge && (
-              <p className="text-green-600 font-bold text-sm mt-1">
-                +{questionPoints} pt{questionPoints > 1 ? "s" : ""}
-              </p>
-            )}
-            {myCurrentAnswer && (
-              <p className="text-gray-700 mt-1">Tu respuesta: <span className="font-semibold">{myCurrentAnswer.answer}</span></p>
-            )}
-          </div>
-        );
-        if (myState === "incorrect") return (
-          <div className="bg-red-100 border-2 border-red-500 rounded-xl p-4 text-center">
-            <X className="w-12 h-12 text-red-500 mx-auto mb-2" />
-            <p className="font-bold text-red-700 text-lg">Incorrecto</p>
-            {showValueBadge && penaltyEnabled && (
-              <p className="text-red-500 font-bold text-sm mt-1">
-                -{questionPenalty} pt{questionPenalty > 1 ? "s" : ""}
-              </p>
-            )}
-            {myCurrentAnswer && (
-              <p className="text-gray-700 mt-1">Tu respuesta: <span className="font-semibold">{myCurrentAnswer.answer}</span></p>
-            )}
-          </div>
-        );
-        return (
-          <div className="bg-blue-50 border-2 border-blue-400 rounded-xl p-4 text-center">
-            <Check className="w-12 h-12 text-blue-500 mx-auto mb-2" />
-            <p className="font-bold text-gray-800">Respuesta Enviada</p>
-            {myCurrentAnswer && (
-              <p className="text-gray-700 mt-1">Tu respuesta: <span className="font-semibold">{myCurrentAnswer.answer}</span></p>
-            )}
-            {showValueBadge && (
-              <div className="flex justify-center gap-2 mt-2">
-                <span className="text-xs bg-purple-100 text-purple-700 font-bold px-2 py-1 rounded-full">
-                  +{questionPoints} si aciertas
-                </span>
-                {penaltyEnabled && (
-                  <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
-                    -{questionPenalty} si fallas
-                  </span>
-                )}
-              </div>
-            )}
-            <p className="text-sm text-gray-500 mt-2">Esperando validación del Líder...</p>
-          </div>
-        );
-      })() : (
-        <AnswerOptions question={currentQuestion} onSubmit={submitAnswer} />
-      )}
-
-      <AnswerHistory entries={myHistory} questions={currentRoom.questions} />
-    </Screen>
+      <AnswerHistory entries={history} questions={currentRoom.questions} />
+    </ScreenWrapper>
   );
 }
