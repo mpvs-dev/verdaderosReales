@@ -1,0 +1,2701 @@
+{
+  "genericas": [
+    {
+      "id": 1,
+      "text": "What is your favorite color?",
+      "type": "text"
+    },
+    {
+      "id": 2,
+      "text": "What is your favorite food?",
+      "type": "text"
+    },
+    {
+      "id": 3,
+      "text": "Do you prefer the beach or the mountains?",
+      "type": "multiple",
+      "options": ["Beach", "Mountains"]
+    },
+    {
+      "id": 4,
+      "text": "Are you a morning person?",
+      "type": "boolean"
+    },
+    {
+      "id": 5,
+      "text": "What is your favorite movie?",
+      "type": "text"
+    },
+    {
+      "id": 6,
+      "text": "Do you prefer dogs or cats?",
+      "type": "multiple",
+      "options": ["Dogs", "Cats", "Both", "None"]
+    },
+    {
+      "id": 7,
+      "text": "Do you like coffee?",
+      "type": "boolean"
+    },
+    {
+      "id": 8,
+      "text": "What is your favorite hobby?",
+      "type": "text"
+    },
+    {
+      "id": 9,
+      "text": "Do you prefer summer or winter?",
+      "type": "multiple",
+      "options": ["Summer", "Winter"]
+    },
+    {
+      "id": 10,
+      "text": "How many siblings do you have?",
+      "type": "text"
+    },
+    {
+      "id": 11,
+      "text": "Do you like to dance?",
+      "type": "boolean"
+    },
+    {
+      "id": 12,
+      "text": "What is your favorite music genre?",
+      "type": "text"
+    },
+    {
+      "id": 13,
+      "text": "Do you prefer sweet or savory?",
+      "type": "multiple",
+      "options": ["Sweet", "Savory"]
+    },
+    {
+      "id": 14,
+      "text": "Are you an organized person?",
+      "type": "boolean"
+    },
+    {
+      "id": 15,
+      "text": "What is your favorite sport?",
+      "type": "text"
+    },
+    {
+      "id": 16,
+      "text": "Do you prefer reading books or watching movies?",
+      "type": "multiple",
+      "options": ["Reading books", "Watching movies", "Both equally"]
+    },
+    {
+      "id": 17,
+      "text": "Do you like to cook?",
+      "type": "boolean"
+    },
+    {
+      "id": 18,
+      "text": "What is your favorite season of the year?",
+      "type": "multiple",
+      "options": ["Spring", "Summer", "Autumn", "Winter"]
+    },
+    {
+      "id": 19,
+      "text": "Do you prefer the city or the countryside?",
+      "type": "multiple",
+      "options": ["City", "Countryside"]
+    },
+    {
+      "id": 20,
+      "text": "What is your favorite place in the world?",
+      "type": "text"
+    },
+    {
+      "id": 21,
+      "text": "Do you like to travel?",
+      "type": "boolean"
+    },
+    {
+      "id": 22,
+      "text": "What is your favorite TV show?",
+      "type": "text"
+    },
+    {
+      "id": 23,
+      "text": "Do you prefer morning, afternoon, or night?",
+      "type": "multiple",
+      "options": ["Morning", "Afternoon", "Night"]
+    },
+    {
+      "id": 24,
+      "text": "Are you afraid of public speaking?",
+      "type": "boolean"
+    },
+    {
+      "id": 25,
+      "text": "What is your favorite drink?",
+      "type": "text"
+    },
+    {
+      "id": 26,
+      "text": "Do you prefer cold or hot weather?",
+      "type": "multiple",
+      "options": ["Cold", "Hot"]
+    },
+    {
+      "id": 27,
+      "text": "Do you like concerts?",
+      "type": "boolean"
+    },
+    {
+      "id": 28,
+      "text": "What is your favorite book?",
+      "type": "text"
+    },
+    {
+      "id": 29,
+      "text": "Do you prefer breakfast, lunch, or dinner?",
+      "type": "multiple",
+      "options": ["Breakfast", "Lunch", "Dinner"]
+    },
+    {
+      "id": 30,
+      "text": "Are you a shy person?",
+      "type": "boolean"
+    },
+    {
+      "id": 31,
+      "text": "What is your favorite superpower?",
+      "type": "text"
+    },
+    {
+      "id": 32,
+      "text": "Do you prefer going to the gym or doing outdoor sports?",
+      "type": "multiple",
+      "options": ["Gym", "Outdoors", "I don't do sports"]
+    },
+    {
+      "id": 33,
+      "text": "Do you like spicy food?",
+      "type": "boolean"
+    },
+    {
+      "id": 34,
+      "text": "What is your favorite song?",
+      "type": "text"
+    },
+    {
+      "id": 35,
+      "text": "Do you prefer going out with friends or staying home?",
+      "type": "multiple",
+      "options": [
+        "Going out with friends",
+        "Staying home",
+        "Depends on the day"
+      ]
+    },
+    {
+      "id": 36,
+      "text": "Do you like surprises?",
+      "type": "boolean"
+    },
+    {
+      "id": 37,
+      "text": "What is your greatest fear?",
+      "type": "text"
+    },
+    {
+      "id": 38,
+      "text": "Do you prefer pizza or burgers?",
+      "type": "multiple",
+      "options": ["Pizza", "Burgers", "Both", "None"]
+    },
+    {
+      "id": 39,
+      "text": "Do you consider yourself a romantic person?",
+      "type": "boolean"
+    },
+    {
+      "id": 40,
+      "text": "What is your favorite city?",
+      "type": "text"
+    },
+    {
+      "id": 41,
+      "text": "Do you prefer working alone or in a team?",
+      "type": "multiple",
+      "options": ["Alone", "In a team", "Depends on the task"]
+    },
+    {
+      "id": 42,
+      "text": "Do you like photography?",
+      "type": "boolean"
+    },
+    {
+      "id": 43,
+      "text": "What is the food you hate the most?",
+      "type": "text"
+    },
+    {
+      "id": 44,
+      "text": "Do you prefer tea or coffee?",
+      "type": "multiple",
+      "options": ["Tea", "Coffee", "None", "Both"]
+    },
+    {
+      "id": 45,
+      "text": "Are you punctual?",
+      "type": "boolean"
+    },
+    {
+      "id": 46,
+      "text": "What is your hidden talent?",
+      "type": "text"
+    },
+    {
+      "id": 47,
+      "text": "Do you prefer vacations at the beach, in the mountains, or in the city?",
+      "type": "multiple",
+      "options": ["Beach", "Mountains", "City"]
+    },
+    {
+      "id": 48,
+      "text": "Would you like to be famous?",
+      "type": "boolean"
+    },
+    {
+      "id": 49,
+      "text": "Which celebrity would you like to meet?",
+      "type": "text"
+    },
+    {
+      "id": 50,
+      "text": "Do you prefer Android or iPhone?",
+      "type": "multiple",
+      "options": ["Android", "iPhone", "Other"]
+    },
+    {
+      "id": 51,
+      "text": "Do you consider yourself good at cooking?",
+      "type": "boolean"
+    },
+    {
+      "id": 52,
+      "text": "What is your favorite alcoholic drink?",
+      "type": "text"
+    },
+    {
+      "id": 53,
+      "text": "What is your favorite way to communicate?",
+      "type": "multiple",
+      "options": ["Social media", "Calls", "Text messages", "In person"]
+    },
+    {
+      "id": 54,
+      "text": "Do you like chocolate?",
+      "type": "boolean"
+    },
+    {
+      "id": 55,
+      "text": "What is your favorite childhood memory?",
+      "type": "text"
+    },
+    {
+      "id": 56,
+      "text": "Do you prefer action, comedy, horror, or romance movies?",
+      "type": "multiple",
+      "options": ["Action", "Comedy", "Horror", "Romance"]
+    },
+    {
+      "id": 57,
+      "text": "Do you like to sing?",
+      "type": "boolean"
+    },
+    {
+      "id": 58,
+      "text": "In which country would you like to live?",
+      "type": "text"
+    },
+    {
+      "id": 59,
+      "text": "Do you prefer watching sports or playing them?",
+      "type": "multiple",
+      "options": ["Watching them", "Playing them", "Both", "None"]
+    },
+    {
+      "id": 60,
+      "text": "Are you afraid of the dark?",
+      "type": "boolean"
+    },
+    {
+      "id": 61,
+      "text": "What is your favorite clothing brand?",
+      "type": "text"
+    },
+    {
+      "id": 62,
+      "text": "Do you prefer to save or spend money?",
+      "type": "multiple",
+      "options": ["Save", "Spend", "Half and half"]
+    },
+    {
+      "id": 63,
+      "text": "Do you like going shopping?",
+      "type": "boolean"
+    },
+    {
+      "id": 64,
+      "text": "What is your favorite dessert?",
+      "type": "text"
+    },
+    {
+      "id": 65,
+      "text": "Do you prefer silence or background music?",
+      "type": "multiple",
+      "options": ["Silence", "Background music"]
+    },
+    {
+      "id": 66,
+      "text": "Do you consider yourself impulsive?",
+      "type": "boolean"
+    },
+    {
+      "id": 67,
+      "text": "What is your favorite social media platform?",
+      "type": "text"
+    },
+    {
+      "id": 68,
+      "text": "Do you prefer to pay with cash or card?",
+      "type": "multiple",
+      "options": ["Cash", "Card", "Bank transfer"]
+    },
+    {
+      "id": 69,
+      "text": "Do you like exercising?",
+      "type": "boolean"
+    },
+    {
+      "id": 70,
+      "text": "What is your favorite profession?",
+      "type": "text"
+    },
+    {
+      "id": 71,
+      "text": "Do you prefer sleeping with noise or in silence?",
+      "type": "multiple",
+      "options": ["With noise", "In silence", "With soft music"]
+    },
+    {
+      "id": 72,
+      "text": "Do you consider yourself a patient person?",
+      "type": "boolean"
+    },
+    {
+      "id": 73,
+      "text": "What is your favorite board game?",
+      "type": "text"
+    },
+    {
+      "id": 74,
+      "text": "Do you prefer celebrating your birthday with many friends or with a small family?",
+      "type": "multiple",
+      "options": ["Many friends", "Small family", "Alone", "No celebration"]
+    },
+    {
+      "id": 75,
+      "text": "Do you like to wake up early on weekends?",
+      "type": "boolean"
+    },
+    {
+      "id": 76,
+      "text": "What is your favorite video game?",
+      "type": "text"
+    },
+    {
+      "id": 77,
+      "text": "Do you prefer comfortable clothes or elegant clothes?",
+      "type": "multiple",
+      "options": [
+        "Comfortable clothes",
+        "Elegant clothes",
+        "Depends on the occasion"
+      ]
+    },
+    {
+      "id": 78,
+      "text": "Do you like the sea?",
+      "type": "boolean"
+    },
+    {
+      "id": 79,
+      "text": "Who is your favorite actor or actress?",
+      "type": "text"
+    },
+    {
+      "id": 80,
+      "text": "Do you prefer to make plans or improvise?",
+      "type": "multiple",
+      "options": ["Make plans", "Improvise", "Depends on the moment"]
+    },
+    {
+      "id": 81,
+      "text": "Do you like heights?",
+      "type": "boolean"
+    },
+    {
+      "id": 82,
+      "text": "What is your country's favorite traditional dish?",
+      "type": "text"
+    },
+    {
+      "id": 83,
+      "text": "Do you prefer healthy food or junk food?",
+      "type": "multiple",
+      "options": ["Healthy", "Junk food", "It's the same to you"]
+    },
+    {
+      "id": 84,
+      "text": "Do you consider yourself a creative person?",
+      "type": "boolean"
+    },
+    {
+      "id": 85,
+      "text": "What is your favorite mobile application?",
+      "type": "text"
+    },
+    {
+      "id": 86,
+      "text": "Do you prefer going out at night or during the day?",
+      "type": "multiple",
+      "options": ["At night", "During the day"]
+    },
+    {
+      "id": 87,
+      "text": "Do you like the rain?",
+      "type": "boolean"
+    },
+    {
+      "id": 88,
+      "text": "What was your favorite subject in school?",
+      "type": "text"
+    },
+    {
+      "id": 89,
+      "text": "Do you prefer watching the sunrise or the sunset?",
+      "type": "multiple",
+      "options": ["Sunrise", "Sunset"]
+    },
+    {
+      "id": 90,
+      "text": "Do you like camping?",
+      "type": "boolean"
+    },
+    {
+      "id": 91,
+      "text": "Which song always boosts your mood?",
+      "type": "text"
+    },
+    {
+      "id": 92,
+      "text": "Do you prefer watching sports at the stadium or at home?",
+      "type": "multiple",
+      "options": ["At the stadium", "At home", "Don't watch sports"]
+    },
+    {
+      "id": 93,
+      "text": "Do you consider yourself good at telling jokes?",
+      "type": "boolean"
+    },
+    {
+      "id": 94,
+      "text": "What is your pet's name?",
+      "type": "text"
+    },
+    {
+      "id": 95,
+      "text": "Do you prefer going to the movie theater or watching movies at home?",
+      "type": "multiple",
+      "options": ["Movie theater", "At home"]
+    },
+    {
+      "id": 96,
+      "text": "Do you like ice cream?",
+      "type": "boolean"
+    },
+    {
+      "id": 97,
+      "text": "What is your favorite ice cream flavor?",
+      "type": "text"
+    },
+    {
+      "id": 98,
+      "text": "Who is your favorite family member?",
+      "type": "text"
+    },
+    {
+      "id": 99,
+      "text": "Do you consider yourself an adventurous person?",
+      "type": "boolean"
+    },
+    {
+      "id": 100,
+      "text": "What is your favorite animal?",
+      "type": "text"
+    },
+    {
+      "id": 101,
+      "text": "Do you prefer a shower or a bathtub?",
+      "type": "multiple",
+      "options": ["Shower", "Bathtub"]
+    },
+    {
+      "id": 102,
+      "text": "Do you like to read the horoscope?",
+      "type": "boolean"
+    },
+    {
+      "id": 103,
+      "text": "What is your zodiac sign?",
+      "type": "text"
+    },
+    {
+      "id": 104,
+      "text": "Do you prefer WhatsApp, Instagram, TikTok, or Twitter?",
+      "type": "multiple",
+      "options": ["WhatsApp", "Instagram", "TikTok", "Twitter/X"]
+    },
+    {
+      "id": 105,
+      "text": "Do you consider yourself good at giving advice?",
+      "type": "boolean"
+    },
+    {
+      "id": 106,
+      "text": "What is your favorite animated movie?",
+      "type": "text"
+    },
+    {
+      "id": 107,
+      "text": "Do you prefer to apologize right away or wait for things to cool down?",
+      "type": "multiple",
+      "options": ["Apologize right away", "Wait", "Depends on the situation"]
+    },
+    {
+      "id": 108,
+      "text": "Do you like gardening?",
+      "type": "boolean"
+    },
+    {
+      "id": 109,
+      "text": "What is your favorite sneaker brand?",
+      "type": "text"
+    },
+    {
+      "id": 110,
+      "text": "Do you prefer live music or streaming?",
+      "type": "multiple",
+      "options": ["Live", "Streaming", "Both"]
+    },
+    {
+      "id": 111,
+      "text": "Do you consider yourself a gossipy person?",
+      "type": "boolean"
+    },
+    {
+      "id": 112,
+      "text": "What is your favorite street food?",
+      "type": "text"
+    },
+    {
+      "id": 113,
+      "text": "Do you prefer working from home or in an office?",
+      "type": "multiple",
+      "options": ["From home", "In an office", "Hybrid"]
+    },
+    {
+      "id": 114,
+      "text": "Do you like horror movies?",
+      "type": "boolean"
+    },
+    {
+      "id": 115,
+      "text": "What is your favorite podcast?",
+      "type": "text"
+    },
+    {
+      "id": 116,
+      "text": "Do you prefer waking up early or staying up late?",
+      "type": "multiple",
+      "options": ["Waking up early", "Staying up late"]
+    },
+    {
+      "id": 117,
+      "text": "Do you consider yourself a jealous person?",
+      "type": "boolean"
+    },
+    {
+      "id": 118,
+      "text": "What is your favorite car brand?",
+      "type": "text"
+    },
+    {
+      "id": 119,
+      "text": "Do you prefer adventure or relaxation vacations?",
+      "type": "multiple",
+      "options": ["Adventure", "Relaxation", "A mix of both"]
+    },
+    {
+      "id": 120,
+      "text": "Do you like watching documentaries?",
+      "type": "boolean"
+    },
+    {
+      "id": 121,
+      "text": "Who is your favorite YouTuber or content creator?",
+      "type": "text"
+    },
+    {
+      "id": 122,
+      "text": "Do you prefer eating at home or at a restaurant?",
+      "type": "multiple",
+      "options": ["At home", "At a restaurant", "It's the same to you"]
+    },
+    {
+      "id": 123,
+      "text": "Do you consider yourself a dramatic person?",
+      "type": "boolean"
+    },
+    {
+      "id": 124,
+      "text": "What is your favorite musical instrument?",
+      "type": "text"
+    },
+    {
+      "id": 125,
+      "text": "Do you prefer short and frequent vacations or one long one a year?",
+      "type": "multiple",
+      "options": ["Short and frequent", "One long one a year"]
+    },
+    {
+      "id": 126,
+      "text": "Do you like tattoos?",
+      "type": "boolean"
+    },
+    {
+      "id": 127,
+      "text": "Who is your favorite superhero?",
+      "type": "text"
+    },
+    {
+      "id": 128,
+      "text": "What is your favorite emoji?",
+      "type": "text"
+    },
+    {
+      "id": 129,
+      "text": "Do you consider yourself an introverted person?",
+      "type": "boolean"
+    },
+    {
+      "id": 130,
+      "text": "Who is your favorite music artist?",
+      "type": "text"
+    },
+    {
+      "id": 131,
+      "text": "Do you prefer using social media or going out into the real world?",
+      "type": "multiple",
+      "options": ["Social media", "Real world", "A balance"]
+    },
+    {
+      "id": 132,
+      "text": "Do you like to meditate?",
+      "type": "boolean"
+    },
+    {
+      "id": 133,
+      "text": "What is your greatest virtue?",
+      "type": "text"
+    },
+    {
+      "id": 134,
+      "text": "Do you prefer short or long series?",
+      "type": "multiple",
+      "options": [
+        "Short (1-2 seasons)",
+        "Long (+3 seasons)",
+        "It's the same to you"
+      ]
+    },
+    {
+      "id": 135,
+      "text": "Do you consider yourself a very competitive person?",
+      "type": "boolean"
+    },
+    {
+      "id": 136,
+      "text": "What is your greatest achievement in life so far?",
+      "type": "text"
+    },
+    {
+      "id": 137,
+      "text": "Do you prefer going to museums or amusement parks?",
+      "type": "multiple",
+      "options": ["Museums", "Amusement parks", "None"]
+    },
+    {
+      "id": 138,
+      "text": "Do you like hiking?",
+      "type": "boolean"
+    },
+    {
+      "id": 139,
+      "text": "What is your favorite type of music for studying or working?",
+      "type": "text"
+    },
+    {
+      "id": 140,
+      "text": "Do you prefer asking for help or solving problems alone?",
+      "type": "multiple",
+      "options": [
+        "Asking for help",
+        "Solving them alone",
+        "Depends on the problem"
+      ]
+    },
+    {
+      "id": 141,
+      "text": "Do you like cruises?",
+      "type": "boolean"
+    },
+    {
+      "id": 142,
+      "text": "What is your favorite appetizer or starter?",
+      "type": "text"
+    },
+    {
+      "id": 143,
+      "text": "Do you prefer a surprise or a planned birthday?",
+      "type": "multiple",
+      "options": ["Surprise", "Planned", "No celebration"]
+    },
+    {
+      "id": 144,
+      "text": "Do you consider yourself a resentful person?",
+      "type": "boolean"
+    },
+    {
+      "id": 145,
+      "text": "What was your favorite childhood TV show?",
+      "type": "text"
+    },
+    {
+      "id": 146,
+      "text": "Do you prefer a hard or soft pillow?",
+      "type": "multiple",
+      "options": ["Hard", "Soft", "Medium"]
+    },
+    {
+      "id": 147,
+      "text": "Do you like sushi?",
+      "type": "boolean"
+    },
+    {
+      "id": 148,
+      "text": "What is your rarest phobia?",
+      "type": "text"
+    },
+    {
+      "id": 149,
+      "text": "Do you prefer having many friends or a few but very close ones?",
+      "type": "multiple",
+      "options": ["Many friends", "A few but close ones"]
+    },
+    {
+      "id": 150,
+      "text": "Do you like doing puzzles or brain teasers?",
+      "type": "boolean"
+    },
+    {
+      "id": 151,
+      "text": "What is your favorite technology brand?",
+      "type": "text"
+    },
+    {
+      "id": 152,
+      "text": "Do you prefer receiving or giving gifts?",
+      "type": "multiple",
+      "options": ["Receiving", "Giving", "Both equally"]
+    },
+    {
+      "id": 153,
+      "text": "Do you consider yourself a very perfectionist person?",
+      "type": "boolean"
+    },
+    {
+      "id": 154,
+      "text": "What is your favorite snack for watching movies?",
+      "type": "text"
+    },
+    {
+      "id": 155,
+      "text": "Do you prefer traveling by plane, train, or car?",
+      "type": "multiple",
+      "options": ["Plane", "Train", "Car"]
+    },
+    {
+      "id": 156,
+      "text": "Are you embarrassed to cry in public?",
+      "type": "boolean"
+    },
+    {
+      "id": 157,
+      "text": "What is your favorite type of exercise?",
+      "type": "text"
+    },
+    {
+      "id": 158,
+      "text": "Do you prefer learning something new or perfecting what you already know?",
+      "type": "multiple",
+      "options": ["Learning something new", "Perfecting what you know", "Both"]
+    },
+    {
+      "id": 159,
+      "text": "Do you like astrology?",
+      "type": "boolean"
+    },
+    {
+      "id": 160,
+      "text": "What is your favorite word or expression?",
+      "type": "text"
+    },
+    {
+      "id": 161,
+      "text": "Do you prefer large or small gatherings?",
+      "type": "multiple",
+      "options": ["Large", "Small", "It's the same to you"]
+    },
+    {
+      "id": 162,
+      "text": "Do you consider yourself a very curious person?",
+      "type": "boolean"
+    },
+    {
+      "id": 163,
+      "text": "What is your greatest weakness?",
+      "type": "text"
+    },
+    {
+      "id": 164,
+      "text": "Do you prefer funny or thoughtful content on social media?",
+      "type": "multiple",
+      "options": ["Funny", "Thoughtful", "Both"]
+    },
+    {
+      "id": 165,
+      "text": "Do you like going to the spa?",
+      "type": "boolean"
+    },
+    {
+      "id": 166,
+      "text": "Do you prefer a pool, river, or sea?",
+      "type": "multiple",
+      "options": ["Pool", "River", "Sea", "It's the same to you"]
+    },
+    {
+      "id": 167,
+      "text": "Do you prefer making decisions quickly or thinking it over a lot?",
+      "type": "multiple",
+      "options": [
+        "Quickly",
+        "Thinking it over a lot",
+        "Depends on the decision"
+      ]
+    },
+    {
+      "id": 168,
+      "text": "Do you like karaoke?",
+      "type": "boolean"
+    },
+    {
+      "id": 169,
+      "text": "What is the color you hate the most?",
+      "type": "text"
+    },
+    {
+      "id": 170,
+      "text": "Do you prefer being the leader or following someone?",
+      "type": "multiple",
+      "options": [
+        "Being the leader",
+        "Following someone",
+        "Depends on the situation"
+      ]
+    },
+    {
+      "id": 171,
+      "text": "Do you like anime?",
+      "type": "boolean"
+    },
+    {
+      "id": 172,
+      "text": "Who is your favorite fictional character?",
+      "type": "text"
+    },
+    {
+      "id": 173,
+      "text": "Do you prefer to apologize or to be apologized to first?",
+      "type": "multiple",
+      "options": ["Apologize", "Wait to be apologized to", "Depends"]
+    },
+    {
+      "id": 174,
+      "text": "Do you consider yourself a very sentimental person?",
+      "type": "boolean"
+    },
+    {
+      "id": 175,
+      "text": "What is your bedtime ritual?",
+      "type": "text"
+    },
+    {
+      "id": 176,
+      "text": "Do you prefer spending your free time alone or accompanied?",
+      "type": "multiple",
+      "options": ["Alone", "Accompanied", "A mix"]
+    },
+    {
+      "id": 177,
+      "text": "Are you interested in politics?",
+      "type": "boolean"
+    },
+    {
+      "id": 178,
+      "text": "What is your favorite phrase or saying?",
+      "type": "text"
+    },
+    {
+      "id": 179,
+      "text": "Do you prefer going on vacation abroad or in your own country?",
+      "type": "multiple",
+      "options": ["Abroad", "In your country", "It's the same to you"]
+    },
+    {
+      "id": 180,
+      "text": "Do you consider yourself a very honest person?",
+      "type": "boolean"
+    },
+    {
+      "id": 181,
+      "text": "What is your favorite activity on a rainy day?",
+      "type": "text"
+    },
+    {
+      "id": 182,
+      "text": "Do you prefer having many options or a few to choose from?",
+      "type": "multiple",
+      "options": ["Many options", "Few options"]
+    },
+    {
+      "id": 183,
+      "text": "Do you like makeup?",
+      "type": "boolean"
+    },
+    {
+      "id": 184,
+      "text": "What is your favorite family tradition?",
+      "type": "text"
+    },
+    {
+      "id": 185,
+      "text": "Do you prefer buying clothes in a physical store or online?",
+      "type": "multiple",
+      "options": ["Physical store", "Online", "It's the same to you"]
+    },
+    {
+      "id": 186,
+      "text": "Do you consider yourself a very talkative person?",
+      "type": "boolean"
+    },
+    {
+      "id": 187,
+      "text": "What is your desired profession?",
+      "type": "text"
+    },
+    {
+      "id": 188,
+      "text": "Do you prefer earning little doing something you love or earning a lot doing something you don't like?",
+      "type": "multiple",
+      "options": [
+        "Little doing something I love",
+        "A lot doing something I don't like"
+      ]
+    },
+    {
+      "id": 189,
+      "text": "Would you like to do volunteer work?",
+      "type": "boolean"
+    },
+    {
+      "id": 190,
+      "text": "What is your favorite recipe to cook?",
+      "type": "text"
+    },
+    {
+      "id": 191,
+      "text": "Do you prefer being famous or rich?",
+      "type": "multiple",
+      "options": ["Famous", "Rich", "Both", "None"]
+    },
+    {
+      "id": 192,
+      "text": "Do you consider yourself a grateful person?",
+      "type": "boolean"
+    },
+    {
+      "id": 193,
+      "text": "What is your greatest dream in life?",
+      "type": "text"
+    },
+    {
+      "id": 194,
+      "text": "Do you prefer fantasy or science fiction?",
+      "type": "multiple",
+      "options": ["Fantasy", "Science fiction", "Both", "None"]
+    },
+    {
+      "id": 195,
+      "text": "Do you like taking a nap?",
+      "type": "boolean"
+    },
+    {
+      "id": 196,
+      "text": "Who is your favorite movie or series villain?",
+      "type": "text"
+    },
+    {
+      "id": 197,
+      "text": "Do you prefer giving a second chance or cutting ties completely?",
+      "type": "multiple",
+      "options": ["Second chance", "Cutting ties completely", "Depends"]
+    },
+    {
+      "id": 198,
+      "text": "Do you like astronomy?",
+      "type": "boolean"
+    },
+    {
+      "id": 199,
+      "text": "What is your favorite time of the day?",
+      "type": "text"
+    },
+    {
+      "id": 200,
+      "text": "Do you know how to ride a bicycle?",
+      "type": "boolean"
+    },
+    {
+      "id": 201,
+      "text": "Which foreign language would you like to learn to speak fluently?",
+      "type": "text"
+    },
+    {
+      "id": 202,
+      "text": "Do you prefer a window or aisle seat when traveling?",
+      "type": "multiple",
+      "options": ["Window", "Aisle", "Middle"]
+    },
+    {
+      "id": 203,
+      "text": "Do you believe in the existence of extraterrestrial life?",
+      "type": "boolean"
+    },
+    {
+      "id": 204,
+      "text": "What is your favorite holiday or celebration of the year?",
+      "type": "text"
+    },
+    {
+      "id": 205,
+      "text": "Do you prefer reading books in physical or digital format?",
+      "type": "multiple",
+      "options": ["Physical", "Digital", "Audiobook"]
+    },
+    {
+      "id": 206,
+      "text": "Have you ever broken a bone in your body?",
+      "type": "boolean"
+    },
+    {
+      "id": 207,
+      "text": "Which musical instrument would you love to know how to play?",
+      "type": "text"
+    },
+    {
+      "id": 208,
+      "text": "Do you prefer bathing in the morning or at night?",
+      "type": "multiple",
+      "options": ["In the morning", "At night"]
+    },
+    {
+      "id": 209,
+      "text": "Do you usually remember the dreams you have when you sleep?",
+      "type": "boolean"
+    },
+    {
+      "id": 210,
+      "text": "What is your favorite museum or the one you would most like to visit?",
+      "type": "text"
+    },
+    {
+      "id": 211,
+      "text": "What is your favorite card game?",
+      "type": "text"
+    },
+    {
+      "id": 212,
+      "text": "Do you like abstract art?",
+      "type": "boolean"
+    },
+    {
+      "id": 213,
+      "text": "What is the household chore that bothers you the least?",
+      "type": "text"
+    },
+    {
+      "id": 214,
+      "text": "Which of the following do you prefer?",
+      "type": "multiple",
+      "options": ["Stairs", "Elevator", "Escalators"]
+    },
+    {
+      "id": 215,
+      "text": "Have you ever won a prize in a raffle or lottery?",
+      "type": "boolean"
+    },
+    {
+      "id": 216,
+      "text": "What is your favorite fruit?",
+      "type": "text"
+    },
+    {
+      "id": 217,
+      "text": "Do you prefer sparkling or still water?",
+      "type": "multiple",
+      "options": ["Sparkling", "Still"]
+    },
+    {
+      "id": 218,
+      "text": "Do you like the smell of wet earth after it rains?",
+      "type": "boolean"
+    },
+    {
+      "id": 219,
+      "text": "Which Asian country are you most interested in visiting?",
+      "type": "text"
+    },
+    {
+      "id": 220,
+      "text": "Do you prefer to invest your money in experiences or material objects?",
+      "type": "multiple",
+      "options": ["Experiences", "Material objects", "A balance"]
+    },
+    {
+      "id": 221,
+      "text": "Do you bite your nails when you are nervous?",
+      "type": "boolean"
+    },
+    {
+      "id": 222,
+      "text": "What is your favorite vegetable?",
+      "type": "text"
+    },
+    {
+      "id": 223,
+      "text": "Do you prefer your food hot, warm, or cold?",
+      "type": "multiple",
+      "options": ["Very hot", "Warm", "Cold"]
+    },
+    {
+      "id": 224,
+      "text": "Do you believe in luck or destiny?",
+      "type": "boolean"
+    },
+    {
+      "id": 225,
+      "text": "Which historical figure would you have liked to meet?",
+      "type": "text"
+    },
+    {
+      "id": 226,
+      "text": "Do you prefer fiction movies or documentaries based on real events?",
+      "type": "multiple",
+      "options": ["Fiction", "Documentaries"]
+    },
+    {
+      "id": 227,
+      "text": "Have you ever skydived?",
+      "type": "boolean"
+    },
+    {
+      "id": 228,
+      "text": "What is the best advice you have ever been given in life?",
+      "type": "text"
+    },
+    {
+      "id": 229,
+      "text": "Do you prefer writing by hand or typing on a device?",
+      "type": "multiple",
+      "options": ["Writing by hand", "Typing"]
+    },
+    {
+      "id": 230,
+      "text": "Do you know how to swim well?",
+      "type": "boolean"
+    },
+    {
+      "id": 231,
+      "text": "What is your favorite dog breed?",
+      "type": "text"
+    },
+    {
+      "id": 232,
+      "text": "Do you prefer to travel light or pack everything just in case?",
+      "type": "multiple",
+      "options": ["Light", "Everything just in case"]
+    },
+    {
+      "id": 233,
+      "text": "Do you like extreme amusement parks?",
+      "type": "boolean"
+    },
+    {
+      "id": 234,
+      "text": "What era of the past would you like to visit if you could time travel?",
+      "type": "text"
+    },
+    {
+      "id": 235,
+      "text": "Do you prefer shopping at local stores or large supermarket chains?",
+      "type": "multiple",
+      "options": ["Local stores", "Large chains", "Both"]
+    },
+    {
+      "id": 236,
+      "text": "Have you ever donated blood?",
+      "type": "boolean"
+    },
+    {
+      "id": 237,
+      "text": "What traditional dessert do you make best or enjoy the most?",
+      "type": "text"
+    },
+    {
+      "id": 238,
+      "text": "Do you prefer warm light or white/cold light for your home?",
+      "type": "multiple",
+      "options": ["Warm light", "White/cold light"]
+    },
+    {
+      "id": 239,
+      "text": "Do you consider yourself a superstitious person?",
+      "type": "boolean"
+    },
+    {
+      "id": 240,
+      "text": "What is your favorite type of flower?",
+      "type": "text"
+    },
+    {
+      "id": 241,
+      "text": "Do you prefer listening to interview or narrative podcasts?",
+      "type": "multiple",
+      "options": ["Interviews", "Narratives", "I don't listen to podcasts"]
+    },
+    {
+      "id": 242,
+      "text": "Do you like sweet and sour food?",
+      "type": "boolean"
+    },
+    {
+      "id": 243,
+      "text": "What name would you give a boat if you had one?",
+      "type": "text"
+    },
+    {
+      "id": 244,
+      "text": "Do you prefer theater or cinema?",
+      "type": "multiple",
+      "options": ["Theater", "Cinema"]
+    },
+    {
+      "id": 245,
+      "text": "Do you have any known allergies?",
+      "type": "boolean"
+    },
+    {
+      "id": 246,
+      "text": "What is your favorite piece of art?",
+      "type": "text"
+    },
+    {
+      "id": 247,
+      "text": "Do you prefer wearing shoes, sneakers, or going barefoot at home?",
+      "type": "multiple",
+      "options": ["Shoes", "Sneakers", "Barefoot", "Slippers"]
+    },
+    {
+      "id": 248,
+      "text": "Do you know how to sew by hand?",
+      "type": "boolean"
+    },
+    {
+      "id": 249,
+      "text": "Which school subject did you detest when you were a child?",
+      "type": "text"
+    },
+    {
+      "id": 250,
+      "text": "Do you prefer a relaxing massage or a strong deep-tissue massage?",
+      "type": "multiple",
+      "options": ["Relaxing", "Deep-tissue", "I don't like massages"]
+    },
+    {
+      "id": 251,
+      "text": "Have you ever written a poem?",
+      "type": "boolean"
+    },
+    {
+      "id": 252,
+      "text": "Which language sounds the most romantic to you?",
+      "type": "text"
+    },
+    {
+      "id": 253,
+      "text": "Do you prefer minimalist or cluttered (maximalist) decoration?",
+      "type": "multiple",
+      "options": ["Minimalist", "Maximalist", "Intermediate"]
+    },
+    {
+      "id": 254,
+      "text": "Do you collect any objects?",
+      "type": "boolean"
+    },
+    {
+      "id": 255,
+      "text": "What object from your childhood do you still cherish?",
+      "type": "text"
+    },
+    {
+      "id": 256,
+      "text": "Do you prefer waking up to a sound alarm or natural light?",
+      "type": "multiple",
+      "options": ["Sound alarm", "Natural light", "Vibration"]
+    },
+    {
+      "id": 257,
+      "text": "Do you believe artificial intelligence will surpass human intelligence?",
+      "type": "boolean"
+    },
+    {
+      "id": 258,
+      "text": "What is the best gift you have ever received in your life?",
+      "type": "text"
+    },
+    {
+      "id": 259,
+      "text": "Do you prefer using a traditional wristwatch or a smartwatch?",
+      "type": "multiple",
+      "options": ["Traditional", "Smartwatch", "I don't wear a watch"]
+    },
+    {
+      "id": 260,
+      "text": "Do you like to solve crosswords or sudokus?",
+      "type": "boolean"
+    },
+    {
+      "id": 261,
+      "text": "What is your favorite cheese?",
+      "type": "text"
+    },
+    {
+      "id": 262,
+      "text": "Do you prefer movies dubbed into your language or in the original language with subtitles?",
+      "type": "multiple",
+      "options": [
+        "Dubbed",
+        "Original with subtitles",
+        "Original without subtitles"
+      ]
+    },
+    {
+      "id": 263,
+      "text": "Do you have a good sense of direction?",
+      "type": "boolean"
+    },
+    {
+      "id": 264,
+      "text": "What song would you like to be played at your funeral?",
+      "type": "text"
+    },
+    {
+      "id": 265,
+      "text": "Do you prefer long hair or short hair?",
+      "type": "multiple",
+      "options": ["Long hair", "Short hair", "Shaved"]
+    },
+    {
+      "id": 266,
+      "text": "Do you know how to build a campfire without using a lighter?",
+      "type": "boolean"
+    },
+    {
+      "id": 267,
+      "text": "Who is your favorite writer or author?",
+      "type": "text"
+    },
+    {
+      "id": 268,
+      "text": "What household appliance or gadget makes your life the easiest?",
+      "type": "text"
+    },
+    {
+      "id": 269,
+      "text": "Are you someone who gets motion sickness easily during trips?",
+      "type": "boolean"
+    },
+    {
+      "id": 270,
+      "text": "Which famous monument has impressed you the most?",
+      "type": "text"
+    },
+    {
+      "id": 271,
+      "text": "Do you prefer spicy Mexican food or spiced Indian food?",
+      "type": "multiple",
+      "options": ["Mexican", "Indian", "Neither"]
+    },
+    {
+      "id": 272,
+      "text": "Do you like the feeling of flying in an airplane?",
+      "type": "boolean"
+    },
+    {
+      "id": 273,
+      "text": "What urban myth or legend scared you the most as a child?",
+      "type": "text"
+    },
+    {
+      "id": 274,
+      "text": "Do you prefer to have a manual or automatic car?",
+      "type": "multiple",
+      "options": ["Manual", "Automatic", "Electric", "I don't drive"]
+    },
+    {
+      "id": 275,
+      "text": "Do you know how to perform basic first aid?",
+      "type": "boolean"
+    },
+    {
+      "id": 276,
+      "text": "What type of art do you prefer: painting, sculpture, or photography?",
+      "type": "text",
+      "options": ["Painting", "Sculpture", "Photography"]
+    },
+    {
+      "id": 277,
+      "text": "Do you prefer board games or console video games?",
+      "type": "multiple",
+      "options": ["Card games", "Video games", "Both"]
+    },
+    {
+      "id": 278,
+      "text": "Have you ever adopted a stray animal?",
+      "type": "boolean"
+    },
+    {
+      "id": 279,
+      "text": "What is your favorite soup or creamy soup?",
+      "type": "text"
+    },
+    {
+      "id": 280,
+      "text": "Do you prefer long pasta (spaghetti) or short pasta (macaroni)?",
+      "type": "multiple",
+      "options": ["Long", "Short"]
+    },
+    {
+      "id": 281,
+      "text": "Which ancient or dead language would you like to be able to read and understand?",
+      "type": "text"
+    },
+    {
+      "id": 282,
+      "text": "Which wild animal would you like to be able to domesticate?",
+      "type": "text"
+    },
+    {
+      "id": 283,
+      "text": "Do you prefer to write long messages or short messages?",
+      "type": "multiple",
+      "options": ["Long messages", "Short messages"]
+    },
+    {
+      "id": 284,
+      "text": "Have you ever participated in a marathon or a sports race?",
+      "type": "boolean"
+    },
+    {
+      "id": 285,
+      "text": "What is your favorite proverb or saying?",
+      "type": "text"
+    },
+    {
+      "id": 286,
+      "text": "Do you prefer to buy new or second-hand clothes?",
+      "type": "multiple",
+      "options": ["New", "Second-hand", "A combination of both"]
+    },
+    {
+      "id": 287,
+      "text": "Are you able to touch your toes without bending your knees?",
+      "type": "boolean"
+    },
+    {
+      "id": 288,
+      "text": "What useless skill do you possess that amuses you?",
+      "type": "text"
+    },
+    {
+      "id": 289,
+      "text": "Do you prefer to work at an organized desk or in 'organized chaos'?",
+      "type": "multiple",
+      "options": ["Organized", "Organized chaos"]
+    },
+    {
+      "id": 290,
+      "text": "Do you talk in your sleep?",
+      "type": "boolean"
+    },
+    {
+      "id": 291,
+      "text": "Which world capital fascinates you the most?",
+      "type": "text"
+    },
+    {
+      "id": 292,
+      "text": "Do you prefer to wear large or small sunglasses?",
+      "type": "multiple",
+      "options": ["Large", "Small", "I don't wear sunglasses"]
+    },
+    {
+      "id": 293,
+      "text": "Have you ever gone scuba diving in the sea?",
+      "type": "boolean"
+    },
+    {
+      "id": 294,
+      "text": "What ingredient can never be missing from your kitchen?",
+      "type": "text"
+    },
+    {
+      "id": 295,
+      "text": "Do you prefer classic 2D animation or modern 3D cinema?",
+      "type": "multiple",
+      "options": ["Classic 2D", "Modern 3D"]
+    },
+    {
+      "id": 296,
+      "text": "Are you someone who cries easily while watching movies?",
+      "type": "boolean"
+    },
+    {
+      "id": 297,
+      "text": "What is your favorite bread?",
+      "type": "text"
+    },
+    {
+      "id": 298,
+      "text": "Do you prefer to go on a cruise or a backpacking trip?",
+      "type": "multiple",
+      "options": ["Cruise", "Backpacker"]
+    },
+    {
+      "id": 299,
+      "text": "Do you like the smell of freshly brewed coffee?",
+      "type": "boolean"
+    },
+    {
+      "id": 300,
+      "text": "Which historical event do you find most interesting to study?",
+      "type": "text"
+    },
+    {
+      "id": 301,
+      "text": "Do you prefer to use blue or black ink pens?",
+      "type": "multiple",
+      "options": ["Blue", "Black"]
+    },
+    {
+      "id": 302,
+      "text": "Do you believe that technology isolates us instead of connecting us?",
+      "type": "boolean"
+    },
+    {
+      "id": 303,
+      "text": "What is your favorite winter sport (to watch or practice)?",
+      "type": "text"
+    },
+    {
+      "id": 304,
+      "text": "Do you prefer stories about vampires, werewolves, or zombies?",
+      "type": "multiple",
+      "options": ["Vampires", "Werewolves", "Zombies"]
+    },
+    {
+      "id": 305,
+      "text": "Have you ever done something crazy for love?",
+      "type": "boolean"
+    },
+    {
+      "id": 306,
+      "text": "Which invention in history do you think is the most important?",
+      "type": "text"
+    },
+    {
+      "id": 307,
+      "text": "Do you prefer pizza with thin crust or thick crust?",
+      "type": "multiple",
+      "options": ["Thin crust", "Thick crust"]
+    },
+    {
+      "id": 308,
+      "text": "Are you afraid of insects or spiders?",
+      "type": "boolean"
+    },
+    {
+      "id": 309,
+      "text": "What international dish do you enjoy the most?",
+      "type": "text"
+    },
+    {
+      "id": 310,
+      "text": "Do you prefer using backpacks, crossbody bags, or briefcases?",
+      "type": "multiple",
+      "options": ["Backpacks", "Crossbody bags", "Briefcases"]
+    },
+    {
+      "id": 311,
+      "text": "Are you one of those people who reads the instruction manual before using something?",
+      "type": "boolean"
+    },
+    {
+      "id": 312,
+      "text": "What useless superpower would you like to have?",
+      "type": "text"
+    },
+    {
+      "id": 313,
+      "text": "Do you prefer to bathe with a sponge or just with soap and your hands?",
+      "type": "multiple",
+      "options": ["Sponge", "Hands"]
+    },
+    {
+      "id": 314,
+      "text": "Do you prefer clothes with prints, stripes, or solid colors?",
+      "type": "multiple",
+      "options": ["Prints", "Stripes", "Solid colors"]
+    },
+    {
+      "id": 315,
+      "text": "What is the best concert you have ever attended?",
+      "type": "text"
+    },
+    {
+      "id": 316,
+      "text": "Do you prefer social gatherings during the day or at night?",
+      "type": "multiple",
+      "options": ["During the day", "At night"]
+    },
+    {
+      "id": 317,
+      "text": "Have you ever experienced a déjà vu?",
+      "type": "boolean"
+    },
+    {
+      "id": 318,
+      "text": "Which language seems the most difficult to learn?",
+      "type": "text"
+    },
+    {
+      "id": 319,
+      "text": "Do you prefer to buy books or borrow them?",
+      "type": "multiple",
+      "options": ["Buy", "Borrow", "I don't read"]
+    },
+    {
+      "id": 320,
+      "text": "Does listening to the sound of ocean waves relax you?",
+      "type": "boolean"
+    },
+    {
+      "id": 321,
+      "text": "What is the most beautiful name you have ever heard?",
+      "type": "text"
+    },
+    {
+      "id": 322,
+      "text": "Do you prefer a humid and tropical climate or a dry and desert climate?",
+      "type": "multiple",
+      "options": ["Humid and tropical", "Dry and desert"]
+    },
+    {
+      "id": 323,
+      "text": "Do you know how to play chess?",
+      "type": "boolean"
+    },
+    {
+      "id": 324,
+      "text": "What would you do if you found a wallet full of money on the street?",
+      "type": "text"
+    },
+    {
+      "id": 325,
+      "text": "Do you prefer parks with many trees or squares with urban architecture?",
+      "type": "multiple",
+      "options": ["Parks with trees", "Urban squares"]
+    },
+    {
+      "id": 326,
+      "text": "Have you ever seen a shooting star?",
+      "type": "boolean"
+    },
+    {
+      "id": 327,
+      "text": "What is your favorite fairy tale or fable?",
+      "type": "text"
+    },
+    {
+      "id": 328,
+      "text": "Do you prefer to give useful gifts or emotional/symbolic gifts?",
+      "type": "multiple",
+      "options": ["Useful", "Emotional"]
+    },
+    {
+      "id": 329,
+      "text": "Do you consider yourself someone who forgives quickly?",
+      "type": "boolean"
+    },
+    {
+      "id": 330,
+      "text": "What is your favorite part of your body?",
+      "type": "text"
+    },
+    {
+      "id": 331,
+      "text": "Do you prefer curtains or blinds on windows?",
+      "type": "multiple",
+      "options": ["Curtains", "Blinds"]
+    },
+    {
+      "id": 332,
+      "text": "Do you like classical music?",
+      "type": "boolean"
+    },
+    {
+      "id": 333,
+      "text": "Which profession seems the hardest in the world to you?",
+      "type": "text"
+    },
+    {
+      "id": 334,
+      "text": "Do you prefer to eat fruit whole or as juice?",
+      "type": "multiple",
+      "options": ["Whole", "As juice"]
+    },
+    {
+      "id": 335,
+      "text": "Have you ever been on television or radio?",
+      "type": "boolean"
+    },
+    {
+      "id": 336,
+      "text": "Which ancient or dead language would you like to be able to read and understand?",
+      "type": "text"
+    },
+    {
+      "id": 337,
+      "text": "Do you prefer carpets/rugs at home or bare floors?",
+      "type": "multiple",
+      "options": ["Carpets/Rugs", "Bare floor"]
+    },
+    {
+      "id": 338,
+      "text": "Do you like the smell of new book pages?",
+      "type": "boolean"
+    },
+    {
+      "id": 339,
+      "text": "What mystery of the universe intrigues you the most?",
+      "type": "text"
+    },
+    {
+      "id": 340,
+      "text": "Do you prefer grilled, fried, or baked chicken?",
+      "type": "multiple",
+      "options": ["Grilled", "Fried", "Baked", "I don't eat chicken"]
+    },
+    {
+      "id": 341,
+      "text": "Are you left-handed or right-handed?",
+      "type": "boolean"
+    },
+    {
+      "id": 342,
+      "text": "What band name do you find the most original?",
+      "type": "text"
+    },
+    {
+      "id": 343,
+      "text": "Do you prefer to watch movies on a big screen (TV/Cinema) or on your mobile/laptop?",
+      "type": "multiple",
+      "options": ["Big screen", "Tablet/Laptop"]
+    },
+    {
+      "id": 344,
+      "text": "Do you like doing crafts or handmade items?",
+      "type": "boolean"
+    },
+    {
+      "id": 345,
+      "text": "What smell automatically transports you back to your childhood?",
+      "type": "text"
+    },
+    {
+      "id": 346,
+      "text": "Do you prefer shoes with laces, velcro, or without fasteners?",
+      "type": "multiple",
+      "options": ["Laces", "Velcro", "Without fasteners"]
+    },
+    {
+      "id": 347,
+      "text": "Have you ever won a trophy or a medal?",
+      "type": "boolean"
+    },
+    {
+      "id": 348,
+      "text": "What is your favorite hot drink?",
+      "type": "text"
+    },
+    {
+      "id": 349,
+      "text": "Do you prefer dark humor or clean humor jokes?",
+      "type": "multiple",
+      "options": ["Dark humor", "Clean humor"]
+    },
+    {
+      "id": 350,
+      "text": "Do you consider yourself photogenic?",
+      "type": "boolean"
+    },
+    {
+      "id": 351,
+      "text": "What skill would you like to master 100% (e.g., cooking, dancing, programming)?",
+      "type": "text"
+    },
+    {
+      "id": 352,
+      "text": "Do you prefer food courts, restaurants, or street food?",
+      "type": "multiple",
+      "options": ["Food courts", "Restaurants", "Street food"]
+    },
+    {
+      "id": 353,
+      "text": "Do you like fruit jam?",
+      "type": "boolean"
+    },
+    {
+      "id": 354,
+      "text": "What is your favorite constellation in the night sky?",
+      "type": "text"
+    },
+    {
+      "id": 355,
+      "text": "Do you like tea?",
+      "type": "boolean"
+    },
+    {
+      "id": 356,
+      "text": "Have you ever composed a song?",
+      "type": "boolean"
+    },
+    {
+      "id": 357,
+      "text": "What is the oldest piece of clothing you still keep in your closet?",
+      "type": "text"
+    },
+    {
+      "id": 358,
+      "text": "Do you prefer to ride in the back seat or be the co-pilot?",
+      "type": "multiple",
+      "options": ["Back seat", "Co-pilot"]
+    },
+    {
+      "id": 359,
+      "text": "Do you believe that human beings will eventually live on Mars?",
+      "type": "boolean"
+    },
+    {
+      "id": 360,
+      "text": "What is your favorite cut of meat?",
+      "type": "text"
+    },
+    {
+      "id": 361,
+      "text": "Do you like nuts?",
+      "type": "boolean"
+    },
+    {
+      "id": 362,
+      "text": "Do you have any scars with an interesting story?",
+      "type": "boolean"
+    },
+    {
+      "id": 363,
+      "text": "Which sport do you find the most boring to watch on television?",
+      "type": "text"
+    },
+    {
+      "id": 364,
+      "text": "Do you prefer knitted scarves or beanies/hats for the cold?",
+      "type": "multiple",
+      "options": ["Scarves", "Beanies/Hats"]
+    },
+    {
+      "id": 365,
+      "text": "Do you like virtual reality games?",
+      "type": "boolean"
+    },
+    {
+      "id": 366,
+      "text": "What household appliance or gadget makes your life the easiest?",
+      "type": "text"
+    },
+    {
+      "id": 367,
+      "text": "Do you prefer to use bar soap or liquid soap for bathing?",
+      "type": "multiple",
+      "options": ["Bar soap", "Liquid soap"]
+    },
+    {
+      "id": 368,
+      "text": "Have you ever painted the walls of your own house?",
+      "type": "boolean"
+    },
+    {
+      "id": 369,
+      "text": "What regional dialect or accent do you enjoy listening to the most?",
+      "type": "text"
+    },
+    {
+      "id": 370,
+      "text": "Do you prefer to use emojis or stickers in your conversations?",
+      "type": "multiple",
+      "options": ["Emojis", "Stickers", "Plain text"]
+    },
+    {
+      "id": 371,
+      "text": "Do you like the feeling of sand on your feet?",
+      "type": "boolean"
+    },
+    {
+      "id": 372,
+      "text": "What book were you forced to read in school and ended up loving?",
+      "type": "text"
+    },
+    {
+      "id": 373,
+      "text": "Do you prefer French fries, baked potatoes, or mashed potatoes?",
+      "type": "multiple",
+      "options": ["French fries", "Baked", "Mashed"]
+    },
+    {
+      "id": 374,
+      "text": "Do you have a good memory for remembering birthdays?",
+      "type": "boolean"
+    },
+    {
+      "id": 375,
+      "text": "What is the worst job you have ever had or can imagine having?",
+      "type": "text"
+    },
+    {
+      "id": 376,
+      "text": "Do you prefer to read news on internet portals or watch news broadcasts on television?",
+      "type": "multiple",
+      "options": [
+        "Internet portals",
+        "Television news",
+        "I don't follow the news"
+      ]
+    },
+    {
+      "id": 377,
+      "text": "Have you ever been lost in a foreign city?",
+      "type": "boolean"
+    },
+    {
+      "id": 378,
+      "text": "What is your favorite sauce to accompany meals?",
+      "type": "text"
+    },
+    {
+      "id": 379,
+      "text": "Do you prefer analog or digital clocks?",
+      "type": "multiple",
+      "options": ["Analog", "Digital"]
+    },
+    {
+      "id": 380,
+      "text": "Are you able to whistle loudly?",
+      "type": "boolean"
+    },
+    {
+      "id": 381,
+      "text": "What movie have you watched more than five times?",
+      "type": "text"
+    },
+    {
+      "id": 382,
+      "text": "Do you prefer a garden full of flowers or a vegetable garden?",
+      "type": "multiple",
+      "options": ["Flower garden", "Vegetable garden", "Zen/rock garden"]
+    },
+    {
+      "id": 383,
+      "text": "Do you believe that money can buy happiness?",
+      "type": "boolean"
+    },
+    {
+      "id": 384,
+      "text": "What is the best nature documentary you have ever seen?",
+      "type": "text"
+    },
+    {
+      "id": 385,
+      "text": "Do you prefer to use an umbrella or a raincoat when it rains?",
+      "type": "multiple",
+      "options": ["Umbrella", "Raincoat"]
+    },
+    {
+      "id": 386,
+      "text": "Have you ever gone fishing?",
+      "type": "boolean"
+    },
+    {
+      "id": 387,
+      "text": "What is your favorite cat breed?",
+      "type": "text"
+    },
+    {
+      "id": 388,
+      "text": "Do you prefer high beds or mattresses almost level with the floor?",
+      "type": "multiple",
+      "options": ["High beds", "Level with the floor"]
+    },
+    {
+      "id": 389,
+      "text": "Do you like escape room games?",
+      "type": "boolean"
+    },
+    {
+      "id": 390,
+      "text": "What is the best proverb or saying that you apply to your daily life?",
+      "type": "text"
+    },
+    {
+      "id": 391,
+      "text": "Do you prefer to eat sandwiches made with sliced bread or baguette-style bread?",
+      "type": "multiple",
+      "options": ["Sliced bread", "Baguette"]
+    },
+    {
+      "id": 392,
+      "text": "Have you ever sung in a choir?",
+      "type": "boolean"
+    },
+    {
+      "id": 393,
+      "text": "What song would you like to know how to sing perfectly?",
+      "type": "text"
+    },
+    {
+      "id": 394,
+      "text": "Do you prefer having a physical calendar on the wall or a digital one on your phone?",
+      "type": "multiple",
+      "options": ["Physical", "Digital"]
+    },
+    {
+      "id": 395,
+      "text": "Do you like the feeling of speed in vehicles?",
+      "type": "boolean"
+    },
+    {
+      "id": 396,
+      "text": "What custom from another culture would you like to be adopted in your country?",
+      "type": "text"
+    },
+    {
+      "id": 397,
+      "text": "Do you prefer direct sunlight or the cool shade under a tree?",
+      "type": "multiple",
+      "options": ["Direct sun", "Shade"]
+    },
+    {
+      "id": 398,
+      "text": "Do you know how to juggle?",
+      "type": "boolean"
+    },
+    {
+      "id": 399,
+      "text": "What is the name of your favorite star or galaxy?",
+      "type": "text"
+    },
+    {
+      "id": 400,
+      "text": "Do you prefer history or philosophy books?",
+      "type": "multiple",
+      "options": ["History", "Philosophy"]
+    },
+    {
+      "id": 401,
+      "text": "Have you ever found a four-leaf clover?",
+      "type": "boolean"
+    },
+    {
+      "id": 402,
+      "text": "Which fruit do you consider the most difficult to peel?",
+      "type": "text"
+    },
+    {
+      "id": 403,
+      "text": "Do you prefer rustic or industrial interior design?",
+      "type": "multiple",
+      "options": ["Rustic", "Industrial"]
+    },
+    {
+      "id": 404,
+      "text": "Do you like the British accent in English?",
+      "type": "boolean"
+    },
+    {
+      "id": 405,
+      "text": "What is your favorite type of salad?",
+      "type": "text"
+    },
+    {
+      "id": 406,
+      "text": "Do you prefer baking desserts or making cold desserts (without an oven)?",
+      "type": "multiple",
+      "options": ["Baked", "Cold", "Buying them pre-made"]
+    },
+    {
+      "id": 407,
+      "text": "Do you have any live plants in your room?",
+      "type": "boolean"
+    },
+    {
+      "id": 408,
+      "text": "What animal do you consider to be your 'spirit animal'?",
+      "type": "text"
+    },
+    {
+      "id": 409,
+      "text": "Do you prefer neutral-colored or bright-colored shoes?",
+      "type": "multiple",
+      "options": ["Neutral", "Bright"]
+    },
+    {
+      "id": 410,
+      "text": "Do you believe in karma?",
+      "type": "boolean"
+    },
+    {
+      "id": 411,
+      "text": "What television game show would you like to participate in?",
+      "type": "text"
+    },
+    {
+      "id": 412,
+      "text": "Do you prefer serrano ham (cured) or cooked ham (York)?",
+      "type": "multiple",
+      "options": ["Serrano/Cured", "Cooked", "I don't eat meat"]
+    },
+    {
+      "id": 413,
+      "text": "Do you know how to use chopsticks to eat?",
+      "type": "boolean"
+    },
+    {
+      "id": 414,
+      "text": "What historical myth disappointed you when you found out it was false?",
+      "type": "text"
+    },
+    {
+      "id": 415,
+      "text": "Do you prefer mint or fruit chewing gum?",
+      "type": "multiple",
+      "options": ["Mint", "Fruit"]
+    },
+    {
+      "id": 416,
+      "text": "Do you like walking barefoot on the grass?",
+      "type": "boolean"
+    },
+    {
+      "id": 417,
+      "text": "What dish do you cook when you want to impress someone?",
+      "type": "text"
+    },
+    {
+      "id": 418,
+      "text": "Do you prefer washing dishes by hand or using the dishwasher?",
+      "type": "multiple",
+      "options": ["By hand", "Dishwasher"]
+    },
+    {
+      "id": 419,
+      "text": "Have you ever read a book with more than 1000 pages?",
+      "type": "boolean"
+    },
+    {
+      "id": 420,
+      "text": "What country name sounds the most beautiful to you?",
+      "type": "text"
+    },
+    {
+      "id": 421,
+      "text": "Do you prefer shopping early in the morning or late in the afternoon?",
+      "type": "multiple",
+      "options": ["Early morning", "Late afternoon"]
+    },
+    {
+      "id": 422,
+      "text": "Are you someone who snores while sleeping?",
+      "type": "boolean"
+    },
+    {
+      "id": 423,
+      "text": "What is your favorite type of Italian pasta sauce?",
+      "type": "text"
+    },
+    {
+      "id": 424,
+      "text": "Do you prefer watches with a leather or metallic strap?",
+      "type": "multiple",
+      "options": ["Leather", "Metallic", "Silicone/Rubber"]
+    },
+    {
+      "id": 425,
+      "text": "Have you ever ridden in a helicopter?",
+      "type": "boolean"
+    },
+    {
+      "id": 426,
+      "text": "Which percussion instrument do you like the most?",
+      "type": "text"
+    },
+    {
+      "id": 427,
+      "text": "Do you prefer melted cheese or solid cheese chunks?",
+      "type": "multiple",
+      "options": ["Melted", "Solid"]
+    },
+    {
+      "id": 428,
+      "text": "Have you ever cried from laughing?",
+      "type": "boolean"
+    },
+    {
+      "id": 429,
+      "text": "What is your favorite music festival in the world?",
+      "type": "text"
+    },
+    {
+      "id": 430,
+      "text": "Do you prefer oil painting or watercolors?",
+      "type": "multiple",
+      "options": ["Oil", "Watercolors"]
+    },
+    {
+      "id": 431,
+      "text": "Do you like True Crime documentaries?",
+      "type": "boolean"
+    },
+    {
+      "id": 432,
+      "text": "What mythological animal would you like to exist?",
+      "type": "text"
+    },
+    {
+      "id": 433,
+      "text": "Which of these massages do you prefer?",
+      "type": "multiple",
+      "options": ["Back", "Feet", "Neck/Head"]
+    },
+    {
+      "id": 434,
+      "text": "Have you ever planted a tree?",
+      "type": "boolean"
+    },
+    {
+      "id": 435,
+      "text": "Which historical figure do you consider a misunderstood hero?",
+      "type": "text"
+    },
+    {
+      "id": 436,
+      "text": "Do you prefer stories told in the first person or third person?",
+      "type": "multiple",
+      "options": ["First person", "Third person"]
+    },
+    {
+      "id": 437,
+      "text": "Do you like the feeling of cracking your knuckles?",
+      "type": "boolean"
+    },
+    {
+      "id": 438,
+      "text": "What is the best financial advice you have ever heard?",
+      "type": "text"
+    },
+    {
+      "id": 439,
+      "text": "Do you prefer to keep the room temperature cool and use blankets, or warm without blankets?",
+      "type": "multiple",
+      "options": ["Cool with blankets", "Warm without blankets"]
+    },
+    {
+      "id": 440,
+      "text": "Have you ever built a Lego set?",
+      "type": "boolean"
+    },
+    {
+      "id": 441,
+      "text": "What Olympic sport would you like to master?",
+      "type": "text"
+    },
+    {
+      "id": 442,
+      "text": "Do you prefer single-story or multi-story houses?",
+      "type": "multiple",
+      "options": ["Single story", "Multi-story"]
+    },
+    {
+      "id": 443,
+      "text": "Have you ever cut your own hair?",
+      "type": "boolean"
+    },
+    {
+      "id": 444,
+      "text": "What is your favorite sweet bakery item?",
+      "type": "text"
+    },
+    {
+      "id": 445,
+      "text": "Do you prefer thunderstorms or quiet rain?",
+      "type": "multiple",
+      "options": ["Thunderstorms", "Quiet rain"]
+    },
+    {
+      "id": 446,
+      "text": "Do you believe in soulmates?",
+      "type": "boolean"
+    },
+    {
+      "id": 447,
+      "text": "What is your favorite documentary television channel?",
+      "type": "text"
+    },
+    {
+      "id": 448,
+      "text": "Do you prefer light wood or dark wood furniture?",
+      "type": "multiple",
+      "options": ["Light wood", "Dark wood"]
+    },
+    {
+      "id": 449,
+      "text": "Do you like doing crosswords on paper?",
+      "type": "boolean"
+    },
+    {
+      "id": 450,
+      "text": "What social skill do you consider to be your strong point?",
+      "type": "text"
+    },
+    {
+      "id": 451,
+      "text": "Do you prefer traveling in an organized group or exploring on your own?",
+      "type": "multiple",
+      "options": ["Organized group", "On my own", "Small groups of friends"]
+    },
+    {
+      "id": 452,
+      "text": "Have you ever been in a hot air balloon?",
+      "type": "boolean"
+    },
+    {
+      "id": 453,
+      "text": "Have you ever put together a jigsaw puzzle?",
+      "type": "boolean"
+    },
+    {
+      "id": 454,
+      "text": "Do you prefer rings, necklaces, or bracelets?",
+      "type": "multiple",
+      "options": ["Rings", "Necklaces", "Bracelets"]
+    },
+    {
+      "id": 455,
+      "text": "Do you like the feeling of cold water after exercising?",
+      "type": "boolean"
+    },
+    {
+      "id": 456,
+      "text": "What non-fiction book has impacted your way of thinking the most?",
+      "type": "text"
+    },
+    {
+      "id": 457,
+      "text": "Do you prefer to watch movies in their extended version (Director's cut) or the regular theatrical version?",
+      "type": "multiple",
+      "options": ["Extended version", "Theatrical version", "I don't mind"]
+    },
+    {
+      "id": 458,
+      "text": "Do you consider yourself good at negotiating prices or haggling?",
+      "type": "boolean"
+    },
+    {
+      "id": 459,
+      "text": "Which architectural style fascinates you the most?",
+      "type": "text"
+    },
+    {
+      "id": 460,
+      "text": "Do you prefer to eat from deep dishes/bowls or flat plates?",
+      "type": "multiple",
+      "options": ["Deep/Bowls", "Flat"]
+    },
+    {
+      "id": 461,
+      "text": "Have you ever donated hair?",
+      "type": "boolean"
+    },
+    {
+      "id": 462,
+      "text": "Which horse breed seems the most majestic to you?",
+      "type": "text"
+    },
+    {
+      "id": 463,
+      "text": "Do you prefer notebooks with lined, grid, or blank pages?",
+      "type": "multiple",
+      "options": ["Lined", "Grid", "Blank"]
+    },
+    {
+      "id": 464,
+      "text": "Do you know how to light charcoal for a barbecue?",
+      "type": "boolean"
+    },
+    {
+      "id": 465,
+      "text": "Which accent in Spanish do you find the most amusing or pleasant?",
+      "type": "text"
+    },
+    {
+      "id": 466,
+      "text": "Do you prefer water parks or trampoline parks?",
+      "type": "multiple",
+      "options": ["Water parks", "Trampoline parks", "Neither"]
+    },
+    {
+      "id": 467,
+      "text": "Have you ever ridden a horse on the beach?",
+      "type": "boolean"
+    },
+    {
+      "id": 468,
+      "text": "What pizza ingredient can you not stand?",
+      "type": "text"
+    },
+    {
+      "id": 469,
+      "text": "Do you prefer plain, sweet, or fruit-chunk yogurt?",
+      "type": "multiple",
+      "options": ["Plain", "Sweet/Flavored", "With fruit chunks"]
+    },
+    {
+      "id": 470,
+      "text": "Does watching ASMR videos relax you?",
+      "type": "boolean"
+    },
+    {
+      "id": 471,
+      "text": "What is your favorite magazine (physical or digital)?",
+      "type": "text"
+    },
+    {
+      "id": 472,
+      "text": "Do you prefer exercising with weights or using your own body weight (calisthenics)?",
+      "type": "multiple",
+      "options": ["Weights", "Body weight"]
+    },
+    {
+      "id": 473,
+      "text": "Have you ever found a message in a bottle or written one?",
+      "type": "boolean"
+    },
+    {
+      "id": 474,
+      "text": "What conspiracy theory do you find most entertaining (even if you don't believe it)?",
+      "type": "text"
+    },
+    {
+      "id": 475,
+      "text": "Do you prefer big, luxurious weddings or intimate, simple ones?",
+      "type": "multiple",
+      "options": ["Big", "Intimate"]
+    },
+    {
+      "id": 476,
+      "text": "Have you ever learned something useful by watching internet tutorials?",
+      "type": "boolean"
+    },
+    {
+      "id": 477,
+      "text": "What is your preferred brand or flavor of chocolate bar?",
+      "type": "text"
+    },
+    {
+      "id": 478,
+      "text": "Do you prefer bath towels to be very rough or very soft?",
+      "type": "multiple",
+      "options": ["Rough", "Soft"]
+    },
+    {
+      "id": 479,
+      "text": "Do you consider yourself an expert at pitching tents?",
+      "type": "boolean"
+    },
+    {
+      "id": 480,
+      "text": "What word in another language do you wish existed in Spanish?",
+      "type": "text"
+    },
+    {
+      "id": 481,
+      "text": "Have you ever practiced skiing or snowboarding?",
+      "type": "boolean"
+    },
+    {
+      "id": 482,
+      "text": "Do you like clothing designs with floral prints?",
+      "type": "boolean"
+    },
+    {
+      "id": 483,
+      "text": "What is the gardening task you like the most?",
+      "type": "text"
+    },
+    {
+      "id": 484,
+      "text": "Do you prefer zombie or alien movies?",
+      "type": "multiple",
+      "options": ["Zombies", "Aliens"]
+    },
+    {
+      "id": 485,
+      "text": "Have you ever written a personal diary?",
+      "type": "boolean"
+    },
+    {
+      "id": 486,
+      "text": "What type of wood do you prefer for its scent?",
+      "type": "text"
+    },
+    {
+      "id": 487,
+      "text": "Do you prefer to use over-ear (large) or in-ear (small) headphones?",
+      "type": "multiple",
+      "options": ["Over-ear", "In-ear"]
+    },
+    {
+      "id": 488,
+      "text": "Do you like white noise for concentration?",
+      "type": "boolean"
+    },
+    {
+      "id": 489,
+      "text": "Which constellation or planet do you recognize the fastest in the sky?",
+      "type": "text"
+    },
+    {
+      "id": 490,
+      "text": "Do you prefer hyperrealistic or impressionistic art?",
+      "type": "multiple",
+      "options": ["Hyperrealistic", "Impressionistic"]
+    },
+    {
+      "id": 491,
+      "text": "Have you ever cooked over a wood fire?",
+      "type": "boolean"
+    },
+    {
+      "id": 492,
+      "text": "Which insect do you find most fascinating because of its behavior?",
+      "type": "text"
+    },
+    {
+      "id": 493,
+      "text": "Do you prefer collaborative or competitive board games?",
+      "type": "multiple",
+      "options": ["Collaborative", "Competitive"]
+    },
+    {
+      "id": 494,
+      "text": "Do you like the feeling of clothes fresh out of the dryer?",
+      "type": "boolean"
+    },
+    {
+      "id": 495,
+      "text": "What is your favorite font or typography?",
+      "type": "text"
+    },
+    {
+      "id": 496,
+      "text": "Do you prefer pools with heated water or ambient temperature water?",
+      "type": "multiple",
+      "options": ["Heated", "Ambient temperature"]
+    },
+    {
+      "id": 497,
+      "text": "Have you ever won a sports tournament, no matter how small?",
+      "type": "boolean"
+    },
+    {
+      "id": 498,
+      "text": "What everyday noise do you find most annoying?",
+      "type": "text"
+    },
+    {
+      "id": 499,
+      "text": "Do you prefer vanilla, lavender, or citrus scents for your home?",
+      "type": "multiple",
+      "options": ["Vanilla", "Lavender", "Citrus"]
+    },
+    {
+      "id": 500,
+      "text": "Do you consider yourself someone who knows how to keep a secret?",
+      "type": "boolean"
+    }
+  ]
+}

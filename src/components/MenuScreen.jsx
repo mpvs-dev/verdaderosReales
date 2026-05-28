@@ -1,84 +1,91 @@
 import { Crown, LogIn } from "lucide-react";
-import { ScreenWrapper } from "./Layout.jsx";
+import LanguageSwitcher from "./LanguageSwitcher.jsx";
+import { AdBanner } from "./Layout.jsx";
+import { useTranslation } from "../i18n/useTranslation.js";
 
 export default function MenuScreen({ playerName, setPlayerName, roomCode, setRoomCode, createRoom, joinRoom, loading }) {
+  const { t } = useTranslation();
+
   return (
-    <div className="screen" style={{
-      background: "radial-gradient(ellipse at 30% 60%, #3B0764 0%, #1a0a3e 50%, #0f0520 100%)",
+    <div style={{
       minHeight: "100vh",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      background: "radial-gradient(ellipse at 30% 60%, #3B0764 0%, #1a0a3e 50%, #0f0520 100%)",
     }}>
-      {/* Top ad */}
-      <div style={{ width: "100%", maxWidth: 480, padding: "10px 16px 0" }}>
-        <div className="ad-banner"><span>Publicidad</span></div>
+      {/* AD — siempre arriba */}
+      <div style={{ width: "100%", maxWidth: 480, padding: "10px 16px 0", flexShrink: 0 }}>
+        <AdBanner />
       </div>
 
-      <div className="screen-inner" style={{ justifyContent: "center", flex: 1 }}>
-
+      {/* Contenido principal */}
+      <div style={{
+        flex: 1,
+        width: "100%",
+        maxWidth: 480,
+        padding: "16px 16px 0",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        justifyContent: "center",
+      }}>
         {/* Logo */}
         <div style={{ textAlign: "center", paddingBottom: 8 }}>
-          <div className="anim-float" style={{ fontSize: 52, display: "inline-block", marginBottom: 8 }}>
-            👑
-          </div>
+          <div className="anim-float" style={{ fontSize: 52, display: "inline-block", marginBottom: 8 }}>👑</div>
           <h1 className="t-display" style={{ fontSize: 36, color: "#fff", textShadow: "0 4px 0 rgba(0,0,0,0.3)", marginBottom: 6 }}>
-            Verdaderos <span style={{ color: "var(--c-gold)" }}>Reales</span>
+            {t("menu.title")} <span style={{ color: "var(--c-gold)" }}>{t("menu.titleAccent")}</span>
           </h1>
-          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>
-            ¿Qué tan bien te conocen tus amigos?
-          </p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>{t("menu.subtitle")}</p>
         </div>
 
         {/* Form */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div>
-            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>Tu nombre</label>
-            <input
-              className="input"
-              type="text"
-              placeholder="Escribe tu nombre..."
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              maxLength={20}
-            />
+            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>{t("menu.nameLabel")}</label>
+            <input className="input" type="text" placeholder={t("menu.namePlaceholder")}
+              value={playerName} onChange={(e) => setPlayerName(e.target.value)} maxLength={20} />
           </div>
 
-          <button
-            className="btn btn-gold"
-            onClick={createRoom}
-            disabled={loading || !playerName.trim()}
-          >
-            <Crown size={17} />
-            Crear Sala
+          <button className="btn btn-gold" onClick={createRoom} disabled={loading || !playerName.trim()}>
+            <Crown size={17} />{t("menu.createRoom")}
           </button>
 
-          <div className="divider">o únete con un código</div>
+          <div className="divider">{t("menu.orJoinWith")}</div>
 
           <div>
-            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>Código de sala</label>
-            <input
-              className="input"
-              type="text"
-              placeholder="ABC12X"
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-              maxLength={6}
-              style={{ letterSpacing: 5, textAlign: "center", fontSize: 20, fontFamily: "var(--font-display)" }}
-            />
+            <label className="t-label" style={{ display: "block", marginBottom: 6 }}>{t("menu.roomCodeLabel")}</label>
+            <input className="input" type="text" placeholder={t("menu.roomCodePlaceholder")}
+              value={roomCode} onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              maxLength={6} style={{ letterSpacing: 5, textAlign: "center", fontSize: 20, fontFamily: "var(--font-display)" }} />
           </div>
 
-          <button
-            className="btn btn-ghost"
-            onClick={joinRoom}
-            disabled={loading || !playerName.trim() || !roomCode.trim()}
-          >
-            <LogIn size={17} />
-            Unirse a la Sala
+          <button className="btn btn-ghost" onClick={joinRoom} disabled={loading || !playerName.trim() || !roomCode.trim()}>
+            <LogIn size={17} />{t("menu.joinRoom")}
           </button>
         </div>
       </div>
 
-      {/* Bottom ad */}
-      <div style={{ width: "100%", maxWidth: 480, padding: "0 16px 16px" }}>
-        <div className="ad-banner"><span>Publicidad</span></div>
+      {/* Footer — créditos + selector de idioma, siempre abajo */}
+      <div style={{
+        width: "100%",
+        maxWidth: 480,
+        padding: "12px 16px 20px",
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.5 }}>
+            Verdaderos Reales v1.2
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
+            © 2026 Paul Diaz · BSL 1.1
+          </span>
+        </div>
+        <LanguageSwitcher />
       </div>
     </div>
   );

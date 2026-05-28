@@ -5,6 +5,7 @@ import { PLAYER_ROLE, KING_PICK_ANIMATION } from "../constants/game.js";
 import { getEveryone } from "../utils/room.js";
 import { assignAvatars } from "../assets/avatars.js";
 import storage from "../services/storage.js";
+import { useTranslation } from "../i18n/useTranslation.js";
 
 const { BASE_STEPS, RANDOM_EXTRA_STEPS, FAST_DELAY_MS, SLOW_DELAY_MULTIPLIER, SLOW_START_RATIO } = KING_PICK_ANIMATION;
 
@@ -19,6 +20,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
   const [winner, setWinner]           = useState(null);
   const [spinning, setSpinning]       = useState(false);
   const animatingRef                  = useRef(false);
+  const { t } = useTranslation();
 
   const isAdmin   = playerRole === PLAYER_ROLE.ADMIN;
   const everyone  = getEveryone(currentRoom);
@@ -79,9 +81,11 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
     <ScreenWrapper withBg onExit={resetGame}>
       <div style={{ textAlign: "center" }}>
         <div className="anim-float" style={{ fontSize: 44, display: "inline-block", marginBottom: 8 }}>👑</div>
-        <h2 className="t-display" style={{ fontSize: 28, color: "#fff", marginBottom: 4 }}>¿Quién es el Líder?</h2>
+        <h2 className="t-display" style={{ fontSize: 28, color: "#fff", marginBottom: 4 }}>{t("kingPick.title")}</h2>
         <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>
-          {isAdmin ? "Elige tú o deja que el azar decida" : `${currentRoom?.admin?.name} está eligiendo...`}
+          {isAdmin
+            ? t("kingPick.subtitleAdmin")
+            : t("kingPick.subtitleWaiting", { adminName: currentRoom?.admin?.name })}
         </p>
       </div>
 
@@ -103,7 +107,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
               </div>
               <div className="truncate" style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>{person.name}</div>
               {person.id === currentRoom.admin?.id && (
-                <div style={{ fontSize: 10, color: "var(--c-gold)", fontWeight: 800, marginTop: 2 }}>Admin</div>
+                <div style={{ fontSize: 10, color: "var(--c-gold)", fontWeight: 800, marginTop: 2 }}>{t("kingPick.adminBadge")}</div>
               )}
             </div>
           );
@@ -114,9 +118,9 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <button className="btn btn-gold" onClick={handleRandom} disabled={spinning} style={{ fontSize: 16 }}>
             <Shuffle size={17} />
-            {spinning ? "Eligiendo..." : "Líder al Azar"}
+            {spinning ? t("kingPick.randomButtonSpinning") : t("kingPick.randomButton")}
           </button>
-          <div className="divider">o elige manualmente</div>
+          <div className="divider">{t("kingPick.orChooseManual")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {everyone.map((person) => (
               <button key={person.id} className="btn btn-ghost" disabled={spinning}
@@ -126,7 +130,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
                 <Avatar avatar={avatarMap[person.id]} size="sm" />
                 <span className="truncate">{person.name}</span>
                 {person.id === currentRoom.admin?.id && (
-                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--c-gold)", fontWeight: 800 }}>Admin</span>
+                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--c-gold)", fontWeight: 800 }}>{t("kingPick.adminBadge")}</span>
                 )}
               </button>
             ))}
@@ -136,7 +140,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
 
       {!isAdmin && !winner && !spinning && (
         <p style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>
-          Esperando decisión del administrador...
+          {t("kingPick.waitingAdmin")}
         </p>
       )}
 
@@ -146,7 +150,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
           borderRadius: "var(--r-lg)", padding: 18, textAlign: "center",
         }}>
           <div style={{ fontSize: 36, marginBottom: 6 }}>🎉</div>
-          <p style={{ fontWeight: 800, color: "#fff", fontSize: 18 }}>{winner.name} es el Líder</p>
+          <p style={{ fontWeight: 800, color: "#fff", fontSize: 18 }}>{t("kingPick.winnerIs", { name: winner.name })}</p>
         </div>
       )}
     </ScreenWrapper>
@@ -155,9 +159,10 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
 
 /* ─── KingRevealScreen ───────────────────────────────────────────────────── */
 export function KingRevealScreen({ currentRoom, playerRole, playerName, confirmKingAndStart, resetGame }) {
-  const king      = currentRoom?.king;
-  const isAdmin   = playerRole === PLAYER_ROLE.ADMIN || playerRole === PLAYER_ROLE.ADMIN_KING;
-  const isKing    = king?.name === playerName;
+  const { t } = useTranslation();
+  const king    = currentRoom?.king;
+  const isAdmin = playerRole === PLAYER_ROLE.ADMIN || playerRole === PLAYER_ROLE.ADMIN_KING;
+  const isKing  = king?.name === playerName;
   const everyone  = getEveryone(currentRoom);
   const avatarMap = assignAvatars(everyone);
 
@@ -165,13 +170,11 @@ export function KingRevealScreen({ currentRoom, playerRole, playerName, confirmK
     <ScreenWrapper withBg onExit={resetGame}>
       <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
         <div className="anim-float" style={{ fontSize: 44 }}>👑</div>
-
         <div className="anim-pop">
           <Avatar avatar={avatarMap[king?.id]} size="lg" crown />
         </div>
-
         <div>
-          <div className="t-label" style={{ marginBottom: 5 }}>El Líder es</div>
+          <div className="t-label" style={{ marginBottom: 5 }}>{t("kingReveal.kingLabel")}</div>
           <h2 className="t-display" style={{ fontSize: 34, color: "#fff" }}>{king?.name}</h2>
         </div>
 
@@ -180,26 +183,22 @@ export function KingRevealScreen({ currentRoom, playerRole, playerName, confirmK
             background: "rgba(245,158,11,0.15)", border: "1.5px solid rgba(245,158,11,0.4)",
             borderRadius: "var(--r-lg)", padding: "12px 20px", width: "100%",
           }}>
-            <p style={{ fontWeight: 800, color: "#FDE68A", fontSize: 14 }}>
-              ¡Eres el Líder! Las preguntas son sobre ti 👑
-            </p>
+            <p style={{ fontWeight: 800, color: "#FDE68A", fontSize: 14 }}>{t("kingReveal.isKingMessage")}</p>
           </div>
         ) : (
           <div className="glass" style={{ width: "100%" }}>
             <p style={{ fontWeight: 700, color: "var(--c-w60)", fontSize: 14, textAlign: "center" }}>
-              Las preguntas serán sobre <strong style={{ color: "#fff" }}>{king?.name}</strong>
+              {t("kingReveal.aboutKing", { kingName: king?.name })}
             </p>
           </div>
         )}
 
         {isAdmin ? (
           <button className="btn btn-green" onClick={confirmKingAndStart} style={{ fontSize: 16, width: "100%" }}>
-            <Play size={18} /> Iniciar Partida
+            <Play size={18} /> {t("kingReveal.startGame")}
           </button>
         ) : (
-          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>
-            Esperando que el administrador inicie...
-          </p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>{t("kingReveal.waitingAdmin")}</p>
         )}
       </div>
     </ScreenWrapper>
