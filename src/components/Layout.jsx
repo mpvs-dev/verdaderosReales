@@ -74,14 +74,14 @@ export function Credits() {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: 2,
+      gap: 6,
       flexShrink: 0,
     }}>
       <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.5 }}>
         Verdaderos Reales v1.2
       </span>
       <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
-        © 2026 Paul Diaz · BSL 1.1
+        © 2026 MPVs · BSL 1.1
       </span>
     </div>
   );

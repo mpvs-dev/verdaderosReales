@@ -148,41 +148,43 @@ export default function CreateQuestionScreen({ currentRoom, submitCustomQuestion
         </div>
       )}
 
-      {/* Points */}
-      <div className="glass">
-        <div className="t-label" style={{ marginBottom: 12 }}>{t("createQuestion.pointsLabel")}</div>
-        <div style={{ marginBottom: penaltyEnabled ? 14 : 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)" }}>{t("createQuestion.hitLabel")}</span>
-            <span className="t-display" style={{ fontSize: 22, color: "var(--c-gold)" }}>{points}</span>
-          </div>
-          <input type="range" min={1} max={10} step={1} value={points}
-            onChange={(e) => setPoints(Number(e.target.value))}
-            style={{ width: "100%", accentColor: "var(--c-gold)" }} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--c-w45)", marginTop: 3 }}>
-            <span>1</span>
-            <span>{t("createQuestion.defaultPoints", { points: defaultPoints })}</span>
-            <span>10</span>
-          </div>
-        </div>
-        {penaltyEnabled && (
-          <div style={{ paddingTop: 12, borderTop: "1px solid var(--c-w12)" }}>
+      {/* Points — solo visible si customPointsEnabled está activo */}
+      {currentRoom?.config?.customPointsEnabled && (
+        <div className="glass">
+          <div className="t-label" style={{ marginBottom: 12 }}>{t("createQuestion.pointsLabel")}</div>
+          <div style={{ marginBottom: penaltyEnabled ? 14 : 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)", display: "flex", alignItems: "center", gap: 5 }}>
-                <Zap size={13} color="#EF4444" /> {t("createQuestion.penaltyLabel")}
-              </span>
-              <span className="t-display" style={{ fontSize: 22, color: "#EF4444" }}>{penalty}</span>
+              <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)" }}>{t("createQuestion.hitLabel")}</span>
+              <span className="t-display" style={{ fontSize: 22, color: "var(--c-gold)" }}>{points}</span>
             </div>
-            <input type="range" min={1} max={10} step={1} value={penalty}
-              onChange={(e) => setPenalty(Number(e.target.value))}
-              style={{ width: "100%", accentColor: "#EF4444" }} />
+            <input type="range" min={1} max={10} step={1} value={points}
+              onChange={(e) => setPoints(Number(e.target.value))}
+              style={{ width: "100%", accentColor: "var(--c-gold)" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontWeight: 700, color: "var(--c-w45)", marginTop: 3 }}>
+              <span>1</span>
+              <span>{t("createQuestion.defaultPoints", { points: defaultPoints })}</span>
+              <span>10</span>
+            </div>
           </div>
-        )}
-        <div style={{ display: "flex", gap: 6, marginTop: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <div className="pill pill-purple">{t("createQuestion.pillHit", { points })}</div>
-          {penaltyEnabled && <div className="pill pill-red">{t("createQuestion.pillMiss", { points: penalty })}</div>}
+          {penaltyEnabled && (
+            <div style={{ paddingTop: 12, borderTop: "1px solid var(--c-w12)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 800, color: "var(--c-w60)", display: "flex", alignItems: "center", gap: 5 }}>
+                  <Zap size={13} color="#EF4444" /> {t("createQuestion.penaltyLabel")}
+                </span>
+                <span className="t-display" style={{ fontSize: 22, color: "#EF4444" }}>{penalty}</span>
+              </div>
+              <input type="range" min={1} max={10} step={1} value={penalty}
+                onChange={(e) => setPenalty(Number(e.target.value))}
+                style={{ width: "100%", accentColor: "#EF4444" }} />
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 6, marginTop: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <div className="pill pill-purple">{t("createQuestion.pillHit", { points })}</div>
+            {penaltyEnabled && <div className="pill pill-red">{t("createQuestion.pillMiss", { points: penalty })}</div>}
+          </div>
         </div>
-      </div>
+      )}
 
       <button className="btn btn-gold" onClick={handleSend} disabled={!canSend} style={{ fontSize: 16 }}>
         <Send size={17} />

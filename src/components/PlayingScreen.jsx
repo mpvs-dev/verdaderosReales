@@ -10,6 +10,7 @@ const S = { CORRECT: "correct", INCORRECT: "incorrect", ANSWERED: "answered", PE
 const DOT_COLOR = { correct: "#10B981", incorrect: "#EF4444", answered: "#3B82F6", pending: "rgba(255,255,255,0.2)" };
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
+/* ─── Scoreboard ─────────────────────────────────────────────────────────── */
 function Scoreboard({ currentRoom, getState, avatarMap }) {
   const players = getAllPlayers(currentRoom);
   const sorted  = [...players].sort((a, b) => (currentRoom.scores?.[b.id] || 0) - (currentRoom.scores?.[a.id] || 0));
@@ -28,6 +29,7 @@ function Scoreboard({ currentRoom, getState, avatarMap }) {
   );
 }
 
+/* ─── Answer options ─────────────────────────────────────────────────────── */
 function AnswerOptions({ question, onSubmit, t }) {
   const [sending, setSending] = useState(false);
   const [text, setText]       = useState("");
@@ -83,6 +85,7 @@ function AnswerOptions({ question, onSubmit, t }) {
   );
 }
 
+/* ─── Answer feedback ────────────────────────────────────────────────────── */
 function AnswerFeedback({ state, answer, question, config, t }) {
   const gp   = config?.pointsPerAnswer ?? 1;
   const pen  = config?.penaltyEnabled  ?? false;
@@ -100,11 +103,11 @@ function AnswerFeedback({ state, answer, question, config, t }) {
     <div className={`feedback ${cfg.cls} anim-pop`}>
       <div style={{ fontSize: 40, marginBottom: 8 }}>{cfg.icon}</div>
       <p style={{ fontWeight: 800, color: cfg.titleColor, fontSize: 18, marginBottom: 6 }}>{cfg.title}</p>
-      {show && state === S.CORRECT   && <div className="pill pill-green" style={{ display: "inline-flex", marginBottom: 6 }}>{t("playing.pointsHit", { points: pts })}</div>}
+      {show && state === S.CORRECT   && <div className="pill pill-green" style={{ display: "inline-flex", marginBottom: 6 }}>{t("playing.pointsHit",  { points: pts })}</div>}
       {show && state === S.INCORRECT && pen && <div className="pill pill-red" style={{ display: "inline-flex", marginBottom: 6 }}>{t("playing.pointsMiss", { points: pnt })}</div>}
       {show && state === S.ANSWERED  && (
         <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 6 }}>
-          <div className="pill pill-purple">{t("playing.pointsIfHit", { points: pts })}</div>
+          <div className="pill pill-purple">{t("playing.pointsIfHit",  { points: pts })}</div>
           {pen && <div className="pill pill-red">{t("playing.pointsIfMiss", { points: pnt })}</div>}
         </div>
       )}
@@ -120,21 +123,21 @@ function AnswerFeedback({ state, answer, question, config, t }) {
   );
 }
 
+/* ─── Value pills ────────────────────────────────────────────────────────── */
 function ValuePills({ question, config, t }) {
   const gp   = config?.pointsPerAnswer ?? 1;
   const pen  = config?.penaltyEnabled  ?? false;
   const show = config?.customPointsEnabled || gp !== 1 || pen;
   if (!show) return null;
-  const pts = question?.points ?? gp;
-  const pnt = question?.penalty ?? gp;
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>
-      <div className="pill pill-purple">{t("playing.pointsIfHit", { points: pts })}</div>
-      {pen && <div className="pill pill-red">{t("playing.pointsIfMiss", { points: pnt })}</div>}
+      <div className="pill pill-purple">{t("playing.pointsIfHit",  { points: question?.points  ?? gp })}</div>
+      {pen && <div className="pill pill-red">{t("playing.pointsIfMiss", { points: question?.penalty ?? gp })}</div>}
     </div>
   );
 }
 
+/* ─── Answer history ─────────────────────────────────────────────────────── */
 function AnswerHistory({ entries, questions, t }) {
   if (!entries.length) return null;
   return (
@@ -163,6 +166,35 @@ function AnswerHistory({ entries, questions, t }) {
   );
 }
 
+/* ─── King answer options (boolean/multiple only) ────────────────────────── */
+// FIX bug 3: el líder puede responder en preguntas boolean y multiple.
+// En text el líder no puede responder (él conoce la respuesta correcta).
+function KingAnswerSection({ question, currentRoom, submitAnswer, answeredQuestions, t }) {
+  const qIdx   = currentRoom.currentQuestionIndex;
+  const qId    = question?.id;
+  const kingIdForState = currentRoom.king?.id;
+
+  // Estado del líder para esta pregunta
+  const rec = currentRoom.answers?.[kingIdForState]?.find((h) => String(h.questionId) === String(qId));
+  const alreadyAnswered = !!rec || answeredQuestions.has(qIdx);
+
+  if (!question || question.type === "text") return null;
+  if (alreadyAnswered) return null;
+
+  return (
+    <div style={{
+      background: "rgba(245,158,11,0.1)", border: "1.5px solid rgba(245,158,11,0.3)",
+      borderRadius: "var(--r-lg)", padding: 14,
+    }}>
+      <div style={{ fontSize: 11, fontWeight: 800, color: "var(--c-gold)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>
+        {t("playing.kingAnswerLabel")}
+      </div>
+      <AnswerOptions question={question} onSubmit={submitAnswer} t={t} />
+    </div>
+  );
+}
+
+/* ─── Main ────────────────────────────────────────────────────────────────── */
 export default function PlayingScreen({ currentRoom, playerRole, playerName, submitAnswer, validateAnswer, answeredQuestions, resetGame }) {
   const [validating, setValidating] = useState(new Set());
   const { t } = useTranslation();
@@ -178,6 +210,9 @@ export default function PlayingScreen({ currentRoom, playerRole, playerName, sub
   const me = allPlayers.find((p) => p.name === playerName)
           ?? (currentRoom.admin?.name === playerName ? currentRoom.admin : null);
 
+  // FIX bug 2: stateOf revisa primero answers[id] (ya validadas) para la pregunta actual,
+  // luego currentAnswers (pendientes de validar). Así cuando el líder valida a alguien
+  // y su respuesta pasa de currentAnswers → answers, el dot sigue mostrando ✅/❌.
   function stateOf(id) {
     const rec = currentRoom.answers?.[id]?.find((h) => String(h.questionId) === String(qId));
     if (rec) return rec.isCorrect ? S.CORRECT : S.INCORRECT;
@@ -196,9 +231,16 @@ export default function PlayingScreen({ currentRoom, playerRole, playerName, sub
     (a) => a.aspirantName === playerName && String(a.questionId) === String(qId)
   );
 
+  // FIX bug 2: para el contador del líder, contar tanto las respuestas en currentAnswers
+  // como las que ya fueron validadas en esta pregunta (están en answers[id])
   const totalExpected = allPlayers.length;
-  const totalAnswered = currentRoom.currentAnswers?.length ?? 0;
-  const allAnswered   = totalAnswered >= totalExpected && totalExpected > 0;
+  const alreadyValidated = allPlayers.filter((p) =>
+    currentRoom.answers?.[p.id]?.some((h) => String(h.questionId) === String(qId))
+  ).length;
+  const kingId = currentRoom.king?.id;
+  const pendingAnswers = (currentRoom.currentAnswers ?? []).filter((a) => String(a.aspirantId) !== String(kingId)).length;
+  const totalAnswered  = alreadyValidated + pendingAnswers;
+  const allAnswered    = totalAnswered >= totalExpected && totalExpected > 0;
 
   async function handleValidate(aspirantId, isCorrect) {
     if (validating.has(aspirantId)) return;
@@ -223,11 +265,21 @@ export default function PlayingScreen({ currentRoom, playerRole, playerName, sub
       <ScreenWrapper withBg onExit={resetGame}>
         <Header />
         <Scoreboard currentRoom={currentRoom} getState={stateOf} avatarMap={avatarMap} />
+
         <div className="question-box">
           <div className="question-over">{t("playing.yourQuestion")}</div>
           <div className="question-text">{q?.text}</div>
           <ValuePills question={q} config={currentRoom.config} t={t} />
         </div>
+
+        {/* FIX bug 3: sección de respuesta del líder en boolean/multiple */}
+        <KingAnswerSection
+          question={q}
+          currentRoom={currentRoom}
+          submitAnswer={submitAnswer}
+          answeredQuestions={answeredQuestions}
+          t={t}
+        />
 
         {allAnswered ? (
           <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(16,185,129,0.14)", border: "1.5px solid rgba(16,185,129,0.35)", borderRadius: "var(--r-lg)", padding: "11px 14px" }}>
@@ -242,36 +294,78 @@ export default function PlayingScreen({ currentRoom, playerRole, playerName, sub
           </div>
         )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-          {currentRoom.currentAnswers?.length ? (
-            currentRoom.currentAnswers.map((ans) => (
-              <div key={ans.aspirantId} style={{
-                display: "flex", alignItems: "center", gap: 12,
-                background: "rgba(255,255,255,0.07)", border: "1px solid var(--c-w12)",
-                borderRadius: "var(--r-lg)", padding: "12px 14px",
-              }}>
-                <Avatar avatar={avatarMap[ans.aspirantId]} size="sm" />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: "var(--c-w60)" }} className="truncate">{ans.aspirantName}</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", wordBreak: "break-word" }}>{ans.answer}</div>
-                  <ValuePills question={q} config={currentRoom.config} t={t} />
-                </div>
-                <div style={{ display: "flex", gap: 7, flexShrink: 0 }}>
-                  <button onClick={() => handleValidate(ans.aspirantId, true)} disabled={validating.has(ans.aspirantId)}
-                    style={{ background: "var(--c-success)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 var(--c-success-dark)", display: "flex", alignItems: "center" }}>
-                    <Check size={17} color="#fff" />
-                  </button>
-                  <button onClick={() => handleValidate(ans.aspirantId, false)} disabled={validating.has(ans.aspirantId)}
-                    style={{ background: "var(--c-danger)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 #991B1B", display: "flex", alignItems: "center" }}>
-                    <X size={17} color="#fff" />
-                  </button>
+        {/* Respuestas:
+            - boolean/multiple => auto-validación, sin botones ✓/✗, mostrar banner del líder
+            - texto => validación manual con botones ✓/✗ */}
+        {q?.type !== "text" ? (
+          <>
+            {currentRoom.kingAnswer && String(currentRoom.kingAnswer.questionId) === String(qId) ? (
+              <div className="glass" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 18 }}>⚡</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: "var(--c-gold)" }}>
+                    {t("playing.autoValidating")}
+                  </p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: "var(--c-w45)", marginTop: 2 }}>
+                    {t("playing.kingAnswerRef")}: <strong style={{ color: "#fff" }}>{currentRoom.kingAnswer.answer}</strong>
+                  </p>
                 </div>
               </div>
-            ))
-          ) : (
-            <p style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>{t("playing.waitingAnswersList")}</p>
-          )}
-        </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                {currentRoom.currentAnswers?.length ? (
+                  currentRoom.currentAnswers.map((ans) => (
+                    <div key={ans.aspirantId} style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      background: "rgba(255,255,255,0.07)", border: "1px solid var(--c-w12)",
+                      borderRadius: "var(--r-lg)", padding: "12px 14px",
+                    }}>
+                      <Avatar avatar={avatarMap[ans.aspirantId]} size="sm" />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: "var(--c-w60)" }} className="truncate">{ans.aspirantName}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", wordBreak: "break-word" }}>{ans.answer}</div>
+                        <ValuePills question={q} config={currentRoom.config} t={t} />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>{t("playing.waitingAnswersList")}</p>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {currentRoom.currentAnswers?.length ? (
+              currentRoom.currentAnswers.map((ans) => (
+                <div key={ans.aspirantId} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  background: "rgba(255,255,255,0.07)", border: "1px solid var(--c-w12)",
+                  borderRadius: "var(--r-lg)", padding: "12px 14px",
+                }}>
+                  <Avatar avatar={avatarMap[ans.aspirantId]} size="sm" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: "var(--c-w60)" }} className="truncate">{ans.aspirantName}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", wordBreak: "break-word" }}>{ans.answer}</div>
+                    <ValuePills question={q} config={currentRoom.config} t={t} />
+                  </div>
+                  <div style={{ display: "flex", gap: 7, flexShrink: 0 }}>
+                    <button onClick={() => handleValidate(ans.aspirantId, true)} disabled={validating.has(ans.aspirantId)}
+                      style={{ background: "var(--c-success)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 var(--c-success-dark)", display: "flex", alignItems: "center" }}>
+                      <Check size={17} color="#fff" />
+                    </button>
+                    <button onClick={() => handleValidate(ans.aspirantId, false)} disabled={validating.has(ans.aspirantId)}
+                      style={{ background: "var(--c-danger)", border: "none", borderRadius: 10, padding: "9px 11px", cursor: "pointer", boxShadow: "0 4px 0 #991B1B", display: "flex", alignItems: "center" }}>
+                      <X size={17} color="#fff" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--c-w45)" }}>{t("playing.waitingAnswersList")}</p>
+            )}
+          </div>
+        )}
       </ScreenWrapper>
     );
   }

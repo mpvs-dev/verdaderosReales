@@ -6,6 +6,25 @@
 
 ---
 
+## [1.3] - 2026-05-27
+
+### Nuevo
+- Sistema de internacionalización (i18n) completo.
+- Selector de idioma en el menú principal (español / inglés).
+- El Líder puede responder en preguntas de tipo Sí/No y opción múltiple. Su respuesta se valida automáticamente como correcta y suma los puntos correspondientes, sin necesidad de que él mismo la valide.
+- Corrección del cierre de sala por el administrador: al pulsar "Salir", todos los jugadores conectados son redirigidos automáticamente al menú.
+
+### Arreglado
+- La animación de selección del Líder se ejecutaba 2 o 3 veces para los aspirantes.
+- El contador "Esperando: X/Y" en la vista del Líder mostraba un número incorrecto después de validar alguna respuesta.
+- El banner de publicidad no se mostraba en pantallas grandes.
+- Al reconectarse a una sala ya iniciada, algunos jugadores podían ver el rol incorrecto si habían salido durante la fase de selección del Líder.
+
+### Cambiado
+- El layout de todas las pantallas (menú, lobby, partida, resultados) fue unificado.
+
+---
+
 ## [1.2] - 2026-05-25
 
 ### Nuevo

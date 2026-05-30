@@ -1,7 +1,7 @@
 {
   "menu": {
-    "title": "Know Them",
-    "titleAccent": "All",
+    "title": "Truly",
+    "titleAccent": "Royal",
     "subtitle": "How well do your friends really know you?",
     "namePlaceholder": "Enter your name...",
     "nameLabel": "Your name",
@@ -97,7 +97,10 @@
     "pointsHit": "+{points} pts",
     "pointsMiss": "-{points} pts",
     "pointsIfHit": "+{points} if correct",
-    "pointsIfMiss": "-{points} if wrong"
+    "pointsIfMiss": "-{points} if wrong",
+    "kingAnswerLabel": "Your answer (auto-validated)",
+    "autoValidating": "Auto-validating answers...",
+    "kingAnswerRef": "Leader answer"
   },
   "createQuestion": {
     "title": "Create Question",

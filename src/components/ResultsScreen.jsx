@@ -1,5 +1,4 @@
 import { Trophy, Check, X, Clock, RotateCcw } from "lucide-react";
-import AdBanner from "./AdBanner";
 import { PLAYER_ROLE } from "../constants/game.js";
 import { formatDuration } from "../utils/room.js";
 
@@ -11,8 +10,12 @@ export default function ResultsScreen({
 }) {
   if (!currentRoom) return null;
 
-  const duration = formatDuration(currentRoom.startedAt, currentRoom.finishedAt);
-  const isAdmin = playerRole === PLAYER_ROLE.ADMIN || playerRole === PLAYER_ROLE.ADMIN_KING;
+  const duration = formatDuration(
+    currentRoom.startedAt,
+    currentRoom.finishedAt,
+  );
+  const isAdmin =
+    playerRole === PLAYER_ROLE.ADMIN || playerRole === PLAYER_ROLE.ADMIN_KING;
 
   const playerMap = buildPlayerMap(currentRoom);
   const sorted = buildSortedResults(currentRoom, playerMap);
@@ -20,15 +23,15 @@ export default function ResultsScreen({
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-purple-50 to-indigo-100">
-      <div className="w-full p-3">
-        <AdBanner slot="top" />
-      </div>
+      <div className="w-full p-3"></div>
 
       <div className="flex-1 w-full p-4 flex flex-col items-center overflow-y-auto">
         <div className="w-full sm:max-w-2xl bg-white sm:rounded-2xl shadow-xl p-5">
           <ResultsHeader winner={winner} duration={duration} />
 
-          <h3 className="font-bold text-gray-700 text-center mb-3">Tabla Final:</h3>
+          <h3 className="font-bold text-gray-700 text-center mb-3">
+            Tabla Final:
+          </h3>
           <div className="space-y-3 mb-5">
             {sorted.map((entry, idx) => (
               <PlayerResultCard
@@ -40,13 +43,15 @@ export default function ResultsScreen({
             ))}
           </div>
 
-          <ActionButtons isAdmin={isAdmin} onRematch={rematch} onReset={resetGame} />
+          <ActionButtons
+            isAdmin={isAdmin}
+            onRematch={rematch}
+            onReset={resetGame}
+          />
         </div>
       </div>
 
-      <div className="w-full p-3">
-        <AdBanner slot="bottom" />
-      </div>
+      <div className="w-full p-3"></div>
     </div>
   );
 }
@@ -74,13 +79,16 @@ function ResultsHeader({ winner, duration }) {
   return (
     <div className="text-center mb-6">
       <Trophy className="w-20 h-20 mx-auto mb-3 text-yellow-500" />
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">¡Juego Terminado!</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        ¡Juego Terminado!
+      </h1>
 
       {duration && (
         <div className="flex items-center justify-center gap-2 text-gray-500 mt-1">
           <Clock className="w-4 h-4" />
           <span className="text-sm">
-            Duración: <span className="font-semibold text-gray-700">{duration}</span>
+            Duración:{" "}
+            <span className="font-semibold text-gray-700">{duration}</span>
           </span>
         </div>
       )}
@@ -121,7 +129,7 @@ function PlayerResultCard({ entry, rank, questions }) {
         <div className="space-y-1 mt-2 border-t pt-2">
           {entry.answers.map((a, i) => {
             const q = questions?.find(
-              (q) => String(q.id) === String(a.questionId)
+              (q) => String(q.id) === String(a.questionId),
             );
             return (
               <div key={i} className="flex items-center gap-2 text-sm">
@@ -131,7 +139,9 @@ function PlayerResultCard({ entry, rank, questions }) {
                   <X className="w-3 h-3 text-red-500 flex-shrink-0" />
                 )}
                 <span className="text-gray-500 truncate">{q?.text}:</span>
-                <span className="font-medium text-gray-700 truncate">{a.answer}</span>
+                <span className="font-medium text-gray-700 truncate">
+                  {a.answer}
+                </span>
               </div>
             );
           })}

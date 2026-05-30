@@ -22,7 +22,7 @@ for _, id in ipairs(room.answeredAspirants) do
   if tostring(id) == tostring(aspirantId) then return cjson.encode(room) end
 end
 
--- Leer puntos de la pregunta actual (pueden sobreescribir el global)
+-- Leer puntos de la pregunta actual
 local currentQ = nil
 local qIndex = tonumber(room.currentQuestionIndex) or 0
 if room.questions and room.questions[qIndex + 1] then
@@ -42,7 +42,7 @@ if isCorrect == '1' then
   room.scores[aspirantId] = (room.scores[aspirantId] or 0) + pointsToUse
 else
   if penaltyEnabled == '1' and penaltyToUse > 0 then
-    local current  = room.scores[aspirantId] or 0
+    local current = room.scores[aspirantId] or 0
     room.scores[aspirantId] = current - penaltyToUse
   end
 end
@@ -77,16 +77,54 @@ if room.admin and not adminIsKing then
   if room.scores[room.admin.id] == nil then room.scores[room.admin.id] = 0 end
 end
 
+-- FIX: el total esperado son solo los ASPIRANTES (el rey ya respondió por su cuenta
+-- en answer.js y está en answeredAspirants, pero no debe bloquear el avance de ronda).
+-- Contamos solo los aspirantes que aún NO tienen respuesta validada para esta pregunta.
+local kingId = room.king and room.king.id or nil
+local qId = currentQ and currentQ.id or nil
+
+-- Total de jugadores que deben responder = aspirantes (el rey no cuenta para avanzar ronda)
 local total = room.aspirants and #room.aspirants or 0
-if room.admin and not adminIsKing then
-  total = total + 1
+
+-- Contar cuántos aspirantes ya tienen su respuesta validada para esta pregunta
+local validatedCount = 0
+for _, a in ipairs(room.aspirants or {}) do
+  if room.answers[a.id] then
+    for _, ans in ipairs(room.answers[a.id]) do
+      if qId and tostring(ans.questionId) == tostring(qId) then
+        validatedCount = validatedCount + 1
+        break
+      end
+    end
+  end
 end
 
-local validated = #room.answeredAspirants
+-- También contar al admin si no es el rey y es aspirante en la partida
+if room.admin and not adminIsKing then
+  local adminId = room.admin.id
+  -- El admin puede estar en aspirants o no dependiendo del flujo
+  -- Solo sumarlo si NO está ya contado en aspirants
+  local adminInAspirants = false
+  for _, a in ipairs(room.aspirants or {}) do
+    if tostring(a.id) == tostring(adminId) then adminInAspirants = true; break end
+  end
+  if not adminInAspirants then
+    total = total + 1
+    if room.answers[adminId] then
+      for _, ans in ipairs(room.answers[adminId]) do
+        if qId and tostring(ans.questionId) == tostring(qId) then
+          validatedCount = validatedCount + 1
+          break
+        end
+      end
+    end
+  end
+end
 
-if validated >= total then
+if validatedCount >= total then
   room.currentQuestionIndex = tonumber(room.currentQuestionIndex) + 1
   room.answeredAspirants    = {}
+  room.kingAnswer           = nil
   room.currentAnswers       = {}
 
   local totalQ
@@ -140,7 +178,7 @@ export default async function handler(req, res) {
         now,
         String(pointsPerAnswer),
         penaltyEnabled ? "1" : "0",
-        String(pointsPerAnswer), // globalPenalty = mismo valor que globalPoints por defecto
+        String(pointsPerAnswer),
       ],
     );
     const room = parseRoom(result);

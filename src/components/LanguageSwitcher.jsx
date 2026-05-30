@@ -1,6 +1,6 @@
 import { useI18n } from "../i18n/i18nContext.jsx";
 
-const FLAG  = { es: "🇪🇸", en: "🇬🇧" };
+const FLAG = { es: "🇪🇸", en: "🇬🇧" };
 const LABEL = { es: "Español", en: "English" };
 
 export default function LanguageSwitcher() {
@@ -30,7 +30,11 @@ export default function LanguageSwitcher() {
       }}
     >
       {availableLangs.map((l) => (
-        <option key={l} value={l} style={{ background: "#1a0a3e", color: "#fff" }}>
+        <option
+          key={l}
+          value={l}
+          style={{ background: "#1a0a3e", color: "#fff" }}
+        >
           {FLAG[l]} {LABEL[l]}
         </option>
       ))}

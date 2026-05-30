@@ -97,7 +97,10 @@
     "pointsHit": "+{points} pts",
     "pointsMiss": "-{points} pts",
     "pointsIfHit": "+{points} si aciertas",
-    "pointsIfMiss": "-{points} si fallas"
+    "pointsIfMiss": "-{points} si fallas",
+    "kingAnswerLabel": "Tu respuesta (se valida automáticamente)",
+    "autoValidating": "Auto-validando respuestas...",
+    "kingAnswerRef": "Respuesta del Líder"
   },
   "createQuestion": {
     "title": "Crear Pregunta",

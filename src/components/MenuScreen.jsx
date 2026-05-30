@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Crown, LogIn } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher.jsx";
 import { AdBanner } from "./Layout.jsx";
@@ -5,6 +6,10 @@ import { useTranslation } from "../i18n/useTranslation.js";
 
 export default function MenuScreen({ playerName, setPlayerName, roomCode, setRoomCode, createRoom, joinRoom, loading }) {
   const { t } = useTranslation();
+
+  useEffect(() => {
+
+  }, []);
 
   return (
     <div style={{
@@ -66,26 +71,27 @@ export default function MenuScreen({ playerName, setPlayerName, roomCode, setRoo
           </button>
         </div>
       </div>
-
-      {/* Footer — créditos + selector de idioma, siempre abajo */}
       <div style={{
         width: "100%",
         maxWidth: 480,
         padding: "12px 16px 20px",
         flexShrink: 0,
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
+        flexDirection: "column",
+        gap: 8,
       }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.5 }}>
-            Verdaderos Reales v1.2
-          </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
-            © 2026 Paul Diaz · BSL 1.1
-          </span>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.5 }}>
+              Verdaderos Reales v1.2
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
+              © 2026 MPVs · BSL 1.1
+            </span>
+          </div>
+          <LanguageSwitcher />
         </div>
-        <LanguageSwitcher />
       </div>
     </div>
   );

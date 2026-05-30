@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import DEFAULT_BG from "../assets/game-background.png";
@@ -16,7 +15,10 @@ export default function GameBackground({ children, imageSrc, className = "" }) {
   }, [src]);
 
   return (
-    <div className={`game-bg ${className}`} style={{ position: "relative", minHeight: "100vh" }}>
+    <div
+      className={`game-bg ${className}`}
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
       {/* Background layer */}
       <div
         style={{
@@ -64,7 +66,8 @@ export default function GameBackground({ children, imageSrc, className = "" }) {
             position: "fixed",
             inset: 0,
             zIndex: 0,
-            background: "linear-gradient(155deg, #4C1D95 0%, #1E1B4B 60%, #0F0A2E 100%)",
+            background:
+              "linear-gradient(155deg, #4C1D95 0%, #1E1B4B 60%, #0F0A2E 100%)",
           }}
         />
       )}

@@ -4,7 +4,6 @@ import { ScreenWrapper, Avatar } from "./Layout.jsx";
 import { PLAYER_ROLE, KING_PICK_ANIMATION } from "../constants/game.js";
 import { getEveryone } from "../utils/room.js";
 import { assignAvatars } from "../assets/avatars.js";
-import storage from "../services/storage.js";
 import { useTranslation } from "../i18n/useTranslation.js";
 
 const { BASE_STEPS, RANDOM_EXTRA_STEPS, FAST_DELAY_MS, SLOW_DELAY_MULTIPLIER, SLOW_START_RATIO } = KING_PICK_ANIMATION;
@@ -25,24 +24,23 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
   const isAdmin   = playerRole === PLAYER_ROLE.ADMIN;
   const everyone  = getEveryone(currentRoom);
   const avatarMap = assignAvatars(everyone);
+  const everyoneRef = useRef(everyone);
+  useEffect(() => { everyoneRef.current = everyone; }, [everyone]);
 
+  // SOLUCIÓN REAL: no usamos intervalo propio.
+  // useGameRoom ya hace polling y entrega currentRoom actualizado como prop.
+  // Solo observamos currentRoom.pickingAnimation?.winnerId.
+  // Cuando aparece (admin eligió), corremos la animación una sola vez.
+  const winnerId = currentRoom?.pickingAnimation?.winnerId;
   useEffect(() => {
-    if (isAdmin) return;
-    const timer = setInterval(async () => {
-      if (animatingRef.current) return;
-      try {
-        const result   = await storage.get(`room_${roomCode}`);
-        const room     = JSON.parse(result.value);
-        const winnerId = room.pickingAnimation?.winnerId;
-        if (!winnerId) return;
-        clearInterval(timer);
-        const chosen = everyone.find((p) => p.id === winnerId);
-        if (chosen) runAnimation(chosen);
-      } catch (_) {}
-    }, 500);
-    return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+    if (isAdmin) return;              // el admin anima localmente en handleRandom
+    if (!winnerId) return;            // aún no hay selección
+    if (animatingRef.current) return; // ya estamos animando
+
+    const chosen = everyoneRef.current.find((p) => p.id === winnerId);
+    if (chosen) runAnimation(chosen);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [winnerId, isAdmin]);
 
   function runAnimation(chosen) {
     if (animatingRef.current) return;
@@ -52,7 +50,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
     const totalSteps = BASE_STEPS + Math.floor(Math.random() * RANDOM_EXTRA_STEPS);
     let step = 0;
     function tick() {
-      setHighlighted(everyone[step % everyone.length].id);
+      setHighlighted(everyoneRef.current[step % everyoneRef.current.length].id);
       step++;
       const slow  = Math.floor(totalSteps * SLOW_START_RATIO);
       const delay = step < slow ? FAST_DELAY_MS : FAST_DELAY_MS + (step - slow) * SLOW_DELAY_MULTIPLIER;
@@ -70,8 +68,13 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
   async function handleRandom() {
     if (animatingRef.current) return;
     const chosen = everyone[Math.floor(Math.random() * everyone.length)];
+    // Escribir winnerId en la sala para que los aspirantes lo reciban vía polling
     try {
-      await storage.set(`room_${roomCode}`, JSON.stringify({ ...currentRoom, pickingAnimation: { winnerId: chosen.id } }));
+      const { storage } = await import("../services/storage.js");
+      await storage.set(`room_${roomCode}`, JSON.stringify({
+        ...currentRoom,
+        pickingAnimation: { winnerId: chosen.id },
+      }));
     } catch (_) {}
     runAnimation(chosen);
     setTimeout(() => pickRandomKing(chosen.id), computeDuration(BASE_STEPS + RANDOM_EXTRA_STEPS));
@@ -92,7 +95,7 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
         {everyone.map((person) => {
           const hl  = highlighted === person.id;
-          const win = winner?.id  === person.id;
+          const win = winner?.id === person.id;
           return (
             <div key={person.id} style={{
               background: win ? "rgba(245,158,11,0.2)" : hl ? "rgba(109,40,217,0.35)" : "rgba(255,255,255,0.07)",
@@ -130,7 +133,9 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
                 <Avatar avatar={avatarMap[person.id]} size="sm" />
                 <span className="truncate">{person.name}</span>
                 {person.id === currentRoom.admin?.id && (
-                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--c-gold)", fontWeight: 800 }}>{t("kingPick.adminBadge")}</span>
+                  <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--c-gold)", fontWeight: 800 }}>
+                    {t("kingPick.adminBadge")}
+                  </span>
                 )}
               </button>
             ))}
@@ -150,7 +155,9 @@ export function KingPickScreen({ currentRoom, playerRole, pickKing, pickRandomKi
           borderRadius: "var(--r-lg)", padding: 18, textAlign: "center",
         }}>
           <div style={{ fontSize: 36, marginBottom: 6 }}>🎉</div>
-          <p style={{ fontWeight: 800, color: "#fff", fontSize: 18 }}>{t("kingPick.winnerIs", { name: winner.name })}</p>
+          <p style={{ fontWeight: 800, color: "#fff", fontSize: 18 }}>
+            {t("kingPick.winnerIs", { name: winner.name })}
+          </p>
         </div>
       )}
     </ScreenWrapper>
@@ -177,7 +184,6 @@ export function KingRevealScreen({ currentRoom, playerRole, playerName, confirmK
           <div className="t-label" style={{ marginBottom: 5 }}>{t("kingReveal.kingLabel")}</div>
           <h2 className="t-display" style={{ fontSize: 34, color: "#fff" }}>{king?.name}</h2>
         </div>
-
         {isKing ? (
           <div style={{
             background: "rgba(245,158,11,0.15)", border: "1.5px solid rgba(245,158,11,0.4)",
@@ -192,7 +198,6 @@ export function KingRevealScreen({ currentRoom, playerRole, playerName, confirmK
             </p>
           </div>
         )}
-
         {isAdmin ? (
           <button className="btn btn-green" onClick={confirmKingAndStart} style={{ fontSize: 16, width: "100%" }}>
             <Play size={18} /> {t("kingReveal.startGame")}

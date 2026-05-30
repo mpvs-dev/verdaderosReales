@@ -10,7 +10,13 @@ import { getAvatar } from "../assets/avatars.js";
  * @param {boolean} crown   - muestra corona encima (para el Líder)
  * @param {boolean} pulse   - anima con glow (para highlight en animación)
  */
-export default function Avatar({ index, avatar: avatarProp, size = "md", crown = false, pulse = false }) {
+export default function Avatar({
+  index,
+  avatar: avatarProp,
+  size = "md",
+  crown = false,
+  pulse = false,
+}) {
   const avatar = avatarProp ?? getAvatar(index ?? 0);
 
   return (
