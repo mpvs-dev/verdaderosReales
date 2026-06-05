@@ -1,20 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertCircle, X } from "lucide-react";
 
 export default function Toast({ message, onClose }) {
   const [visible, setVisible] = useState(false);
+  // FIX Bug moderado (Toast): guardar los timeouts para limpiarlos si el
+  // componente se desmonta antes de que disparen, evitando llamar onClose
+  // o setVisible sobre un componente ya desmontado.
+  const hideTimerRef  = useRef(null);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => {
+    // Limpiar timers anteriores ante cualquier cambio de mensaje
+    clearTimeout(hideTimerRef.current);
+    clearTimeout(closeTimerRef.current);
+
     if (!message) {
       setVisible(false);
       return;
     }
+
     setVisible(true);
-    const t = setTimeout(() => {
+    hideTimerRef.current = setTimeout(() => {
       setVisible(false);
-      setTimeout(onClose, 300);
+      closeTimerRef.current = setTimeout(onClose, 300);
     }, 3700);
-    return () => clearTimeout(t);
+
+    // Cleanup: si el componente se desmonta o el mensaje cambia
+    // antes de que disparen los timers, los cancelamos.
+    return () => {
+      clearTimeout(hideTimerRef.current);
+      clearTimeout(closeTimerRef.current);
+    };
+  // onClose se excluye de las deps intencionalmente: es una función estable
+  // del padre (useCallback en useGameRoom) y añadirla causaría re-runs
+  // innecesarios si el padre no la memoiza.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
   if (!message) return null;
@@ -64,8 +84,10 @@ export default function Toast({ message, onClose }) {
         </p>
         <button
           onClick={() => {
+            clearTimeout(hideTimerRef.current);
+            clearTimeout(closeTimerRef.current);
             setVisible(false);
-            setTimeout(onClose, 300);
+            closeTimerRef.current = setTimeout(onClose, 300);
           }}
           style={{
             background: "transparent",

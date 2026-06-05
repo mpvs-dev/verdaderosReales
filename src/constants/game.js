@@ -50,11 +50,14 @@ export const TOAST_DURATION_MS = 4000;
 export const ROOM_TTL_SECONDS = 86400;
 
 export const DEFAULT_GAME_CONFIG = {
-  rounds: 10,
+  rounds: 5,
   pointsPerAnswer: 1,
   penaltyEnabled: false,
   customPointsEnabled: false,
   mode: GAME_MODE.GENERIC,
+  // Categorías activas — por defecto todas las disponibles
+  // Se sobreescribe al guardar la configuración en el modal
+  categories: ["genericas"],
 };
 
 export const KING_PICK_ANIMATION = {

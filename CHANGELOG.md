@@ -6,6 +6,29 @@
 
 ---
 
+## [1.4] - 2026-06-05
+
+### Nuevo
+- Al crear una sala, ahora puedes elegir qué tipos de preguntas quieres que salgan durante la partida. Por ahora solo hay un tipo (Genéricas).
+- El código de sala ahora tiene un botón para copiarlo al portapapeles con un solo toque.
+- El botón de Ko-fi aparece en la parte inferior de todas las pantallas por si quieres apoyar el proyecto.
+
+### Cambiado
+- La pantalla de sala de espera fue rediseñada: el código se ve más grande y claro, y las características de la partida.
+- La configuración de la sala ahora muestra los modos de juego y los tipos de preguntas en cuadrículas de dos columnas.
+- Se eliminó el banner de publicidad que aparecía en la parte superior de todas las pantallas.
+- El selector de idioma y los créditos de la app ahora aparecen en una sola línea.
+
+### Arreglado
+- Al elegir al Líder con la animación de ruleta, el juego esperaba hasta 11 segundos de más antes de pasar a la siguiente pantalla. Ahora avanza en cuanto termina la animación.
+
+### Mejoras de velocidad
+- El juego dejó de actualizarse visualmente cada 3 segundos si nada había cambiado en la sala.
+- Los avatares de los jugadores dejaron de recalcularse en cada actualización cuando no era necesario.
+- Las preguntas del banco ya no se cargan al abrir la app, sino solo cuando se crea una sala.
+
+---
+
 ## [1.3] - 2026-05-27
 
 ### Nuevo

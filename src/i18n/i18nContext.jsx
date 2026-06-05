@@ -1,15 +1,47 @@
 import { createContext, useContext, useState, useCallback } from "react";
 import es from "./es.json";
 import en from "./en.json";
-import questionsEs from "../assets/questions_es.json";
-import questionsEn from "../assets/questions_en.json";
 
 const LOCALES = { es, en };
-export const QUESTIONS = {
-  es: questionsEs.genericas,
-  en: questionsEn.genericas,
-};
 const STORAGE_KEY = "vr_lang";
+
+// Cache de preguntas ya cargadas: { "es:genericas": [...], "en:genericas": [...] }
+const questionsCache = {};
+
+/**
+ * Carga las preguntas de una o varias categorías para un idioma.
+ * @param {string}   lang        - "es" | "en"
+ * @param {string[]} categoryIds - categorías seleccionadas, ej: ["genericas", "deportes"]
+ * @returns {Promise<object[]>}  - array mezclado de preguntas de todas las categorías pedidas
+ */
+export async function loadQuestions(lang, categoryIds = ["genericas"]) {
+  const key = lang in LOCALES ? lang : "es";
+
+  // Importar el módulo completo una sola vez por idioma
+  const moduleKey = `module:${key}`;
+  if (!questionsCache[moduleKey]) {
+    const mod = key === "en"
+      ? await import("../assets/questions_en.json")
+      : await import("../assets/questions_es.json");
+    questionsCache[moduleKey] = mod.default;
+  }
+
+  const allData = questionsCache[moduleKey];
+
+  // Combinar las categorías solicitadas que existan en el JSON
+  const combined = categoryIds.flatMap((catId) => {
+    const cacheKey = `${key}:${catId}`;
+    if (!questionsCache[cacheKey]) {
+      questionsCache[cacheKey] = allData[catId] ?? [];
+    }
+    return questionsCache[cacheKey];
+  });
+
+  return combined;
+}
+
+// Mantener QUESTIONS vacío por compatibilidad con imports legacy
+export const QUESTIONS = {};
 
 function getInitialLang() {
   try {

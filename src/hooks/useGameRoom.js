@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useContext } from "react";
-import { I18nContext, QUESTIONS } from "../i18n/i18nContext.jsx";
+import { I18nContext, loadQuestions } from "../i18n/i18nContext.jsx";
+import { DEFAULT_CATEGORIES } from "../constants/questionCategories.js";
 import storage from "../services/storage.js";
 import { roomApi } from "../services/roomApi.js";
 import {
@@ -11,10 +12,31 @@ import { shuffleArray, generateRoomCode, generateId, derivePlayerRole, isPlayerI
 
 function buildRoomKey(code) { return `room_${code}`; }
 
-function selectQuestions(config, lang) {
+/**
+ * Selecciona y mezcla preguntas de las categorías activas en la config.
+ * Si no hay categorías configuradas cae en DEFAULT_CATEGORIES.
+ */
+async function selectQuestions(config, lang) {
   if (config.mode === GAME_MODE.CUSTOM) return [];
-  const pool = QUESTIONS[lang] ?? QUESTIONS["es"];
+  const cats = config.categories?.length ? config.categories : DEFAULT_CATEGORIES;
+  const pool = await loadQuestions(lang, cats);
   return shuffleArray(pool).slice(0, config.rounds);
+}
+
+// Hash rápido para evitar re-renders innecesarios en el polling
+function roomHash(room) {
+  if (!room) return "";
+  return [
+    room.status,
+    room.currentQuestionIndex,
+    room.finishedAt,
+    room.startedAt,
+    room.king?.id ?? "",
+    room.pickingAnimation?.winnerId ?? "",
+    (room.currentAnswers ?? []).length,
+    (room.answeredAspirants ?? []).length,
+    JSON.stringify(room.scores ?? {}),
+  ].join("|");
 }
 
 export default function useGameRoom() {
@@ -32,6 +54,7 @@ export default function useGameRoom() {
   const [errorMsg, setErrorMsg] = useState(null);
 
   const stateRef = useRef({ roomCode: "", currentRoom: null, gameState: GAME_STATE.MENU, playerRole: null, playerName: "" });
+  const lastRoomHashRef = useRef("");
 
   useEffect(() => { stateRef.current.roomCode = roomCode; }, [roomCode]);
   useEffect(() => { stateRef.current.currentRoom = currentRoom; }, [currentRoom]);
@@ -57,8 +80,12 @@ export default function useGameRoom() {
     try {
       const result = await storage.get(buildRoomKey(code));
       const room = JSON.parse(result.value);
-      setCurrentRoom(room);
-      handleRoomTransition(room, gs, role, name, code);
+      const newHash = roomHash(room);
+      if (newHash !== lastRoomHashRef.current) {
+        lastRoomHashRef.current = newHash;
+        setCurrentRoom(room);
+        handleRoomTransition(room, gs, role, name, code);
+      }
     } catch (err) { console.error("pollRoom:", err); }
   }
 
@@ -66,12 +93,14 @@ export default function useGameRoom() {
     if (room.status === "closed") {
       clearSession();
       setGameState(GAME_STATE.MENU); setCurrentRoom(null); setRoomCode(""); setPlayerRole(null);
+      lastRoomHashRef.current = "";
       showError("El administrador cerró la sala.");
       return;
     }
     if (room.status === ROOM_STATUS.WAITING && gs !== GAME_STATE.LOBBY && gs !== GAME_STATE.RESULTS && !isPlayerInRoom(room, name)) {
       clearSession();
       setGameState(GAME_STATE.MENU); setCurrentRoom(null); setRoomCode(""); setPlayerRole(null);
+      lastRoomHashRef.current = "";
       showError("La sala fue cerrada por el administrador.");
       return;
     }
@@ -113,6 +142,7 @@ export default function useGameRoom() {
       const room = JSON.parse(result.value);
       const role = derivePlayerRole(room, name);
       setRoomCode(code); setPlayerName(name); setCurrentRoom(room); setPlayerRole(role);
+      lastRoomHashRef.current = roomHash(room);
       const savedAnswered = loadAnsweredQuestions(code);
       const myId = findPlayerId(room, name);
       if (myId && room.answers?.[myId] && room.questions) {
@@ -150,7 +180,7 @@ export default function useGameRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
     const adminId = generateId();
     const code = generateRoomCode();
-    const questions = selectQuestions(gameConfig, lang);
+    const questions = await selectQuestions(gameConfig, lang);
     const { scores, answers } = buildInitialScoresAndAnswers([adminId]);
     const room = {
       code, mode: gameConfig.mode, config: gameConfig,
@@ -163,6 +193,7 @@ export default function useGameRoom() {
       setLoading(true);
       await storage.set(buildRoomKey(code), JSON.stringify(room));
       setRoomCode(code); setPlayerRole(PLAYER_ROLE.ADMIN); setCurrentRoom(room);
+      lastRoomHashRef.current = roomHash(room);
       setGameState(GAME_STATE.LOBBY);
       saveSession({ code, name: playerName, role: PLAYER_ROLE.ADMIN });
     } catch (err) { showError("Error al crear la sala: " + err.message); }
@@ -180,6 +211,7 @@ export default function useGameRoom() {
       if (isPlayerInRoom(existingRoom, playerName)) { await reconnectSession({ code, name: playerName }); return; }
       const { room } = await roomApi.join(code, playerName);
       setPlayerRole(PLAYER_ROLE.ASPIRANT); setCurrentRoom(room);
+      lastRoomHashRef.current = roomHash(room);
       setGameState(GAME_STATE.LOBBY);
       saveSession({ code, name: playerName, role: PLAYER_ROLE.ASPIRANT });
     } catch (err) { showError("Error al unirse: " + err.message); }
@@ -234,7 +266,11 @@ export default function useGameRoom() {
     const aspirantId = findPlayerId(currentRoom, playerName);
     const newAnswered = new Set(answeredQuestions).add(currentRoom.currentQuestionIndex);
     setAnsweredQuestions(newAnswered); saveAnsweredQuestions(roomCode, newAnswered);
-    try { const { room } = await roomApi.submitAnswer({ roomCode, aspirantId, aspirantName: playerName, questionId: question.id, answer }); setCurrentRoom(room); }
+    try {
+      const { room } = await roomApi.submitAnswer({ roomCode, aspirantId, aspirantName: playerName, questionId: question.id, answer });
+      setCurrentRoom(room);
+      lastRoomHashRef.current = roomHash(room);
+    }
     catch (err) { showError("Error al enviar respuesta: " + err.message); }
   }
 
@@ -242,6 +278,7 @@ export default function useGameRoom() {
     try {
       const { room } = await roomApi.validate({ roomCode, aspirantId, isCorrect, pointsPerAnswer: currentRoom.config?.pointsPerAnswer ?? 1, penaltyEnabled: currentRoom.config?.penaltyEnabled ?? false });
       setCurrentRoom(room);
+      lastRoomHashRef.current = roomHash(room);
       if (room.status === ROOM_STATUS.FINISHED) { setGameState(GAME_STATE.RESULTS); return; }
       if (room.mode === GAME_MODE.CUSTOM && room.status === ROOM_STATUS.WAITING_QUESTION) {
         const role = stateRef.current.playerRole;
@@ -252,7 +289,7 @@ export default function useGameRoom() {
 
   async function updateRoomConfig(newConfig) {
     try {
-      const room = { ...currentRoom, mode: newConfig.mode, config: newConfig, questions: selectQuestions(newConfig, lang) };
+      const room = { ...currentRoom, mode: newConfig.mode, config: newConfig, questions: await selectQuestions(newConfig, lang) };
       await persistRoom(room); setGameConfig(newConfig);
     } catch (err) { showError("Error al actualizar configuración: " + err.message); }
   }
@@ -267,7 +304,7 @@ export default function useGameRoom() {
       const allPlayers = Array.from(playerMap.values());
       const allPlayerIds = [...(currentRoom.admin ? [currentRoom.admin.id] : []), ...allPlayers.map((p) => p.id)];
       const { scores, answers } = buildInitialScoresAndAnswers(allPlayerIds);
-      const room = { ...currentRoom, king: null, aspirants: allPlayers, questions: selectQuestions(config, lang), currentQuestionIndex: 0, currentAnswers: [], answeredAspirants: [], status: ROOM_STATUS.WAITING, scores, answers, pickingAnimation: null, startedAt: null, finishedAt: null };
+      const room = { ...currentRoom, king: null, aspirants: allPlayers, questions: await selectQuestions(config, lang), currentQuestionIndex: 0, currentAnswers: [], answeredAspirants: [], status: ROOM_STATUS.WAITING, scores, answers, pickingAnimation: null, startedAt: null, finishedAt: null };
       await persistRoom(room);
       setAnsweredQuestions(new Set()); saveAnsweredQuestions(roomCode, new Set());
       setPlayerRole(PLAYER_ROLE.ADMIN); setGameState(GAME_STATE.LOBBY);
@@ -282,6 +319,7 @@ export default function useGameRoom() {
       } else { await removePlayerFromRoom(room, code, name); }
     }
     clearSession();
+    lastRoomHashRef.current = "";
     setGameState(GAME_STATE.MENU); setCurrentRoom(null); setAnsweredQuestions(new Set()); setRoomCode(""); setPlayerRole(null);
   }
 
@@ -301,6 +339,7 @@ export default function useGameRoom() {
   async function persistRoom(room) {
     await storage.set(buildRoomKey(roomCode), JSON.stringify(room));
     setCurrentRoom(room);
+    lastRoomHashRef.current = roomHash(room);
   }
 
   return {

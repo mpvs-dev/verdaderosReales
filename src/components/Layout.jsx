@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAvatar } from "../assets/avatars.js";
 import ExitButton from "./ExitButton.jsx";
-import { useTranslation } from "../i18n/useTranslation.js";
 import DEFAULT_BG from "../assets/game-background.png";
 
 const OVERLAY_OPACITY = 0.58;
@@ -41,48 +40,59 @@ export function GameBackground({ children, imageSrc }) {
   );
 }
 
-/* ─── AdBanner ──────────────────────────────────────────────────────────── */
-export function AdBanner() {
-  const { t } = useTranslation();
-  return (
-    <div style={{
-      width: "100%",
-      height: 52,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "rgba(255,255,255,0.05)",
-      border: "1px dashed rgba(255,255,255,0.13)",
-      borderRadius: 12,
-      flexShrink: 0,
-    }}>
-      {/* Coloca aquí tu código de publicidad */}
-      <span style={{
-        fontSize: 9, fontWeight: 800, letterSpacing: 2,
-        textTransform: "uppercase", color: "rgba(255,255,255,0.18)",
-      }}>
-        {t("common.advertisement")}
-      </span>
-    </div>
-  );
-}
-
 /* ─── Credits ───────────────────────────────────────────────────────────── */
-export function Credits() {
+export function Credits({ LanguageSwitcherComponent }) {
   return (
     <div style={{
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      gap: 6,
+      gap: 8,
       flexShrink: 0,
     }}>
-      <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.5 }}>
-        Verdaderos Reales v1.2
-      </span>
-      <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
-        © 2026 MPVs · BSL 1.1
-      </span>
+      {/* Fila: Ko-fi · versión/licencia · idioma */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 12,
+        flexWrap: "wrap",
+      }}>
+        {/* Ko-fi oficial */}
+        <a
+          href="https://ko-fi.com/A5N820C8X8"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "inline-flex", lineHeight: 0, border: 0 }}
+        >
+          <img
+            height="28"
+            style={{ border: "0px", height: "28px", borderRadius: 6, display: "block" }}
+            src="https://storage.ko-fi.com/cdn/kofi3.png?v=6"
+            alt="Buy Me a Coffee at ko-fi.com"
+          />
+        </a>
+
+        {/* Separador */}
+        <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>·</span>
+
+        {/* Versión + licencia */}
+        <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 0.4 }}>
+            v1.4
+          </span>
+          <span style={{ color: "rgba(255,255,255,0.12)", fontSize: 10 }}>·</span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.18)" }}>
+            © 2026 MPVs · BSL 1.1
+          </span>
+        </div>
+
+        {/* Separador */}
+        <span style={{ color: "rgba(255,255,255,0.15)", fontSize: 12 }}>·</span>
+
+        {/* Selector de idioma inyectado */}
+        {LanguageSwitcherComponent}
+      </div>
     </div>
   );
 }
@@ -121,17 +131,7 @@ export function ScreenWrapper({ children, withBg = false, onExit, exitLabel }) {
     }}>
       {onExit && <ExitButton onConfirm={onExit} label={exitLabel} />}
 
-      {/* AD — siempre arriba */}
-      <div style={{
-        width: "100%",
-        maxWidth: 480,
-        padding: "10px 16px 0",
-        flexShrink: 0,
-      }}>
-        <AdBanner />
-      </div>
-
-      {/* Contenido principal — crece para ocupar espacio */}
+      {/* Contenido principal */}
       <div style={{
         flex: 1,
         width: "100%",
@@ -144,13 +144,8 @@ export function ScreenWrapper({ children, withBg = false, onExit, exitLabel }) {
         {children}
       </div>
 
-      {/* Créditos — siempre abajo */}
-      <div style={{
-        width: "100%",
-        maxWidth: 480,
-        padding: "12px 16px 20px",
-        flexShrink: 0,
-      }}>
+      {/* Créditos (sin selector de idioma en pantallas de juego) */}
+      <div style={{ width: "100%", maxWidth: 480, padding: "12px 16px 20px", flexShrink: 0 }}>
         <Credits />
       </div>
     </div>

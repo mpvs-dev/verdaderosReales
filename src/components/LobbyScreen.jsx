@@ -1,11 +1,233 @@
-import { useState } from "react";
-import { Play, Settings, Users } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Play, Settings, Users, Copy, Check, Zap, Star } from "lucide-react";
 import { ScreenWrapper, Avatar } from "./Layout.jsx";
 import GameConfigModal from "./GameConfigModal.jsx";
 import { PLAYER_ROLE } from "../constants/game.js";
 import { assignAvatars } from "../assets/avatars.js";
 import { useTranslation } from "../i18n/useTranslation.js";
 
+/* ─── RoomCodeBox ─────────────────────────────────────────────────────────── */
+function RoomCodeBox({ roomCode, t }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(roomCode);
+    } catch (_) {
+      const el = document.createElement("textarea");
+      el.value = roomCode;
+      el.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [roomCode]);
+
+  return (
+    <div
+      style={{
+        background: "var(--c-gold-bg)",
+        border: "1.5px solid var(--c-gold-border)",
+        borderRadius: "var(--r-xl)",
+        padding: "16px 18px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}
+    >
+      <div
+        className="t-label"
+        style={{ color: "var(--c-gold)", textAlign: "center" }}
+      >
+        {t("lobby.roomCodeLabel")}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 14,
+        }}
+      >
+        <div style={{ display: "flex", gap: 6 }}>
+          {roomCode.split("").map((char, i) => (
+            <div
+              key={i}
+              style={{
+                width: 38,
+                height: 46,
+                background: "rgba(245,158,11,0.15)",
+                border: "2px solid rgba(245,158,11,0.35)",
+                borderRadius: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "var(--font-display)",
+                fontSize: 24,
+                color: "var(--c-gold)",
+                boxShadow: "0 3px 0 rgba(146,64,14,0.4)",
+                animation: `charPop 0.3s cubic-bezier(0.34,1.56,0.64,1) ${i * 55}ms both`,
+              }}
+            >
+              {char}
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={handleCopy}
+          title="Copiar código"
+          style={{
+            background: copied
+              ? "rgba(16,185,129,0.2)"
+              : "rgba(245,158,11,0.15)",
+            border: `1.5px solid ${copied ? "rgba(16,185,129,0.45)" : "rgba(245,158,11,0.35)"}`,
+            borderRadius: 12,
+            padding: "10px 12px",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+            transition: "all 0.2s ease",
+            flexShrink: 0,
+          }}
+        >
+          {copied ? (
+            <Check size={18} color="#10B981" />
+          ) : (
+            <Copy size={18} color="var(--c-gold)" />
+          )}
+          <span
+            style={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+              color: copied ? "#10B981" : "var(--c-gold)",
+              transition: "color 0.2s",
+            }}
+          >
+            {copied ? "¡Listo!" : "Copiar"}
+          </span>
+        </button>
+      </div>
+
+      <p
+        style={{
+          textAlign: "center",
+          fontSize: 11,
+          fontWeight: 700,
+          color: "rgba(245,158,11,0.55)",
+        }}
+      >
+        Comparte este código con tus amigos
+      </p>
+
+      <style>{`
+        @keyframes charPop {
+          0%   { opacity:0; transform:scale(0.6) translateY(8px); }
+          70%  { transform:scale(1.08) translateY(-2px); }
+          100% { opacity:1; transform:scale(1) translateY(0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+/* ─── ConfigPills ─────────────────────────────────────────────────────────── */
+function ConfigPills({ cfg, isAdmin, onOpenConfig, t }) {
+  const isCustom = cfg.mode === "custom";
+  const penaltyOn = cfg.penaltyEnabled;
+  const customPts = cfg.customPointsEnabled;
+
+  const pills = [
+    { label: `${cfg.rounds} rondas`, color: "gold" },
+    { label: isCustom ? "✏️ Custom" : "🎲 Genérico", color: "purple" },
+    {
+      label: customPts
+        ? "Pts por pregunta"
+        : `+${cfg.pointsPerAnswer} por acierto`,
+      color: "purple",
+    },
+    penaltyOn && { label: "⚡ Castigo activo", color: "red" },
+  ].filter(Boolean);
+
+  const pillStyle = (color) =>
+    ({
+      gold: {
+        background: "rgba(245,158,11,0.12)",
+        border: "1px solid rgba(245,158,11,0.28)",
+        color: "var(--c-gold)",
+      },
+      purple: {
+        background: "rgba(109,40,217,0.2)",
+        border: "1px solid rgba(139,92,246,0.32)",
+        color: "#C4B5FD",
+      },
+      red: {
+        background: "rgba(239,68,68,0.12)",
+        border: "1px solid rgba(239,68,68,0.28)",
+        color: "#FCA5A5",
+      },
+    })[color];
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
+      }}
+    >
+      {/* Pills */}
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", flex: 1 }}>
+        {pills.map((p, i) => (
+          <span
+            key={i}
+            style={{
+              ...pillStyle(p.color),
+              borderRadius: 999,
+              padding: "4px 9px",
+              fontSize: 11,
+              fontWeight: 800,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {p.label}
+          </span>
+        ))}
+      </div>
+
+      {/* Botón config solo para admin */}
+      {isAdmin && (
+        <button
+          className="btn btn-ghost btn-sm"
+          style={{
+            width: "auto",
+            gap: 5,
+            fontSize: 11,
+            padding: "5px 10px",
+            flexShrink: 0,
+          }}
+          onClick={onOpenConfig}
+        >
+          <Settings size={11} /> {t("lobby.configButton")}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ─── LobbyScreen ─────────────────────────────────────────────────────────── */
 export default function LobbyScreen({
   roomCode,
   playerRole,
@@ -35,92 +257,52 @@ export default function LobbyScreen({
     <ScreenWrapper withBg onExit={resetGame} exitLabel={t("lobby.exitLabel")}>
       {showConfig && (
         <GameConfigModal
-          config={gameConfig}
+          config={currentRoom?.config ?? gameConfig}
           onClose={() => setShowConfig(false)}
           onSave={handleConfigSave}
         />
       )}
 
-      {/* Room code */}
-      <div className="room-code-box">
-        <div className="t-label" style={{ marginBottom: 4 }}>
-          {t("lobby.roomCodeLabel")}
-        </div>
-        <div className="room-code">{roomCode}</div>
-      </div>
+      {/* Código de sala */}
+      <RoomCodeBox roomCode={roomCode} t={t} />
 
-      {/* Admin row */}
+      {/* Admin + config en una sola fila */}
       <div
         className="glass"
-        style={{ display: "flex", alignItems: "center", gap: 12 }}
+        style={{ display: "flex", flexDirection: "column", gap: 10 }}
       >
-        <Avatar avatar={avatarMap[currentRoom?.admin?.id]} size="sm" crown />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="t-label">{t("lobby.adminLabel")}</div>
-          <div
-            style={{
-              fontWeight: 800,
-              color: "#fff",
-              fontSize: 15,
-              marginTop: 2,
-            }}
-            className="truncate"
-          >
-            {currentRoom?.admin?.name}
+        {/* Fila admin */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Avatar avatar={avatarMap[currentRoom?.admin?.id]} size="sm" crown />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="t-label">{t("lobby.adminLabel")}</div>
+            <div
+              style={{
+                fontWeight: 800,
+                color: "#fff",
+                fontSize: 14,
+                marginTop: 1,
+              }}
+              className="truncate"
+            >
+              {currentRoom?.admin?.name}
+            </div>
           </div>
         </div>
-        {isAdmin && (
-          <button
-            className="btn btn-ghost btn-sm"
-            style={{ width: "auto", gap: 5 }}
-            onClick={() => setShowConfig(true)}
-          >
-            <Settings size={13} /> {t("lobby.configButton")}
-          </button>
-        )}
+
+        {/* Separador */}
+        <div style={{ height: 1, background: "var(--c-w12)" }} />
+
+        {/* Pills de configuración */}
+        <ConfigPills
+          cfg={cfg}
+          isAdmin={isAdmin}
+          onOpenConfig={() => setShowConfig(true)}
+          t={t}
+        />
       </div>
 
-      {/* Config summary */}
-      <div className="glass-gold" style={{ display: "flex" }}>
-        {[
-          { val: cfg.rounds, label: t("lobby.rounds") },
-          { val: cfg.pointsPerAnswer, label: t("lobby.pointsPerAnswer") },
-          {
-            val:
-              cfg.mode === "custom"
-                ? t("lobby.modeCustom")
-                : t("lobby.modeGeneric"),
-            label: t("lobby.mode"),
-            small: true,
-          },
-        ].map(({ val, label, small }, i, arr) => (
-          <div
-            key={label}
-            style={{
-              flex: 1,
-              textAlign: "center",
-              borderRight:
-                i < arr.length - 1 ? "1px solid var(--c-gold-border)" : "none",
-            }}
-          >
-            <div
-              className="t-display"
-              style={{
-                fontSize: small ? 14 : 22,
-                color: "var(--c-gold)",
-                paddingTop: small ? 3 : 0,
-              }}
-            >
-              {val}
-            </div>
-            <div className="t-label" style={{ marginTop: 2 }}>
-              {label}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Players */}
+      {/* Jugadores */}
       <div className="glass">
         <div
           style={{
@@ -137,17 +319,27 @@ export default function LobbyScreen({
         </div>
 
         {aspirants.length === 0 ? (
-          <p
+          <div
             style={{
-              fontSize: 13,
-              fontWeight: 700,
-              color: "var(--c-w45)",
-              textAlign: "center",
-              padding: "8px 0",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 0",
             }}
           >
-            {t("lobby.waitingPlayers")}
-          </p>
+            <div style={{ fontSize: 28 }}>👋</div>
+            <p
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: "var(--c-w45)",
+                textAlign: "center",
+              }}
+            >
+              {t("lobby.waitingPlayers")}
+            </p>
+          </div>
         ) : (
           <div
             style={{
