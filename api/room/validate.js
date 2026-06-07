@@ -121,6 +121,11 @@ if room.admin and not adminIsKing then
   end
 end
 
+if room.status == 'finished' then
+  redis.call('SET', key, cjson.encode(room), 'EX', 86400)
+  return cjson.encode(room)
+end
+
 if validatedCount >= total then
   room.currentQuestionIndex = tonumber(room.currentQuestionIndex) + 1
   room.answeredAspirants    = {}
@@ -159,7 +164,7 @@ export default async function handler(req, res) {
     aspirantId,
     isCorrect,
     pointsPerAnswer = 1,
-    penaltyEnabled  = false,
+    penaltyEnabled = false,
   } = req.body;
 
   if (!roomCode || !aspirantId)

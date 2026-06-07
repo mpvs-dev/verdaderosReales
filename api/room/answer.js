@@ -75,6 +75,7 @@ end
 
 -- Avanza la ronda si todos los aspirantes ya tienen respuesta validada para la pregunta actual
 local function tryAdvanceRound(room, now)
+  if room.status == 'finished' then return end
   local qIndex   = tonumber(room.currentQuestionIndex) or 0
   local currentQ = room.questions and room.questions[qIndex + 1]
   local qId      = currentQ and currentQ.id or nil
@@ -199,7 +200,8 @@ return cjson.encode(room)
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Method not allowed" });
 
   const { roomCode, aspirantId, aspirantName, questionId, answer } = req.body;
   if (!roomCode || !aspirantId || !answer)
@@ -209,7 +211,11 @@ export default async function handler(req, res) {
   const now = new Date().toISOString();
 
   try {
-    const result = await redis.eval(ANSWER_SCRIPT, [key], [aspirantId, aspirantName, questionId, answer, now]);
+    const result = await redis.eval(
+      ANSWER_SCRIPT,
+      [key],
+      [aspirantId, aspirantName, questionId, answer, now],
+    );
     const room = parseRoom(result);
     if (!room) return res.status(404).json({ error: "Sala no encontrada" });
     return res.status(200).json({ room });

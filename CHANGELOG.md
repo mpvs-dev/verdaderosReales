@@ -6,6 +6,14 @@
 
 ---
 
+## [1.5]
+
+### Removido
+ - Removido pantallas legacy no utilizadas.
+ - 
+
+---
+
 ## [1.4] - 2026-06-05
 
 ### Nuevo
