@@ -10,7 +10,12 @@
 
 ### Removido
  - Removido pantallas legacy no utilizadas.
- - 
+
+### Arreglado
+ - Validación de las rondas mal ejecutas creando una posible ronda extra q no deberia existir.
+ - Descentralización de la logica del juego.
+
+### Nuevo
 
 ---
 
