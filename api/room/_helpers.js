@@ -8,8 +8,3 @@ export const CORS_HEADERS = {
 export function setCors(res) {
   Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
 }
-
-export function parseRoom(result) {
-  if (!result) return null;
-  return typeof result === "string" ? JSON.parse(result) : result;
-}
