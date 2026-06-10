@@ -14,8 +14,11 @@
 ### Arreglado
  - Validación de las rondas mal ejecutas creando una posible ronda extra q no deberia existir.
  - Descentralización de la logica del juego.
+ - Polling cuando la pestaña no esta activa.
+ - Arreglos generales para mejorar la logica de polling.
 
 ### Nuevo
+ - Modo hover y link al portafolio en los creditos del juego.
 
 ---
 

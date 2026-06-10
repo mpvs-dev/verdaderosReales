@@ -45,9 +45,12 @@ export const MIN_OPTIONS = 2;
 export const SESSION_KEY = "vr_session";
 export const ANSWERED_KEY_PREFIX = "vr_answered";
 
-export const POLLING_INTERVAL_MS = 3000;
+export const POLL_BASE_MS = 3_000;
+export const POLL_MAX_MS = 48_000;
+export const POLL_FAIL_TOAST = 3;
 export const TOAST_DURATION_MS = 4000;
 export const ROOM_TTL_SECONDS = 86400;
+
 
 export const DEFAULT_GAME_CONFIG = {
   rounds: 5,
@@ -55,8 +58,6 @@ export const DEFAULT_GAME_CONFIG = {
   penaltyEnabled: false,
   customPointsEnabled: false,
   mode: GAME_MODE.GENERIC,
-  // Categorías activas — por defecto todas las disponibles
-  // Se sobreescribe al guardar la configuración en el modal
   categories: ["genericas"],
 };
 
