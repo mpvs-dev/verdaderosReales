@@ -5,6 +5,7 @@ import GameConfigModal from "./GameConfigModal.jsx";
 import { PLAYER_ROLE } from "../constants/game.js";
 import { assignAvatars } from "../assets/avatars.js";
 import { useTranslation } from "../i18n/useTranslation.js";
+import useConfigChange from "../hooks/useConfigChange.js";
 
 /* ─── RoomCodeBox ─────────────────────────────────────────────────────────── */
 function RoomCodeBox({ roomCode, t }) {
@@ -140,21 +141,35 @@ function RoomCodeBox({ roomCode, t }) {
 }
 
 /* ─── ConfigPills ─────────────────────────────────────────────────────────── */
-function ConfigPills({ cfg, isAdmin, onOpenConfig, t }) {
+function ConfigPills({ cfg, isAdmin, onOpenConfig, t, changedKeys }) {
   const isCustom = cfg.mode === "custom";
   const penaltyOn = cfg.penaltyEnabled;
   const customPts = cfg.customPointsEnabled;
 
+  // Cada pill lleva su key de config asociada para saber si animarla
   const pills = [
-    { label: `${cfg.rounds} rondas`, color: "gold" },
-    { label: isCustom ? "✏️ Custom" : "🎲 Genérico", color: "purple" },
+    {
+      label: `${cfg.rounds} rondas`,
+      color: "gold",
+      configKey: "rounds",
+    },
+    {
+      label: isCustom ? "✏️ Custom" : "🎲 Genérico",
+      color: "purple",
+      configKey: "mode",
+    },
     {
       label: customPts
         ? "Pts por pregunta"
         : `+${cfg.pointsPerAnswer} por acierto`,
       color: "purple",
+      configKey: customPts ? "customPointsEnabled" : "pointsPerAnswer",
     },
-    penaltyOn && { label: "⚡ Castigo activo", color: "red" },
+    penaltyOn && {
+      label: "⚡ Castigo activo",
+      color: "red",
+      configKey: "penaltyEnabled",
+    },
   ].filter(Boolean);
 
   const pillStyle = (color) =>
@@ -177,53 +192,110 @@ function ConfigPills({ cfg, isAdmin, onOpenConfig, t }) {
     })[color];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 8,
-      }}
-    >
-      {/* Pills */}
-      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", flex: 1 }}>
-        {pills.map((p, i) => (
-          <span
-            key={i}
-            style={{
-              ...pillStyle(p.color),
-              borderRadius: 999,
-              padding: "4px 9px",
-              fontSize: 11,
-              fontWeight: 800,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {p.label}
-          </span>
-        ))}
-      </div>
+    <>
+      {/* Estilos de animación inline — solo se inyectan una vez */}
+      <style>{`
+        @keyframes pillPop {
+          0%   { transform: scale(1); }
+          30%  { transform: scale(1.18); }
+          60%  { transform: scale(0.95); }
+          100% { transform: scale(1); }
+        }
+        @keyframes pillGlow {
+          0%, 100% { box-shadow: none; }
+          50%      { box-shadow: 0 0 8px 2px rgba(245,158,11,0.55); }
+        }
+        .pill-changed {
+          animation: pillPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both,
+                     pillGlow 0.9s ease 0.1s;
+        }
+      `}</style>
 
-      {/* Botón config solo para admin */}
-      {isAdmin && (
-        <button
-          className="btn btn-ghost btn-sm"
-          style={{
-            width: "auto",
-            gap: 5,
-            fontSize: 11,
-            padding: "5px 10px",
-            flexShrink: 0,
-          }}
-          onClick={onOpenConfig}
-        >
-          <Settings size={11} /> {t("lobby.configButton")}
-        </button>
-      )}
-    </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+        }}
+      >
+        {/* Pills */}
+        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", flex: 1 }}>
+          {pills.map((p, i) => {
+            const changed = changedKeys.has(p.configKey);
+            return (
+              <span
+                key={i}
+                className={changed ? "pill-changed" : ""}
+                style={{
+                  ...pillStyle(p.color),
+                  borderRadius: 999,
+                  padding: "4px 9px",
+                  fontSize: 11,
+                  fontWeight: 800,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  whiteSpace: "nowrap",
+                  position: "relative",
+                  transition: "border-color 0.2s",
+                  // borde más brillante mientras está animando
+                  ...(changed &&
+                    p.color === "gold" && {
+                      border: "1px solid rgba(245,158,11,0.7)",
+                    }),
+                  ...(changed &&
+                    p.color === "purple" && {
+                      border: "1px solid rgba(139,92,246,0.7)",
+                    }),
+                  ...(changed &&
+                    p.color === "red" && {
+                      border: "1px solid rgba(239,68,68,0.7)",
+                    }),
+                }}
+              >
+                {/* Punto indicador de cambio */}
+                {changed && (
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background:
+                        p.color === "gold"
+                          ? "var(--c-gold)"
+                          : p.color === "red"
+                            ? "#EF4444"
+                            : "#A78BFA",
+                      flexShrink: 0,
+                      boxShadow: "0 0 4px currentColor",
+                    }}
+                  />
+                )}
+                {p.label}
+              </span>
+            );
+          })}
+        </div>
+
+        {/* Botón config solo para admin */}
+        {isAdmin && (
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{
+              width: "auto",
+              gap: 5,
+              fontSize: 11,
+              padding: "5px 10px",
+              flexShrink: 0,
+            }}
+            onClick={onOpenConfig}
+          >
+            <Settings size={11} /> {t("lobby.configButton")}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -246,6 +318,8 @@ export default function LobbyScreen({
   const everyone = [currentRoom?.admin, ...aspirants].filter(Boolean);
   const avatarMap = assignAvatars(everyone);
   const cfg = currentRoom?.config ?? gameConfig;
+
+  const changedKeys = useConfigChange(cfg);
 
   async function handleConfigSave(newConfig) {
     setGameConfig(newConfig);
@@ -299,6 +373,7 @@ export default function LobbyScreen({
           isAdmin={isAdmin}
           onOpenConfig={() => setShowConfig(true)}
           t={t}
+          changedKeys={changedKeys}
         />
       </div>
 

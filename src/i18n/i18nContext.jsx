@@ -1,34 +1,42 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import es from "./es.json";
 import en from "./en.json";
 
 const LOCALES = { es, en };
 const STORAGE_KEY = "vr_lang";
 
-// Cache de preguntas ya cargadas: { "es:genericas": [...], "en:genericas": [...] }
 const questionsCache = {};
 
-/**
- * Carga las preguntas de una o varias categorías para un idioma.
- * @param {string}   lang        - "es" | "en"
- * @param {string[]} categoryIds - categorías seleccionadas, ej: ["genericas", "deportes"]
- * @returns {Promise<object[]>}  - array mezclado de preguntas de todas las categorías pedidas
- */
+async function preloadQuestions(lang) {
+  const key = `module:${lang}`;
+  if (questionsCache[key]) return;
+  try {
+    const mod =
+      lang === "en"
+        ? await import("../assets/questions_en.json")
+        : await import("../assets/questions_es.json");
+    questionsCache[key] = mod.default;
+  } catch (err) {
+    console.warn("preloadQuestions error:", err);
+  }
+}
+
 export async function loadQuestions(lang, categoryIds = ["genericas"]) {
   const key = lang in LOCALES ? lang : "es";
-
-  // Importar el módulo completo una sola vez por idioma
   const moduleKey = `module:${key}`;
+
   if (!questionsCache[moduleKey]) {
-    const mod = key === "en"
-      ? await import("../assets/questions_en.json")
-      : await import("../assets/questions_es.json");
-    questionsCache[moduleKey] = mod.default;
+    await preloadQuestions(key);
   }
 
-  const allData = questionsCache[moduleKey];
+  const allData = questionsCache[moduleKey] ?? {};
 
-  // Combinar las categorías solicitadas que existan en el JSON
   const combined = categoryIds.flatMap((catId) => {
     const cacheKey = `${key}:${catId}`;
     if (!questionsCache[cacheKey]) {
@@ -37,10 +45,17 @@ export async function loadQuestions(lang, categoryIds = ["genericas"]) {
     return questionsCache[cacheKey];
   });
 
-  return combined;
+  const seen = new Set();
+  const deduped = combined.filter((q) => {
+    const id = String(q.id);
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+
+  return deduped;
 }
 
-// Mantener QUESTIONS vacío por compatibilidad con imports legacy
 export const QUESTIONS = {};
 
 function getInitialLang() {
@@ -57,10 +72,17 @@ export const I18nContext = createContext(null);
 export function I18nProvider({ children }) {
   const [lang, setLangState] = useState(getInitialLang);
 
+  useEffect(() => {
+    preloadQuestions(lang);
+  }, [lang]);
+  // ──────────────────────────────────────────────────────────────────
+
   const setLang = useCallback((newLang) => {
     if (!LOCALES[newLang]) return;
     setLangState(newLang);
-    try { localStorage.setItem(STORAGE_KEY, newLang); } catch (_) {}
+    try {
+      localStorage.setItem(STORAGE_KEY, newLang);
+    } catch (_) {}
   }, []);
 
   const t = useCallback(
@@ -78,14 +100,21 @@ export function I18nProvider({ children }) {
       }
       if (typeof value !== "string") return key;
       return value.replace(/\{(\w+)\}/g, (_, k) =>
-        vars[k] !== undefined ? String(vars[k]) : `{${k}}`
+        vars[k] !== undefined ? String(vars[k]) : `{${k}}`,
       );
     },
-    [lang]
+    [lang],
   );
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, availableLangs: Object.keys(LOCALES) }}>
+    <I18nContext.Provider
+      value={{
+        lang,
+        setLang,
+        t,
+        availableLangs: Object.keys(LOCALES),
+      }}
+    >
       {children}
     </I18nContext.Provider>
   );

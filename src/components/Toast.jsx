@@ -1,56 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, X } from "lucide-react";
 
-export default function Toast({ message, onClose }) {
+function ToastItem({ id, msg, onDismiss }) {
   const [visible, setVisible] = useState(false);
-  // FIX Bug moderado (Toast): guardar los timeouts para limpiarlos si el
-  // componente se desmonta antes de que disparen, evitando llamar onClose
-  // o setVisible sobre un componente ya desmontado.
-  const hideTimerRef  = useRef(null);
-  const closeTimerRef = useRef(null);
+  const hideTimerRef = useRef(null);
+  const dismissTimerRef = useRef(null);
 
   useEffect(() => {
-    // Limpiar timers anteriores ante cualquier cambio de mensaje
-    clearTimeout(hideTimerRef.current);
-    clearTimeout(closeTimerRef.current);
+    // Entrada
+    requestAnimationFrame(() => setVisible(true));
 
-    if (!message) {
-      setVisible(false);
-      return;
-    }
-
-    setVisible(true);
+    // Salida automática
     hideTimerRef.current = setTimeout(() => {
       setVisible(false);
-      closeTimerRef.current = setTimeout(onClose, 300);
+      dismissTimerRef.current = setTimeout(() => onDismiss(id), 300);
     }, 3700);
 
-    // Cleanup: si el componente se desmonta o el mensaje cambia
-    // antes de que disparen los timers, los cancelamos.
     return () => {
       clearTimeout(hideTimerRef.current);
-      clearTimeout(closeTimerRef.current);
+      clearTimeout(dismissTimerRef.current);
     };
-  // onClose se excluye de las deps intencionalmente: es una función estable
-  // del padre (useCallback en useGameRoom) y añadirla causaría re-runs
-  // innecesarios si el padre no la memoiza.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message]);
+  }, [id, onDismiss]);
 
-  if (!message) return null;
+  function handleClose() {
+    clearTimeout(hideTimerRef.current);
+    clearTimeout(dismissTimerRef.current);
+    setVisible(false);
+    dismissTimerRef.current = setTimeout(() => onDismiss(id), 300);
+  }
 
   return (
     <div
       style={{
-        position: "fixed",
-        top: 16,
-        left: "50%",
-        zIndex: 9999,
-        transform: `translateX(-50%) translateY(${visible ? 0 : -16}px)`,
+        width: "100%",
+        transform: `translateY(${visible ? 0 : -12}px)`,
         opacity: visible ? 1 : 0,
         transition: "all 0.25s ease",
-        width: "calc(100% - 32px)",
-        maxWidth: 400,
         pointerEvents: visible ? "auto" : "none",
       }}
     >
@@ -80,15 +65,10 @@ export default function Toast({ message, onClose }) {
             lineHeight: 1.4,
           }}
         >
-          {message}
+          {msg}
         </p>
         <button
-          onClick={() => {
-            clearTimeout(hideTimerRef.current);
-            clearTimeout(closeTimerRef.current);
-            setVisible(false);
-            closeTimerRef.current = setTimeout(onClose, 300);
-          }}
+          onClick={handleClose}
           style={{
             background: "transparent",
             border: "none",
@@ -102,6 +82,32 @@ export default function Toast({ message, onClose }) {
           <X size={16} />
         </button>
       </div>
+    </div>
+  );
+}
+
+export default function Toast({ toasts, onDismiss }) {
+  if (!toasts.length) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 16,
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        width: "calc(100% - 32px)",
+        maxWidth: 400,
+        pointerEvents: "none",
+      }}
+    >
+      {toasts.map((t) => (
+        <ToastItem key={t.id} id={t.id} msg={t.msg} onDismiss={onDismiss} />
+      ))}
     </div>
   );
 }

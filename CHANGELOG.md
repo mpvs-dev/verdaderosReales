@@ -10,15 +10,21 @@
 
 ### Removido
  - Removido pantallas legacy no utilizadas.
+ - Removido Toda la logica de LUA.
 
 ### Arreglado
  - Validación de las rondas mal ejecutas creando una posible ronda extra q no deberia existir.
  - Descentralización de la logica del juego.
  - Polling cuando la pestaña no esta activa.
  - Arreglos generales para mejorar la logica de polling.
+ - Remplazada la logica de LUA a JS.
+ - Las pills de configuración de la partida se muestran correctamente.
+ - Mejora de rendimiento al cargar las preguntas.
+ - Corregido error de acumulación de toast.
 
 ### Nuevo
  - Modo hover y link al portafolio en los creditos del juego.
+ 
 
 ---
 

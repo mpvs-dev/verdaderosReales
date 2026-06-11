@@ -24,6 +24,12 @@ export function derivePlayerRole(room, playerName) {
   if (isAdmin && isKing) return PLAYER_ROLE.ADMIN_KING;
   if (isAdmin) return PLAYER_ROLE.ADMIN;
   if (isKing) return PLAYER_ROLE.KING;
+
+  const inAspirants = (room.aspirants || []).some((a) => a.name === playerName);
+  if (!inAspirants && !isAdmin && !isKing) {
+    return PLAYER_ROLE.ASPIRANT;
+  }
+
   return PLAYER_ROLE.ASPIRANT;
 }
 

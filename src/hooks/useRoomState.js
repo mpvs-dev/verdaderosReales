@@ -9,6 +9,7 @@ import {
   saveSession, clearSession,
   saveAnsweredQuestions, loadAnsweredQuestions,
 } from "../utils/session.js";
+import useErrorQueue from "./useErrorQueue.js";
 
 function buildRoomKey(code) { return `room_${code}`; }
 
@@ -24,6 +25,11 @@ export function roomHash(room) {
     (room.currentAnswers ?? []).length,
     (room.answeredAspirants ?? []).length,
     JSON.stringify(room.scores ?? {}),
+    room.config?.rounds ?? "",
+    room.config?.pointsPerAnswer ?? "",
+    room.config?.mode ?? "",
+    room.config?.penaltyEnabled ?? "",
+    room.config?.customPointsEnabled ?? "",
   ].join("|");
 }
 
@@ -87,10 +93,9 @@ export default function useRoomState() {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [answeredQuestions, setAnsweredQuestions] = useState(new Set());
   const [reconnecting, setReconnecting] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
-
   const stateRef = useRef({ roomCode: "", currentRoom: null, gameState: GAME_STATE.MENU, playerRole: null, playerName: "" });
   const lastHashRef = useRef("");
+  const { toasts, showError, dismiss } = useErrorQueue();
 
   // refs de control del polling
   const pollTimerRef = useRef(null);
@@ -103,11 +108,6 @@ export default function useRoomState() {
   useEffect(() => { stateRef.current.gameState = gameState; }, [gameState]);
   useEffect(() => { stateRef.current.playerRole = playerRole; }, [playerRole]);
   useEffect(() => { stateRef.current.playerName = playerName; }, [playerName]);
-
-  const showError = useCallback((msg) => {
-    setErrorMsg(msg);
-    setTimeout(() => setErrorMsg(null), TOAST_DURATION_MS);
-  }, []);
 
   const persistRoom = useCallback(async (room) => {
     await storage.set(buildRoomKey(stateRef.current.roomCode), JSON.stringify(room));
@@ -258,7 +258,23 @@ export default function useRoomState() {
     try {
       const result = await storage.get(buildRoomKey(code));
       const room = JSON.parse(result.value);
-      const role = derivePlayerRole(room, name);
+      let role = derivePlayerRole(room, name);
+      if (
+        role === PLAYER_ROLE.ADMIN &&
+        room.king?.name === name &&
+        room.status !== ROOM_STATUS.WAITING &&
+        room.status !== ROOM_STATUS.PICKING_KING
+      ) {
+        role = PLAYER_ROLE.ADMIN_KING;
+      }
+      if (
+        role === PLAYER_ROLE.ASPIRANT &&
+        room.king?.name === name &&
+        room.status !== ROOM_STATUS.WAITING &&
+        room.status !== ROOM_STATUS.PICKING_KING
+      ) {
+        role = PLAYER_ROLE.KING;
+      }
       setRoomCode(code);
       setPlayerName(name);
       setCurrentRoom(room);
@@ -284,7 +300,7 @@ export default function useRoomState() {
 
   return {
     gameState, roomCode, playerName, playerRole,
-    currentRoom, answeredQuestions, reconnecting, errorMsg,
+    currentRoom, answeredQuestions, reconnecting, toast, dismiss, showError,
     setGameState, setRoomCode, setPlayerName, setPlayerRole,
     setCurrentRoom, setAnsweredQuestions,
     showError, persistRoom, stateRef, lastHashRef,

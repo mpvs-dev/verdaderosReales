@@ -13,20 +13,13 @@ import {
 } from "../utils/room.js";
 import { saveSession, clearSession, saveAnsweredQuestions } from "../utils/session.js";
 import { roomHash } from "./useRoomState.js";
-
+import { selectQuestions } from "../utils/questions.js";
 function buildRoomKey(code) { return `room_${code}`; }
-
-async function selectQuestions(config, lang) {
-  if (config.mode === GAME_MODE.CUSTOM) return [];
-  const cats = config.categories?.length ? config.categories : DEFAULT_CATEGORIES;
-  const pool = await loadQuestions(lang, cats);
-  return shuffleArray(pool).slice(0, config.rounds);
-}
 
 function findPlayerId(room, name) {
   return (room.aspirants || []).find((a) => a.name === name)?.id
     || (room.admin?.name === name ? room.admin.id : null)
-    || (room.king?.name  === name ? room.king.id  : null);
+    || (room.king?.name === name ? room.king.id : null);
 }
 
 export default function useRoomActions({
@@ -42,8 +35,8 @@ export default function useRoomActions({
 
   async function createRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
-    const adminId   = generateId();
-    const code      = generateRoomCode();
+    const adminId = generateId();
+    const code = generateRoomCode();
     const questions = await selectQuestions(gameConfig, lang);
     const { scores, answers } = buildInitialScoresAndAnswers([adminId]);
     const room = {
@@ -117,16 +110,16 @@ export default function useRoomActions({
 
   async function pickKing(personId) {
     try {
-      const everyone  = [currentRoom.admin, ...(currentRoom.aspirants || [])];
-      const chosen    = everyone.find((p) => p.id === personId);
+      const everyone = [currentRoom.admin, ...(currentRoom.aspirants || [])];
+      const chosen = everyone.find((p) => p.id === personId);
       if (!chosen) return;
       const aspirants = currentRoom.aspirants.filter((a) => a.id !== personId);
-      const allIds    = [currentRoom.admin?.id, ...aspirants.map((a) => a.id), personId].filter(Boolean);
-      const scores    = { ...currentRoom.scores };
-      const answers   = { ...currentRoom.answers };
+      const allIds = [currentRoom.admin?.id, ...aspirants.map((a) => a.id), personId].filter(Boolean);
+      const scores = { ...currentRoom.scores };
+      const answers = { ...currentRoom.answers };
       allIds.forEach((id) => {
-        if (scores[id]  === undefined) scores[id]  = 0;
-        if (!answers[id])              answers[id]  = [];
+        if (scores[id] === undefined) scores[id] = 0;
+        if (!answers[id]) answers[id] = [];
       });
       const room = {
         ...currentRoom, king: chosen, aspirants, scores, answers,
@@ -149,9 +142,9 @@ export default function useRoomActions({
     try {
       const room = { ...currentRoom, status: currentRoom.pendingStatus, pendingStatus: null };
       await persistRoom(room);
-      const role      = stateRef.current.playerRole;
+      const role = stateRef.current.playerRole;
       const isKingRole = role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING;
-      const isCustom  = room.mode === GAME_MODE.CUSTOM;
+      const isCustom = room.mode === GAME_MODE.CUSTOM;
       setGameState(isKingRole && isCustom ? GAME_STATE.CREATING_QUESTION : isCustom ? GAME_STATE.WAITING_QUESTION : GAME_STATE.PLAYING);
     } catch (err) {
       showError("Error al iniciar: " + err.message);
@@ -175,16 +168,22 @@ export default function useRoomActions({
 
   async function rematch() {
     try {
-      const config      = currentRoom.config ?? DEFAULT_GAME_CONFIG;
-      const activeIds   = new Set(Object.keys(currentRoom.scores || {}));
-      const playerMap   = new Map();
+      const config = currentRoom.config ?? DEFAULT_GAME_CONFIG;
+      const activeIds = new Set(Object.keys(currentRoom.scores || {}));
+      const playerMap = new Map();
       (currentRoom.aspirants || []).forEach((p) => {
-        if (p.id !== currentRoom.admin?.id && activeIds.has(p.id)) playerMap.set(p.id, p);
+        if (p.id !== currentRoom.admin?.id)
+          playerMap.set(p.id, p);
       });
-      if (currentRoom.king && currentRoom.king.id !== currentRoom.admin?.id && activeIds.has(currentRoom.king.id))
+      if (
+        currentRoom.king &&
+        currentRoom.king.id !== currentRoom.admin?.id &&
+        !playerMap.has(currentRoom.king.id)
+      ) {
         playerMap.set(currentRoom.king.id, currentRoom.king);
-      const allPlayers  = Array.from(playerMap.values());
-      const allIds      = [...(currentRoom.admin ? [currentRoom.admin.id] : []), ...allPlayers.map((p) => p.id)];
+      }
+      const allPlayers = Array.from(playerMap.values());
+      const allIds = [...(currentRoom.admin ? [currentRoom.admin.id] : []), ...allPlayers.map((p) => p.id)];
       const { scores, answers } = buildInitialScoresAndAnswers(allIds);
       const room = {
         ...currentRoom,
@@ -211,7 +210,7 @@ export default function useRoomActions({
       if (role === PLAYER_ROLE.ADMIN || role === PLAYER_ROLE.ADMIN_KING) {
         try {
           await storage.set(buildRoomKey(code), JSON.stringify({ ...room, status: "closed" }));
-        } catch (_) {}
+        } catch (_) { }
       } else {
         await removePlayerFromRoom(room, code, name);
       }
@@ -227,7 +226,7 @@ export default function useRoomActions({
 
   async function removePlayerFromRoom(room, code, name) {
     try {
-      const myId   = findPlayerId(room, name);
+      const myId = findPlayerId(room, name);
       const updated = {
         ...room,
         aspirants: (room.aspirants || []).filter((a) => a.name !== name),
@@ -235,11 +234,11 @@ export default function useRoomActions({
       if (myId) {
         delete updated.scores?.[myId];
         delete updated.answers?.[myId];
-        updated.currentAnswers    = (updated.currentAnswers    || []).filter((a) => a.aspirantId !== myId);
+        updated.currentAnswers = (updated.currentAnswers || []).filter((a) => a.aspirantId !== myId);
         updated.answeredAspirants = (updated.answeredAspirants || []).filter((id) => id !== myId);
       }
       await storage.set(buildRoomKey(code), JSON.stringify(updated));
-    } catch (_) {}
+    } catch (_) { }
   }
 
   return {
