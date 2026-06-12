@@ -3,15 +3,9 @@ import { I18nContext, loadQuestions } from "../i18n/i18nContext.jsx";
 import { DEFAULT_CATEGORIES } from "../constants/questionCategories.js";
 import storage from "../services/storage.js";
 import { roomApi } from "../services/roomApi.js";
-import {
-  GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE,
-  DEFAULT_GAME_CONFIG,
-} from "../constants/game.js";
-import {
-  shuffleArray, generateRoomCode, generateId,
-  isPlayerInRoom, buildInitialScoresAndAnswers,
-} from "../utils/room.js";
-import { saveSession, clearSession, saveAnsweredQuestions } from "../utils/session.js";
+import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, DEFAULT_GAME_CONFIG } from "../constants/game.js";
+import { shuffleArray, generateRoomCode, generateId, isPlayerInRoom, buildInitialScoresAndAnswers } from "../utils/room.js";
+import { saveSession, clearSession, saveAnsweredQuestions, clearAnsweredQuestions, clearStaleAnsweredQuestions, } from "../utils/session.js";
 import { roomHash } from "./useRoomState.js";
 import { selectQuestions } from "../utils/questions.js";
 function buildRoomKey(code) { return `room_${code}`; }
@@ -197,6 +191,8 @@ export default function useRoomActions({
       await persistRoom(room);
       setAnsweredQuestions(new Set());
       saveAnsweredQuestions(roomCode, new Set());
+      clearAnsweredQuestions(roomCode);
+      clearStaleAnsweredQuestions(roomCode);
       setPlayerRole(PLAYER_ROLE.ADMIN);
       setGameState(GAME_STATE.LOBBY);
     } catch (err) {
@@ -216,6 +212,8 @@ export default function useRoomActions({
       }
     }
     clearSession();
+    if (code) clearAnsweredQuestions(code);
+    clearStaleAnsweredQuestions(null)
     lastHashRef.current = "";
     setGameState(GAME_STATE.MENU);
     setCurrentRoom(null);

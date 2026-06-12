@@ -51,6 +51,7 @@ export const POLL_FAIL_TOAST = 3;
 export const TOAST_DURATION_MS = 4000;
 export const ROOM_TTL_SECONDS = 86400;
 
+export const INACTIVITY_MS = 5 * 60 * 1000; // 10 minutos
 
 export const DEFAULT_GAME_CONFIG = {
   rounds: 5,

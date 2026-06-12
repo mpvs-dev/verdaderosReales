@@ -1,14 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import storage from "../services/storage.js";
-import {
-  GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE,
-  POLL_BASE_MS, POLL_MAX_MS, POLL_FAIL_TOAST, TOAST_DURATION_MS,
-} from "../constants/game.js";
+import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, POLL_BASE_MS, POLL_MAX_MS, POLL_FAIL_TOAST, TOAST_DURATION_MS } from "../constants/game.js";
 import { derivePlayerRole, isPlayerInRoom } from "../utils/room.js";
-import {
-  saveSession, clearSession,
-  saveAnsweredQuestions, loadAnsweredQuestions,
-} from "../utils/session.js";
+import { saveSession, clearSession, saveAnsweredQuestions, loadAnsweredQuestions } from "../utils/session.js";
 import useErrorQueue from "./useErrorQueue.js";
 
 function buildRoomKey(code) { return `room_${code}`; }
@@ -30,6 +24,7 @@ export function roomHash(room) {
     room.config?.mode ?? "",
     room.config?.penaltyEnabled ?? "",
     room.config?.customPointsEnabled ?? "",
+    (room.aspirants ?? []).length,
   ].join("|");
 }
 
@@ -96,12 +91,14 @@ export default function useRoomState() {
   const stateRef = useRef({ roomCode: "", currentRoom: null, gameState: GAME_STATE.MENU, playerRole: null, playerName: "" });
   const lastHashRef = useRef("");
   const { toasts, showError, dismiss } = useErrorQueue();
+  const [emptyRoom, setEmptyRoom] = useState(false);
 
   // refs de control del polling
   const pollTimerRef = useRef(null);
   const pollIntervalRef = useRef(POLL_BASE_MS);  // intervalo actual (crece con backoff)
   const failCountRef = useRef(0);              // fallos consecutivos
   const isHiddenRef = useRef(false);          // pestaña oculta
+  const hadPlayersRef = useRef(false);
 
   useEffect(() => { stateRef.current.roomCode = roomCode; }, [roomCode]);
   useEffect(() => { stateRef.current.currentRoom = currentRoom; }, [currentRoom]);
@@ -156,6 +153,25 @@ export default function useRoomState() {
     if (room.king && room.status !== ROOM_STATUS.WAITING && room.status !== ROOM_STATUS.PICKING_KING) {
       if (room.king.name === name && role === PLAYER_ROLE.ADMIN) { setPlayerRole(PLAYER_ROLE.ADMIN_KING); effectiveRole = PLAYER_ROLE.ADMIN_KING; }
       if (room.king.name === name && role === PLAYER_ROLE.ASPIRANT) { setPlayerRole(PLAYER_ROLE.KING); effectiveRole = PLAYER_ROLE.KING; }
+    }
+
+    const isAdminRole = effectiveRole === PLAYER_ROLE.ADMIN ||
+      effectiveRole === PLAYER_ROLE.ADMIN_KING;
+    const aspirants = room.aspirants || [];
+
+    // Registrar que hubo jugadores alguna vez
+    if (aspirants.length > 0) hadPlayersRef.current = true;
+
+    if (
+      isAdminRole &&
+      hadPlayersRef.current &&
+      aspirants.length === 0 &&
+      (room.status === ROOM_STATUS.WAITING ||
+        room.status === ROOM_STATUS.ANSWERING)
+    ) {
+      setEmptyRoom(true);
+    } else {
+      setEmptyRoom(false);
     }
 
     const transitionMap = buildTransitionMap({
@@ -259,6 +275,9 @@ export default function useRoomState() {
       const result = await storage.get(buildRoomKey(code));
       const room = JSON.parse(result.value);
       let role = derivePlayerRole(room, name);
+      if (room.status === ROOM_STATUS.WAITING && gs === GAME_STATE.RESULTS) {
+        hadPlayersRef.current = false;
+      }
       if (
         role === PLAYER_ROLE.ADMIN &&
         room.king?.name === name &&
@@ -275,6 +294,7 @@ export default function useRoomState() {
       ) {
         role = PLAYER_ROLE.KING;
       }
+
       setRoomCode(code);
       setPlayerName(name);
       setCurrentRoom(room);
@@ -300,11 +320,11 @@ export default function useRoomState() {
 
   return {
     gameState, roomCode, playerName, playerRole,
-    currentRoom, answeredQuestions, reconnecting, toast, dismiss, showError,
+    currentRoom, answeredQuestions, reconnecting, toasts, dismiss, showError,
     setGameState, setRoomCode, setPlayerName, setPlayerRole,
     setCurrentRoom, setAnsweredQuestions,
     showError, persistRoom, stateRef, lastHashRef,
-    reconnectSession,
+    reconnectSession, emptyRoom
   };
 }
 

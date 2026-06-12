@@ -11,6 +11,8 @@
 ### Removido
  - Removido pantallas legacy no utilizadas.
  - Removido Toda la logica de LUA.
+ - Removido Componente innecesario para el Background.
+ - Removido legacy styles.
 
 ### Arreglado
  - Validación de las rondas mal ejecutas creando una posible ronda extra q no deberia existir.
@@ -21,9 +23,11 @@
  - Las pills de configuración de la partida se muestran correctamente.
  - Mejora de rendimiento al cargar las preguntas.
  - Corregido error de acumulación de toast.
+ - Corregido acumulacion de entradas en localStorage.
 
 ### Nuevo
  - Modo hover y link al portafolio en los creditos del juego.
+ - Modal para cerrar sala si esta mucho tiempo inactivo.
  
 
 ---

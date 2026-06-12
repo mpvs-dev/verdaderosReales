@@ -3,7 +3,7 @@ import { SESSION_KEY, ANSWERED_KEY_PREFIX } from "../constants/game";
 export function saveSession(data) {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify(data));
-  } catch (_) {}
+  } catch (_) { }
 }
 
 export function loadSession() {
@@ -17,7 +17,7 @@ export function loadSession() {
 export function clearSession() {
   try {
     localStorage.removeItem(SESSION_KEY);
-  } catch (_) {}
+  } catch (_) { }
 }
 
 export function saveAnsweredQuestions(roomCode, questionIndexSet) {
@@ -26,7 +26,7 @@ export function saveAnsweredQuestions(roomCode, questionIndexSet) {
       `${ANSWERED_KEY_PREFIX}_${roomCode}`,
       JSON.stringify([...questionIndexSet])
     );
-  } catch (_) {}
+  } catch (_) { }
 }
 
 export function loadAnsweredQuestions(roomCode) {
@@ -41,5 +41,20 @@ export function loadAnsweredQuestions(roomCode) {
 export function clearAnsweredQuestions(roomCode) {
   try {
     localStorage.removeItem(`${ANSWERED_KEY_PREFIX}_${roomCode}`);
-  } catch (_) {}
+  } catch (_) { }
+}
+
+export function clearStaleAnsweredQuestions(activeRoomCode) {
+  try {
+    const prefix = `${ANSWERED_KEY_PREFIX}_`;
+    const toDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(prefix)) {
+        const code = key.slice(prefix.length);
+        if (code !== activeRoomCode) toDelete.push(key);
+      }
+    }
+    toDelete.forEach((k) => localStorage.removeItem(k));
+  } catch (_) { }
 }

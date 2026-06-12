@@ -13,6 +13,8 @@ import Toast from "./components/Toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { GAME_STATE, PLAYER_ROLE } from "./constants/game.js";
+import InactivityModal from "./components/InactivityModal.jsx";
+import EmptyRoomBanner from "./components/EmptyRoomBanner.jsx";
 
 export default function App() {
   const room = useGameRoom();
@@ -21,6 +23,11 @@ export default function App() {
     room.playerRole === PLAYER_ROLE.ADMIN_KING
       ? PLAYER_ROLE.KING
       : room.playerRole;
+
+  const showEmptyBanner =
+    room.emptyRoom &&
+    (room.gameState === GAME_STATE.LOBBY ||
+      room.gameState === GAME_STATE.PLAYING);
 
   const screens = {
     [GAME_STATE.MENU]: <MenuScreen {...room} />,
@@ -37,11 +44,24 @@ export default function App() {
     [GAME_STATE.WAITING_QUESTION]: <WaitingForQuestionScreen {...room} />,
   };
 
+  function handleInactivityClose() {
+    room.resetTimer();
+  }
+
+  async function handleInactivityEndRoom() {
+    await room.resetGame();
+  }
   return (
     <>
       <Analytics />
       <SpeedInsights />
       <Toast toasts={room.toasts} onDismiss={room.dismiss} />
+      <EmptyRoomBanner visible={showEmptyBanner} />
+      <InactivityModal
+        visible={room.inactive}
+        onClose={handleInactivityClose}
+        onEndRoom={handleInactivityEndRoom}
+      />
       {screens[room.gameState] ?? null}
     </>
   );

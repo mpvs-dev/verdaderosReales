@@ -3,11 +3,18 @@ import { DEFAULT_GAME_CONFIG } from "../constants/game.js";
 import useRoomState from "./useRoomState.js";
 import useRoomActions from "./useRoomActions.js";
 import useGameActions from "./useGameActions.js";
+import useInactivityTimeout from "./useInactivityTimeout.js";
 
 export default function useGameRoom() {
   const [gameConfig, setGameConfig] = useState(DEFAULT_GAME_CONFIG);
 
   const state = useRoomState();
+
+  const { inactive, resetTimer } = useInactivityTimeout({
+    gameState: state.gameState,
+    playerRole: state.playerRole,
+    currentRoom: state.currentRoom,
+  });
 
   const roomActions = useRoomActions({
     playerName: state.playerName,
@@ -54,6 +61,8 @@ export default function useGameRoom() {
     toasts: state.toasts,
     dismiss: state.dismiss,
     gameConfig,
+    inactive,
+    resetTimer,
     // setters expuestos a la UI
     setRoomCode: state.setRoomCode,
     setPlayerName: state.setPlayerName,

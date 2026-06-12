@@ -3,18 +3,29 @@ import { getAvatar } from "../assets/avatars.js";
 import ExitButton from "./ExitButton.jsx";
 import DEFAULT_BG from "../assets/game-background.png";
 
+let bgLoaded = false;
+const bgImage = new Image();
+bgImage.onload = () => { bgLoaded = true; };
+bgImage.src = DEFAULT_BG;
 const OVERLAY_OPACITY = 0.58;
 
 /* ─── GameBackground ────────────────────────────────────────────────────── */
 export function GameBackground({ children, imageSrc }) {
   const src = imageSrc || DEFAULT_BG;
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(src === DEFAULT_BG ? bgLoaded : false);
 
   useEffect(() => {
-    const img = new Image();
-    img.src = src;
-    img.onload = () => setLoaded(true);
-  }, [src]);
+    if (loaded) return;
+
+    if (src !== DEFAULT_BG) {
+      const img = new Image();
+      img.onload = () => setLoaded(true);
+      img.src = src;
+    } else {
+      if (bgLoaded) setLoaded(true);
+      else bgImage.addEventListener("load", () => setLoaded(true), { once: true });
+    }
+  }, [src, loaded]);
 
   return (
     <div
@@ -124,7 +135,7 @@ export function Credits({ LanguageSwitcherComponent }) {
             transition: "all 0.2s ease",
             cursor: "pointer",
             color: isHovered
-              ? "rgba(255, 255, 255, 0.8)" 
+              ? "rgba(255, 255, 255, 0.8)"
               : "rgba(255, 255, 255, 0.18)",
           }}
         >
