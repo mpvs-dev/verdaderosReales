@@ -7,46 +7,13 @@ import useInactivityTimeout from "./useInactivityTimeout.js";
 
 export default function useGameRoom() {
   const [gameConfig, setGameConfig] = useState(DEFAULT_GAME_CONFIG);
-
   const state = useRoomState();
-
+  const roomActions = useRoomActions({ ...state, gameConfig, setGameConfig });
+  const gameActions = useGameActions({ ...state });
   const { inactive, resetTimer } = useInactivityTimeout({
     gameState: state.gameState,
     playerRole: state.playerRole,
     currentRoom: state.currentRoom,
-  });
-
-  const roomActions = useRoomActions({
-    playerName: state.playerName,
-    roomCode: state.roomCode,
-    currentRoom: state.currentRoom,
-    gameConfig,
-    setRoomCode: state.setRoomCode,
-    setPlayerName: state.setPlayerName,
-    setPlayerRole: state.setPlayerRole,
-    setCurrentRoom: state.setCurrentRoom,
-    setGameState: state.setGameState,
-    setAnsweredQuestions: state.setAnsweredQuestions,
-    setGameConfig,
-    persistRoom: state.persistRoom,
-    stateRef: state.stateRef,
-    lastHashRef: state.lastHashRef,
-    showError: state.showError,
-    reconnectSession: state.reconnectSession,
-  });
-
-  const gameActions = useGameActions({
-    playerName: state.playerName,
-    roomCode: state.roomCode,
-    currentRoom: state.currentRoom,
-    answeredQuestions: state.answeredQuestions,
-    setCurrentRoom: state.setCurrentRoom,
-    setGameState: state.setGameState,
-    setAnsweredQuestions: state.setAnsweredQuestions,
-    persistRoom: state.persistRoom,
-    stateRef: state.stateRef,
-    lastHashRef: state.lastHashRef,
-    showError: state.showError,
   });
 
   return {
@@ -60,6 +27,7 @@ export default function useGameRoom() {
     reconnecting: state.reconnecting,
     toasts: state.toasts,
     dismiss: state.dismiss,
+    emptyRoom: state.emptyRoom,
     gameConfig,
     inactive,
     resetTimer,
@@ -67,9 +35,22 @@ export default function useGameRoom() {
     setRoomCode: state.setRoomCode,
     setPlayerName: state.setPlayerName,
     setGameConfig,
-    // acciones de sala
-    ...roomActions,
-    // acciones de juego
-    ...gameActions,
+    // acciones de sala — referencias estables de useCallback
+    loadingCreate: roomActions.loadingCreate,
+    loadingJoin: roomActions.loadingJoin,
+    createRoom: roomActions.createRoom,
+    joinRoom: roomActions.joinRoom,
+    startGame: roomActions.startGame,
+    pickKing: roomActions.pickKing,
+    pickRandomKing: roomActions.pickRandomKing,
+    confirmKingAndStart: roomActions.confirmKingAndStart,
+    updateRoomConfig: roomActions.updateRoomConfig,
+    rematch: roomActions.rematch,
+    resetGame: roomActions.resetGame,
+    // acciones de juego — referencias estables de useCallback
+    submitAnswer: gameActions.submitAnswer,
+    validateAnswer: gameActions.validateAnswer,
+    submitCustomQuestion: gameActions.submitCustomQuestion,
+    advanceReview: gameActions.advanceReview,
   };
 }

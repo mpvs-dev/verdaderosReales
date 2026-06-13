@@ -25,12 +25,14 @@ export default function useRoomActions({
   showError, reconnectSession,
 }) {
   const { lang } = useContext(I18nContext);
-  const [loading, setLoading] = useState(false);
-
+  const [loadingCreate, setLoadingCreate] = useState(false);
+  const [loadingJoin, setLoadingJoin] = useState(false);
   async function createRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
     clearStaleAnsweredQuestions(null);
     setAnsweredQuestions(new Set());
+    setLoadingCreate(true);
+
     const adminId = generateId();
     const code = generateRoomCode();
     const questions = await selectQuestions(gameConfig, lang);
@@ -46,7 +48,6 @@ export default function useRoomActions({
       startedAt: null, finishedAt: null,
     };
     try {
-      setLoading(true);
       await storage.set(buildRoomKey(code), JSON.stringify(room));
       setRoomCode(code);
       setPlayerRole(PLAYER_ROLE.ADMIN);
@@ -57,7 +58,7 @@ export default function useRoomActions({
     } catch (err) {
       showError("Error al crear la sala: " + err.message);
     } finally {
-      setLoading(false);
+      setLoadingCreate(false);
     }
   }
 
@@ -65,10 +66,11 @@ export default function useRoomActions({
     if (!playerName.trim() || !roomCode.trim())
       return showError("Por favor ingresa tu nombre y código de sala");
     const code = roomCode.toUpperCase();
-    setLoading(true);
     clearAnsweredQuestions(code);
     clearStaleAnsweredQuestions(code);
     setAnsweredQuestions(new Set());
+    setLoadingJoin(true);
+
     try {
       let existingRoom = null;
       try {
@@ -90,7 +92,7 @@ export default function useRoomActions({
     } catch (err) {
       showError("Error al unirse: " + err.message);
     } finally {
-      setLoading(false);
+      setLoadingJoin(false);
     }
   }
 
@@ -245,7 +247,7 @@ export default function useRoomActions({
   }
 
   return {
-    loading,
+    loadingCreate, loadingJoin,
     createRoom, joinRoom, startGame,
     pickKing, pickRandomKing, confirmKingAndStart,
     updateRoomConfig, rematch, resetGame,

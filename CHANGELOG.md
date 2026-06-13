@@ -30,6 +30,8 @@
  - Modo hover y link al portafolio en los creditos del juego.
  - Modal para cerrar sala si esta mucho tiempo inactivo.
  - nueva opción de mostrar respuestas despues de cada ronda
+ - Agregado Spinner de carga para acciones demorosas.
+ - Agregado pantalla de reconeccion.
  
 
 ---
