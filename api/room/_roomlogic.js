@@ -1,5 +1,3 @@
-// ── Helpers ──────────────────────────────────────────────────────────────
-
 export function normalizeAnswer(s) {
     if (typeof s !== "string") return "";
     return s.toLowerCase().trim();
@@ -44,19 +42,19 @@ export function sanitizeRoom(room) {
 // ── Avance de ronda ───────────────────────────────────────────────────────
 
 export function tryAdvanceRound(room, now) {
-    // Sala ya terminada — no hacer nada
     if (room.status === "finished") return room;
 
     const q = getCurrentQuestion(room);
     const qId = q?.id ?? null;
 
-    // Construir lista de jugadores que deben tener respuesta validada
     const adminIsKing = room.admin && room.king &&
         String(room.admin.id) === String(room.king.id);
 
     const players = [...(room.aspirants || [])];
     if (room.admin && !adminIsKing) {
-        const adminInAspirants = players.some((a) => String(a.id) === String(room.admin.id));
+        const adminInAspirants = players.some(
+            (a) => String(a.id) === String(room.admin.id)
+        );
         if (!adminInAspirants) players.push(room.admin);
     }
 
@@ -64,25 +62,46 @@ export function tryAdvanceRound(room, now) {
     if (total === 0) return room;
 
     const validatedCount = players.filter((p) =>
-        (room.answers?.[p.id] || []).some((a) => String(a.questionId) === String(qId))
+        (room.answers?.[p.id] || []).some(
+            (a) => String(a.questionId) === String(qId)
+        )
     ).length;
 
     if (validatedCount < total) return room;
 
-    // Todos validados — avanzar ronda
-    const next = {
-        ...room,
-        currentQuestionIndex: room.currentQuestionIndex + 1,
-        answeredAspirants: [],
-        kingAnswer: null,
-        currentAnswers: [],
-    };
-
+    const nextIndex = room.currentQuestionIndex + 1;
     const totalQ = room.mode === "custom"
         ? (room.config?.rounds ?? 10)
         : (room.questions?.length ?? 0);
+    const isLastRound = nextIndex >= totalQ;
 
-    if (next.currentQuestionIndex >= totalQ) {
+    const roundSnapshot = players.reduce((acc, p) => {
+        const answer = (room.answers?.[p.id] || [])
+            .find((a) => String(a.questionId) === String(qId));
+        if (answer) acc[p.id] = answer;
+        return acc;
+    }, {});
+
+    if (room.config?.showRoundReview && !isLastRound) {
+        return sanitizeRoom({
+            ...room,
+            status: "round_review",
+            roundSnapshot,       // respuestas de esta ronda para mostrar
+            roundReviewEndsAt: new Date(Date.now() + (room.config?.roundReviewMs ?? 5000)).toISOString(),
+        });
+    }
+
+    const next = {
+        ...room,
+        currentQuestionIndex: nextIndex,
+        answeredAspirants: [],
+        kingAnswer: null,
+        currentAnswers: [],
+        roundSnapshot: null,
+        roundReviewEndsAt: null,
+    };
+
+    if (isLastRound) {
         next.status = "finished";
         next.finishedAt = now;
     } else if (room.mode === "custom") {

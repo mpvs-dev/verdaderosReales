@@ -7,6 +7,7 @@ export const GAME_STATE = {
   RESULTS: "results",
   CREATING_QUESTION: "creating_question",
   WAITING_QUESTION: "waiting_question",
+  ROUND_REVIEW: "round_review",
 };
 
 export const ROOM_STATUS = {
@@ -16,6 +17,7 @@ export const ROOM_STATUS = {
   ANSWERING: "answering",
   WAITING_QUESTION: "waiting_question",
   FINISHED: "finished",
+  ROUND_REVIEW: "round_review",
 };
 
 export const PLAYER_ROLE = {
@@ -60,6 +62,8 @@ export const DEFAULT_GAME_CONFIG = {
   customPointsEnabled: false,
   mode: GAME_MODE.GENERIC,
   categories: ["genericas"],
+  showRoundReview: true,
+  roundReviewMs: 5000,
 };
 
 export const KING_PICK_ANIMATION = {

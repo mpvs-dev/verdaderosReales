@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import storage from "../services/storage.js";
 import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, POLL_BASE_MS, POLL_MAX_MS, POLL_FAIL_TOAST, TOAST_DURATION_MS } from "../constants/game.js";
 import { derivePlayerRole, isPlayerInRoom } from "../utils/room.js";
-import { saveSession, clearSession, saveAnsweredQuestions, loadAnsweredQuestions } from "../utils/session.js";
+import { saveSession, clearSession, clearAnsweredQuestions, clearStaleAnsweredQuestions, saveAnsweredQuestions, loadAnsweredQuestions } from "../utils/session.js";
 import useErrorQueue from "./useErrorQueue.js";
 
 function buildRoomKey(code) { return `room_${code}`; }
@@ -25,18 +25,22 @@ export function roomHash(room) {
     room.config?.penaltyEnabled ?? "",
     room.config?.customPointsEnabled ?? "",
     (room.aspirants ?? []).length,
+    room.roundReviewEndsAt ?? "",
   ].join("|");
 }
 
 // ── Mapa de transiciones O(1) ──────────────────────────────────────────────
-// Cada entrada: status → función(gs, role, room, code, callbacks) → nextState | null
 function buildTransitionMap(callbacks) {
-  const { setAnsweredQuestions, saveAnsweredQuestions: saveAQ, showError, clearSession: cs, setGameState, setCurrentRoom, setRoomCode, setPlayerRole } = callbacks;
+  const { setAnsweredQuestions, saveAnsweredQuestions: saveAQ } = callbacks;
 
   return {
-    // FINISHED siempre tiene prioridad — se evalúa primero en resolveTransition
     [ROOM_STATUS.FINISHED]: (gs) =>
       gs !== GAME_STATE.RESULTS ? GAME_STATE.RESULTS : null,
+
+    [ROOM_STATUS.ROUND_REVIEW]: (gs) => {
+      const validFrom = [GAME_STATE.PLAYING, GAME_STATE.ROUND_REVIEW,GAME_STATE.CREATING_QUESTION, GAME_STATE.WAITING_QUESTION];
+      return validFrom.includes(gs) ? GAME_STATE.ROUND_REVIEW : null;
+    },
 
     [ROOM_STATUS.PICKING_KING]: (gs) =>
       gs === GAME_STATE.LOBBY ? GAME_STATE.PICKING_KING : null,
@@ -45,7 +49,12 @@ function buildTransitionMap(callbacks) {
       gs === GAME_STATE.PICKING_KING ? GAME_STATE.KING_REVEAL : null,
 
     [ROOM_STATUS.ANSWERING]: (gs, _role, room) => {
-      const validFrom = [GAME_STATE.LOBBY, GAME_STATE.PICKING_KING, GAME_STATE.KING_REVEAL];
+      const validFrom = [
+        GAME_STATE.LOBBY,
+        GAME_STATE.PICKING_KING,
+        GAME_STATE.KING_REVEAL,
+        GAME_STATE.ROUND_REVIEW,
+      ];
       if (validFrom.includes(gs)) return GAME_STATE.PLAYING;
       if (gs === GAME_STATE.WAITING_QUESTION && room.mode === GAME_MODE.CUSTOM)
         return GAME_STATE.PLAYING;
@@ -53,7 +62,13 @@ function buildTransitionMap(callbacks) {
     },
 
     [ROOM_STATUS.WAITING_QUESTION]: (gs, role, room) => {
-      const validFrom = [GAME_STATE.PICKING_KING, GAME_STATE.KING_REVEAL, GAME_STATE.PLAYING, GAME_STATE.WAITING_QUESTION];
+      const validFrom = [
+        GAME_STATE.PICKING_KING,
+        GAME_STATE.KING_REVEAL,
+        GAME_STATE.PLAYING,
+        GAME_STATE.WAITING_QUESTION,
+        GAME_STATE.ROUND_REVIEW,
+      ];
       if (!validFrom.includes(gs) || room.mode !== GAME_MODE.CUSTOM) return null;
       const isKingRole = role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING;
       return isKingRole ? GAME_STATE.CREATING_QUESTION : GAME_STATE.WAITING_QUESTION;
@@ -61,6 +76,7 @@ function buildTransitionMap(callbacks) {
 
     [ROOM_STATUS.WAITING]: (gs, _role, _room, code) => {
       if (gs === GAME_STATE.RESULTS) {
+        clearAnsweredQuestions(code);
         setAnsweredQuestions(new Set());
         saveAQ(code, new Set());
         return GAME_STATE.LOBBY;
@@ -74,6 +90,9 @@ function resolveTransition(room, gs, role, code, transitionMap) {
   // FINISHED siempre primero
   if (room.status === ROOM_STATUS.FINISHED) {
     return transitionMap[ROOM_STATUS.FINISHED]?.(gs, role, room, code) ?? null;
+  }
+  if (room.status === ROOM_STATUS.ROUND_REVIEW) {
+    return transitionMap[ROOM_STATUS.ROUND_REVIEW]?.(gs, role, room, code) ?? null;
   }
   const handler = transitionMap[room.status];
   return handler ? handler(gs, role, room, code) : null;
@@ -117,6 +136,9 @@ export default function useRoomState() {
     // Sala cerrada
     if (room.status === "closed") {
       clearSession();
+      clearAnsweredQuestions(code);
+      clearStaleAnsweredQuestions(null);
+      setAnsweredQuestions(new Set());
       setGameState(GAME_STATE.MENU);
       setCurrentRoom(null);
       setRoomCode("");
@@ -134,6 +156,9 @@ export default function useRoomState() {
       !isPlayerInRoom(room, name)
     ) {
       clearSession();
+      clearAnsweredQuestions(code);
+      clearStaleAnsweredQuestions(null);
+      setAnsweredQuestions(new Set());
       setGameState(GAME_STATE.MENU);
       setCurrentRoom(null);
       setRoomCode("");

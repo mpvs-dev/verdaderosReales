@@ -30,4 +30,7 @@ export const roomApi = {
 
   validate: ({ roomCode, aspirantId, isCorrect, pointsPerAnswer, penaltyEnabled }) =>
     post("validate", { roomCode, aspirantId, isCorrect, pointsPerAnswer, penaltyEnabled }),
+
+  advanceReview: (roomCode) =>
+    post("advanceReview", { roomCode }),
 };

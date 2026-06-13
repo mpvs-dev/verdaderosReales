@@ -5,16 +5,14 @@ import LobbyScreen from "./components/LobbyScreen";
 import PlayingScreen from "./components/PlayingScreen";
 import CreateQuestionScreen from "./components/CreateQuestionScreen";
 import { KingPickScreen, KingRevealScreen } from "./components/KingScreens";
-import {
-  ResultsScreen,
-  WaitingForQuestionScreen,
-} from "./components/EndScreens";
+import { ResultsScreen, WaitingForQuestionScreen } from "./components/EndScreens";
 import Toast from "./components/Toast";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { GAME_STATE, PLAYER_ROLE } from "./constants/game.js";
 import InactivityModal from "./components/InactivityModal.jsx";
 import EmptyRoomBanner from "./components/EmptyRoomBanner.jsx";
+import RoundReviewScreen from "./components/RoundReviewScreen.jsx";
 
 export default function App() {
   const room = useGameRoom();
@@ -34,14 +32,11 @@ export default function App() {
     [GAME_STATE.LOBBY]: <LobbyScreen {...room} />,
     [GAME_STATE.PICKING_KING]: <KingPickScreen {...room} />,
     [GAME_STATE.KING_REVEAL]: <KingRevealScreen {...room} />,
-    [GAME_STATE.PLAYING]: (
-      <PlayingScreen {...room} playerRole={effectiveRole} />
-    ),
+    [GAME_STATE.PLAYING]: ( <PlayingScreen {...room} playerRole={effectiveRole} /> ),
     [GAME_STATE.RESULTS]: <ResultsScreen {...room} />,
-    [GAME_STATE.CREATING_QUESTION]: (
-      <CreateQuestionScreen {...room} playerRole={effectiveRole} />
-    ),
+    [GAME_STATE.CREATING_QUESTION]: ( <CreateQuestionScreen {...room} playerRole={effectiveRole} />),
     [GAME_STATE.WAITING_QUESTION]: <WaitingForQuestionScreen {...room} />,
+    [GAME_STATE.ROUND_REVIEW]: <RoundReviewScreen {...room} />,
   };
 
   function handleInactivityClose() {

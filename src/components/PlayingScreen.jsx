@@ -451,8 +451,26 @@ export default function PlayingScreen({
       (h) => String(h.questionId) === String(qId),
     );
     if (rec) return rec.isCorrect ? S.CORRECT : S.INCORRECT;
-    if (answeredQuestions.has(currentRoom.currentQuestionIndex))
+
+    if (
+      currentRoom.currentAnswers?.some(
+        (a) => String(a.aspirantId) === String(me?.id),
+      )
+    )
       return S.ANSWERED;
+
+    if (answeredQuestions.has(currentRoom.currentQuestionIndex)) {
+      const hasServerEvidence =
+        (currentRoom.answers?.[me?.id] || []).length > 0 ||
+        (currentRoom.currentAnswers || []).some(
+          (a) => String(a.aspirantId) === String(me?.id),
+        );
+
+      if (!hasServerEvidence) {
+        return S.PENDING;
+      }
+      return S.ANSWERED;
+    }
     return S.PENDING;
   }
 

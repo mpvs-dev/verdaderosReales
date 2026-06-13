@@ -1,9 +1,7 @@
 import { useContext } from "react";
 import { I18nContext } from "../i18n/i18nContext.jsx";
 import { roomApi } from "../services/roomApi.js";
-import {
-    GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE,
-} from "../constants/game.js";
+import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE } from "../constants/game.js";
 import { saveAnsweredQuestions } from "../utils/session.js";
 import { roomHash } from "./useRoomState.js";
 
@@ -11,6 +9,31 @@ function findPlayerId(room, name) {
     return (room.aspirants || []).find((a) => a.name === name)?.id
         || (room.admin?.name === name ? room.admin.id : null)
         || (room.king?.name === name ? room.king.id : null);
+}
+
+function resolvePostActionState(room, stateRef, setGameState) {
+    if (room.status === ROOM_STATUS.FINISHED) {
+        setGameState(GAME_STATE.RESULTS);
+        return;
+    }
+    if (room.status === ROOM_STATUS.ROUND_REVIEW) {
+        setGameState(GAME_STATE.ROUND_REVIEW);
+        return;
+    }
+
+    if (room.mode === GAME_MODE.CUSTOM &&
+        room.status === ROOM_STATUS.WAITING_QUESTION) {
+        const role = stateRef.current.playerRole;
+        if (role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING)
+            setGameState(GAME_STATE.CREATING_QUESTION);
+        else
+            setGameState(GAME_STATE.WAITING_QUESTION);
+        return;
+    }
+
+    if (room.status === ROOM_STATUS.ANSWERING) {
+        setGameState(GAME_STATE.PLAYING);
+    }
 }
 
 export default function useGameActions({
@@ -33,8 +56,7 @@ export default function useGameActions({
             });
             setCurrentRoom(room);
             lastHashRef.current = roomHash(room);
-
-            // Fix del bug de ronda extra — igual que validateAnswer
+            resolvePostActionState(room, stateRef, setGameState);
             if (room.status === ROOM_STATUS.FINISHED) {
                 setGameState(GAME_STATE.RESULTS);
                 return;
@@ -61,6 +83,7 @@ export default function useGameActions({
             });
             setCurrentRoom(room);
             lastHashRef.current = roomHash(room);
+            resolvePostActionState(room, stateRef, setGameState);
 
             if (room.status === ROOM_STATUS.FINISHED) {
                 setGameState(GAME_STATE.RESULTS);
@@ -93,5 +116,30 @@ export default function useGameActions({
         }
     }
 
-    return { submitAnswer, validateAnswer, submitCustomQuestion };
+    async function advanceReview() {
+        try {
+            const { room } = await roomApi.advanceReview(roomCode);
+            setCurrentRoom(room);
+            lastHashRef.current = roomHash(room);
+            resolvePostActionState(room, stateRef, setGameState);
+
+            if (room.status === ROOM_STATUS.FINISHED) {
+                setGameState(GAME_STATE.RESULTS);
+                return;
+            }
+            if (room.mode === GAME_MODE.CUSTOM &&
+                room.status === ROOM_STATUS.WAITING_QUESTION) {
+                const role = stateRef.current.playerRole;
+                if (role === PLAYER_ROLE.KING || role === PLAYER_ROLE.ADMIN_KING)
+                    setGameState(GAME_STATE.CREATING_QUESTION);
+                else
+                    setGameState(GAME_STATE.WAITING_QUESTION);
+                return;
+            }
+            setGameState(GAME_STATE.PLAYING);
+        } catch (err) {
+            showError("Error al avanzar ronda: " + err.message);
+        }
+    }
+    return { submitAnswer, validateAnswer, submitCustomQuestion, advanceReview };
 }

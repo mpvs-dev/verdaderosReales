@@ -24,10 +24,12 @@
  - Mejora de rendimiento al cargar las preguntas.
  - Corregido error de acumulación de toast.
  - Corregido acumulacion de entradas en localStorage.
+ - Error de reconección al no limpiar bien el store.
 
 ### Nuevo
  - Modo hover y link al portafolio en los creditos del juego.
  - Modal para cerrar sala si esta mucho tiempo inactivo.
+ - nueva opción de mostrar respuestas despues de cada ronda
  
 
 ---

@@ -29,6 +29,8 @@ export default function useRoomActions({
 
   async function createRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
+    clearStaleAnsweredQuestions(null);
+    setAnsweredQuestions(new Set());
     const adminId = generateId();
     const code = generateRoomCode();
     const questions = await selectQuestions(gameConfig, lang);
@@ -64,6 +66,9 @@ export default function useRoomActions({
       return showError("Por favor ingresa tu nombre y código de sala");
     const code = roomCode.toUpperCase();
     setLoading(true);
+    clearAnsweredQuestions(code);
+    clearStaleAnsweredQuestions(code);
+    setAnsweredQuestions(new Set());
     try {
       let existingRoom = null;
       try {
