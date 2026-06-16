@@ -47,9 +47,21 @@ export const MIN_OPTIONS = 2;
 export const SESSION_KEY = "vr_session";
 export const ANSWERED_KEY_PREFIX = "vr_answered";
 
-export const POLL_BASE_MS = 3_000;
+export const POLL_INTERVAL_BY_STATE = {
+  ["menu"]: 0,
+  ["lobby"]: 5_000,
+  ["picking_king"]: 1_500,
+  ["king_reveal"]: 3_000,
+  ["playing"]: 1_500,
+  ["round_review"]: 2_000,
+  ["waiting_question"]: 2_000,
+  ["creating_question"]: 4_000,
+  ["results"]: 5_000,
+};
+
 export const POLL_MAX_MS = 48_000;
 export const POLL_FAIL_TOAST = 3;
+
 export const TOAST_DURATION_MS = 4000;
 export const ROOM_TTL_SECONDS = 86400;
 

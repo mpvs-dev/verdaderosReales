@@ -4,6 +4,7 @@ import { PLAYER_ROLE } from "../constants/game.js";
 import { formatDuration, getEveryone, getAllPlayers } from "../utils/room.js";
 import { assignAvatars } from "../assets/avatars.js";
 import { useTranslation } from "../i18n/useTranslation.js";
+import useAvatarMap from "../hooks/useAvatarMap.js";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -18,8 +19,7 @@ export function ResultsScreen({ currentRoom, playerRole, resetGame, rematch }) {
     currentRoom.startedAt,
     currentRoom.finishedAt,
   );
-  const everyone = getEveryone(currentRoom);
-  const avatarMap = assignAvatars(everyone);
+  const { avatarMap, everyone } = useAvatarMap(currentRoom);
 
   const playerMap = new Map();
   everyone.forEach((p) => playerMap.set(p.id, p));
@@ -77,7 +77,11 @@ export function ResultsScreen({ currentRoom, playerRole, resetGame, rematch }) {
           className="anim-pop glass-gold"
           style={{ display: "flex", alignItems: "center", gap: 14 }}
         >
-          <Avatar avatar={avatarMap[winner.player?.id]} size="md" />
+          <Avatar
+            avatar={avatarMap[winner.player?.id]}
+            size="md"
+            playerName={winner.player?.name}
+          />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               className="truncate"
@@ -225,8 +229,7 @@ export function WaitingForQuestionScreen({ currentRoom, resetGame }) {
   const { t } = useTranslation();
   const roundNum = (currentRoom?.currentQuestionIndex ?? 0) + 1;
   const totalRounds = currentRoom?.config?.rounds ?? 10;
-  const everyone = getEveryone(currentRoom);
-  const avatarMap = assignAvatars(everyone);
+  const { avatarMap, everyone } = useAvatarMap(currentRoom);
   const players = getAllPlayers(currentRoom);
   const sorted = [...players].sort(
     (a, b) =>

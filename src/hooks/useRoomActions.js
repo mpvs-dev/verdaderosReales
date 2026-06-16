@@ -27,6 +27,8 @@ export default function useRoomActions({
   const { lang } = useContext(I18nContext);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [loadingJoin, setLoadingJoin] = useState(false);
+  const [loadingConfig, setLoadingConfig] = useState(false);
+
   async function createRoom() {
     if (!playerName.trim()) return showError("Por favor ingresa tu nombre");
     clearStaleAnsweredQuestions(null);
@@ -153,6 +155,7 @@ export default function useRoomActions({
   }
 
   async function updateRoomConfig(newConfig) {
+    setLoadingConfig(true);
     try {
       const room = {
         ...currentRoom,
@@ -164,6 +167,8 @@ export default function useRoomActions({
       setGameConfig(newConfig);
     } catch (err) {
       showError("Error al actualizar configuración: " + err.message);
+    } finally {
+      setLoadingConfig(false);
     }
   }
 
@@ -247,7 +252,7 @@ export default function useRoomActions({
   }
 
   return {
-    loadingCreate, loadingJoin,
+    loadingCreate, loadingJoin, loadingConfig,
     createRoom, joinRoom, startGame,
     pickKing, pickRandomKing, confirmKingAndStart,
     updateRoomConfig, rematch, resetGame,

@@ -6,6 +6,7 @@ import { PLAYER_ROLE } from "../constants/game.js";
 import { assignAvatars } from "../assets/avatars.js";
 import { useTranslation } from "../i18n/useTranslation.js";
 import useConfigChange from "../hooks/useConfigChange.js";
+import useAvatarMap from "../hooks/useAvatarMap.js";
 
 /* ─── RoomCodeBox ─────────────────────────────────────────────────────────── */
 function RoomCodeBox({ roomCode, t }) {
@@ -309,14 +310,14 @@ export default function LobbyScreen({
   setGameConfig,
   updateRoomConfig,
   resetGame,
+  loadingConfig,
 }) {
   const [showConfig, setShowConfig] = useState(false);
   const { t } = useTranslation();
 
   const isAdmin = playerRole === PLAYER_ROLE.ADMIN;
   const aspirants = currentRoom?.aspirants || [];
-  const everyone = [currentRoom?.admin, ...aspirants].filter(Boolean);
-  const avatarMap = assignAvatars(everyone);
+  const { avatarMap, everyone } = useAvatarMap(currentRoom);
   const cfg = currentRoom?.config ?? gameConfig;
 
   const changedKeys = useConfigChange(cfg);
@@ -334,6 +335,7 @@ export default function LobbyScreen({
           config={currentRoom?.config ?? gameConfig}
           onClose={() => setShowConfig(false)}
           onSave={handleConfigSave}
+          loading={loadingConfig}
         />
       )}
 
@@ -347,7 +349,7 @@ export default function LobbyScreen({
       >
         {/* Fila admin */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Avatar avatar={avatarMap[currentRoom?.admin?.id]} size="sm" crown />
+          <Avatar avatar={avatarMap[currentRoom?.admin?.id]} size="sm" crown playerName={currentRoom?.admin?.name}/>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="t-label">{t("lobby.adminLabel")}</div>
             <div
@@ -439,7 +441,7 @@ export default function LobbyScreen({
                   minWidth: 0,
                 }}
               >
-                <Avatar avatar={avatarMap[player.id]} size="sm" />
+                <Avatar avatar={avatarMap[player.id]} size="sm" playerName={player.name}/>
                 <div style={{ minWidth: 0 }}>
                   <div
                     className="truncate"

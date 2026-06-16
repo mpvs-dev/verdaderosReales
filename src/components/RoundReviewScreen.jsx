@@ -4,6 +4,7 @@ import { ScreenWrapper, Avatar } from "./Layout.jsx";
 import { PLAYER_ROLE } from "../constants/game.js";
 import { getEveryone, getAllPlayers } from "../utils/room.js";
 import { assignAvatars } from "../assets/avatars.js";
+import useAvatarMap from "../hooks/useAvatarMap.js";
 
 const REVIEW_MS = 5000;
 
@@ -53,8 +54,7 @@ export default function RoundReviewScreen({
   const totalRounds =
     currentRoom?.config?.rounds ?? currentRoom?.questions?.length ?? 10;
 
-  const everyone = getEveryone(currentRoom);
-  const avatarMap = assignAvatars(everyone);
+  const { avatarMap, everyone } = useAvatarMap(currentRoom);
   const players = getAllPlayers(currentRoom);
 
   async function handleSkip() {

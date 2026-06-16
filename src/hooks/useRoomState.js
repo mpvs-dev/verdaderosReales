@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import storage from "../services/storage.js";
-import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, POLL_BASE_MS, POLL_MAX_MS, POLL_FAIL_TOAST, TOAST_DURATION_MS } from "../constants/game.js";
+import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, POLL_INTERVAL_BY_STATE, POLL_MAX_MS, POLL_FAIL_TOAST, TOAST_DURATION_MS } from "../constants/game.js";
 import { derivePlayerRole, isPlayerInRoom } from "../utils/room.js";
 import { saveSession, clearSession, clearAnsweredQuestions, clearStaleAnsweredQuestions, saveAnsweredQuestions, loadAnsweredQuestions } from "../utils/session.js";
 import useErrorQueue from "./useErrorQueue.js";
@@ -38,7 +38,7 @@ function buildTransitionMap(callbacks) {
       gs !== GAME_STATE.RESULTS ? GAME_STATE.RESULTS : null,
 
     [ROOM_STATUS.ROUND_REVIEW]: (gs) => {
-      const validFrom = [GAME_STATE.PLAYING, GAME_STATE.ROUND_REVIEW,GAME_STATE.CREATING_QUESTION, GAME_STATE.WAITING_QUESTION];
+      const validFrom = [GAME_STATE.PLAYING, GAME_STATE.ROUND_REVIEW, GAME_STATE.CREATING_QUESTION, GAME_STATE.WAITING_QUESTION];
       return validFrom.includes(gs) ? GAME_STATE.ROUND_REVIEW : null;
     },
 
@@ -85,6 +85,9 @@ function buildTransitionMap(callbacks) {
     },
   };
 }
+function getPollInterval(gs) {
+  return POLL_INTERVAL_BY_STATE[gs] ?? 3_000;
+}
 
 function resolveTransition(room, gs, role, code, transitionMap) {
   // FINISHED siempre primero
@@ -114,16 +117,15 @@ export default function useRoomState() {
 
   // refs de control del polling
   const pollTimerRef = useRef(null);
-  const pollIntervalRef = useRef(POLL_BASE_MS);  // intervalo actual (crece con backoff)
-  const failCountRef = useRef(0);              // fallos consecutivos
-  const isHiddenRef = useRef(false);          // pestaña oculta
+  const failCountRef = useRef(0);
+  const isHiddenRef = useRef(false);
   const hadPlayersRef = useRef(false);
 
-  useEffect(() => { stateRef.current.roomCode = roomCode; }, [roomCode]);
-  useEffect(() => { stateRef.current.currentRoom = currentRoom; }, [currentRoom]);
-  useEffect(() => { stateRef.current.gameState = gameState; }, [gameState]);
-  useEffect(() => { stateRef.current.playerRole = playerRole; }, [playerRole]);
-  useEffect(() => { stateRef.current.playerName = playerName; }, [playerName]);
+  stateRef.current.roomCode = roomCode;
+  stateRef.current.currentRoom = currentRoom;
+  stateRef.current.gameState = gameState;
+  stateRef.current.playerRole = playerRole;
+  stateRef.current.playerName = playerName;
 
   const persistRoom = useCallback(async (room) => {
     await storage.set(buildRoomKey(stateRef.current.roomCode), JSON.stringify(room));
@@ -218,9 +220,16 @@ export default function useRoomState() {
   // ── Polling con backoff + visibilitychange ────────────────────────────
   const schedulePoll = useCallback(() => {
     clearTimeout(pollTimerRef.current);
-    if (isHiddenRef.current) return;  // pestaña oculta → no programar
-    pollTimerRef.current = setTimeout(doPoll, pollIntervalRef.current);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (isHiddenRef.current) return;
+
+    const gs = stateRef.current.gameState;
+    const base = getPollInterval(gs);
+
+    if (base === 0 || !stateRef.current.roomCode) return;
+
+    const interval = failCountRef.current === 0 ? base : Math.min(base * Math.pow(2, failCountRef.current - 1), POLL_MAX_MS);
+    pollTimerRef.current = setTimeout(doPoll, interval);
+  }, []);
 
   async function doPoll() {
     const { roomCode: code, gameState: gs, playerRole: role, playerName: name } = stateRef.current;
@@ -233,7 +242,6 @@ export default function useRoomState() {
 
       // éxito → resetear backoff
       failCountRef.current = 0;
-      pollIntervalRef.current = POLL_BASE_MS;
 
       if (newHash !== lastHashRef.current) {
         lastHashRef.current = newHash;
@@ -243,13 +251,6 @@ export default function useRoomState() {
     } catch (err) {
       failCountRef.current += 1;
 
-      // backoff exponencial con techo
-      pollIntervalRef.current = Math.min(
-        POLL_BASE_MS * Math.pow(2, failCountRef.current - 1),
-        POLL_MAX_MS,
-      );
-
-      // toast tras N fallos consecutivos
       if (failCountRef.current === POLL_FAIL_TOAST) {
         showError("Problemas de conexión. Reintentando...");
       }
@@ -257,7 +258,6 @@ export default function useRoomState() {
       console.warn(`pollRoom fallo #${failCountRef.current}:`, err.message);
     }
 
-    // programar siguiente tick
     schedulePoll();
   }
 
@@ -280,7 +280,6 @@ export default function useRoomState() {
       isHiddenRef.current = document.hidden;
       if (!document.hidden) {
         // reanudar inmediatamente al volver
-        pollIntervalRef.current = POLL_BASE_MS;
         failCountRef.current = 0;
         schedulePoll();
       } else {
@@ -295,14 +294,35 @@ export default function useRoomState() {
   const reconnectSession = useCallback(async (session) => {
     const { code, name } = session;
     if (!code || !name) { clearSession(); return; }
+
     setReconnecting(true);
+
     try {
       const result = await storage.get(buildRoomKey(code));
       const room = JSON.parse(result.value);
-      let role = derivePlayerRole(room, name);
-      if (room.status === ROOM_STATUS.WAITING && gs === GAME_STATE.RESULTS) {
-        hadPlayersRef.current = false;
+
+      // Sala cerrada — no reconectar
+      if (room.status === "closed") {
+        clearSession();
+        clearAnsweredQuestions(code);
+        clearStaleAnsweredQuestions(null);
+        return;
       }
+
+      // Verificar que el jugador sigue en la sala
+      const stillInRoom = isPlayerInRoom(room, name);
+      if (!stillInRoom) {
+        clearSession();
+        clearAnsweredQuestions(code);
+        clearStaleAnsweredQuestions(null);
+        showError("Ya no estás en esta sala.");
+        return;
+      }
+
+      // Derivar rol base
+      let role = derivePlayerRole(room, name);
+
+      // Corrección de rol compuesto ADMIN_KING
       if (
         role === PLAYER_ROLE.ADMIN &&
         room.king?.name === name &&
@@ -311,6 +331,8 @@ export default function useRoomState() {
       ) {
         role = PLAYER_ROLE.ADMIN_KING;
       }
+
+      // Corrección de rol KING para aspirantes elegidos rey
       if (
         role === PLAYER_ROLE.ASPIRANT &&
         room.king?.name === name &&
@@ -320,28 +342,50 @@ export default function useRoomState() {
         role = PLAYER_ROLE.KING;
       }
 
+      // Restaurar preguntas respondidas desde localStorage + answers del servidor
+      const savedAnswered = loadAnsweredQuestions(code);
+      const myId = findPlayerId(room, name);
+
+      if (myId && room.answers?.[myId] && room.questions) {
+        room.answers[myId].forEach((entry) => {
+          const idx = room.questions.findIndex(
+            (q) => String(q.id) === String(entry.questionId)
+          );
+          if (idx !== -1) savedAnswered.add(idx);
+        });
+      }
+
+      // Derivar gameState correcto según el estado de la sala y el rol
+      const gs = deriveGameState(room, role);
+
+      // Actualizar todo el estado de una vez para evitar renders intermedios
       setRoomCode(code);
       setPlayerName(name);
       setCurrentRoom(room);
       setPlayerRole(role);
-      lastHashRef.current = roomHash(room);
-      const savedAnswered = loadAnsweredQuestions(code);
-      const myId = findPlayerId(room, name);
-      if (myId && room.answers?.[myId] && room.questions) {
-        room.answers[myId].forEach((entry) => {
-          const idx = room.questions.findIndex((q) => String(q.id) === String(entry.questionId));
-          if (idx !== -1) savedAnswered.add(idx);
-        });
-      }
       setAnsweredQuestions(savedAnswered);
-      setGameState(deriveGameState(room, role));
+      setGameState(gs);
+      lastHashRef.current = roomHash(room);
+
+      // Guardar sesión actualizada con el rol correcto
       saveSession({ code, name, role });
-    } catch (_) {
+
+    } catch (err) {
+      // Redis no responde o sala no existe — limpiar y volver al menú
+      console.warn("reconnectSession error:", err.message);
       clearSession();
+      clearAnsweredQuestions(code);
+      clearStaleAnsweredQuestions(null);
+      // No mostrar error — el usuario simplemente ve el menú
     } finally {
       setReconnecting(false);
     }
-  }, []);
+  }, [
+    showError,
+    setRoomCode, setPlayerName, setCurrentRoom,
+    setPlayerRole, setAnsweredQuestions, setGameState,
+    lastHashRef,
+  ]);
 
   return {
     gameState, roomCode, playerName, playerRole,
@@ -368,6 +412,7 @@ function deriveGameState(room, role) {
     [ROOM_STATUS.KING_REVEAL]: GAME_STATE.KING_REVEAL,
     [ROOM_STATUS.ANSWERING]: GAME_STATE.PLAYING,
     [ROOM_STATUS.FINISHED]: GAME_STATE.RESULTS,
+    [ROOM_STATUS.ROUND_REVIEW]: GAME_STATE.ROUND_REVIEW,
     [ROOM_STATUS.WAITING_QUESTION]: isKingRole
       ? GAME_STATE.CREATING_QUESTION
       : GAME_STATE.WAITING_QUESTION,

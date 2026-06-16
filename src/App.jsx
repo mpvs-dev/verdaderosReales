@@ -69,6 +69,7 @@ export default function App() {
       startGame: room.startGame,
       updateRoomConfig: room.updateRoomConfig,
       resetGame: room.resetGame,
+      loadingConfig: room.loadingConfig,
     }),
     [
       room.roomCode,
@@ -82,6 +83,7 @@ export default function App() {
       room.startGame,
       room.updateRoomConfig,
       room.resetGame,
+      room.loadingConfig,
     ],
   );
 

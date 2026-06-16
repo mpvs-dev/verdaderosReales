@@ -25,6 +25,9 @@
  - Corregido error de acumulación de toast.
  - Corregido acumulacion de entradas en localStorage.
  - Error de reconección al no limpiar bien el store.
+ - Asignacion de avatares y textos alternativos.
+ - Mala reconección en diversas situaciones. 
+ - Solución de varios problemas de rendimiento.
 
 ### Nuevo
  - Modo hover y link al portafolio en los creditos del juego.

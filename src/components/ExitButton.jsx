@@ -13,8 +13,8 @@ export default function ExitButton({ onConfirm, label }) {
         onClick={() => setShowConfirm(true)}
         style={{
           position: "fixed",
-          top: 14,
-          right: 14,
+          top: "calc(14px + env(safe-area-inset-top, 0px))",
+          right: "calc(14px + env(safe-area-inset-right, 0px))",
           zIndex: 40,
           background: "rgba(0,0,0,0.55)",
           border: "1.5px solid rgba(255,255,255,0.18)",

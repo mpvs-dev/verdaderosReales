@@ -5,7 +5,9 @@ import DEFAULT_BG from "../assets/game-background.png";
 
 let bgLoaded = false;
 const bgImage = new Image();
-bgImage.onload = () => { bgLoaded = true; };
+bgImage.onload = () => {
+  bgLoaded = true;
+};
 bgImage.src = DEFAULT_BG;
 const OVERLAY_OPACITY = 0.58;
 
@@ -23,7 +25,8 @@ export function GameBackground({ children, imageSrc }) {
       img.src = src;
     } else {
       if (bgLoaded) setLoaded(true);
-      else bgImage.addEventListener("load", () => setLoaded(true), { once: true });
+      else
+        bgImage.addEventListener("load", () => setLoaded(true), { once: true });
     }
   }, [src, loaded]);
 
@@ -160,8 +163,10 @@ export function Avatar({
   crown = false,
   pulse = false,
   style: extraStyle = {},
+  playerName = null,
 }) {
   const av = avatarProp ?? getAvatar(index ?? 0);
+  const isDecorative = !playerName;
   return (
     <div
       style={{
@@ -170,19 +175,28 @@ export function Avatar({
         flexShrink: 0,
         ...extraStyle,
       }}
+      role={isDecorative ? undefined : "img"}
+      aria-label={isDecorative ? undefined : `Avatar de ${playerName}`}
+      aria-hidden={isDecorative ? "true" : undefined}
     >
       <div
         className={`avatar avatar-${size} ${pulse ? "anim-float" : ""}`}
         style={{ background: av.bg }}
       >
         {av.img ? (
-          <img src={av.img} alt={av.name ?? "avatar"} />
+          <img
+            src={av.img}
+            alt={isDecorative ? "" : `Avatar de ${playerName}`}
+          />
         ) : (
-          <span style={{ lineHeight: 1 }}>{av.emoji}</span>
+          <span aria-hidden="true" style={{ lineHeight: 1 }}>
+            {av.emoji}
+          </span>
         )}
       </div>
       {crown && (
         <span
+          aria-hidden="true"
           style={{
             position: "absolute",
             top: size === "lg" ? -12 : -9,

@@ -5,6 +5,7 @@ import { PLAYER_ROLE, MAX_ANSWER_LENGTH } from "../constants/game.js";
 import { getAllPlayers, getEveryone } from "../utils/room.js";
 import { assignAvatars } from "../assets/avatars.js";
 import { useTranslation } from "../i18n/useTranslation.js";
+import useAvatarMap from "../hooks/useAvatarMap.js";
 
 const S = {
   CORRECT: "correct",
@@ -34,7 +35,7 @@ function Scoreboard({ currentRoom, getState, avatarMap }) {
     >
       {sorted.map((p) => (
         <div key={p.id} className="score-chip">
-          <Avatar avatar={avatarMap[p.id]} size="sm" />
+          <Avatar avatar={avatarMap[p.id]} size="sm" playerName={p.name} />
           <span
             style={{ fontSize: 12, fontWeight: 800, color: "#fff" }}
             className="truncate"
@@ -417,8 +418,7 @@ export default function PlayingScreen({
   if (!q) return null;
   const qId = q?.id;
   const allPlayers = getAllPlayers(currentRoom);
-  const everyone = getEveryone(currentRoom);
-  const avatarMap = assignAvatars(everyone);
+  const { avatarMap, everyone } = useAvatarMap(currentRoom);
   const totalR = currentRoom.config?.rounds ?? currentRoom.questions.length;
   const progress = t("playing.roundLabel", {
     current: currentRoom.currentQuestionIndex + 1,
@@ -517,7 +517,12 @@ export default function PlayingScreen({
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <Avatar avatar={avatarMap[currentRoom.king?.id]} size="sm" crown />
+        <Avatar
+          avatar={avatarMap[currentRoom.king?.id]}
+          size="sm"
+          crown
+          playerName={currentRoom.king?.name}
+        />
         <span
           style={{
             fontSize: 13,
@@ -588,9 +593,7 @@ export default function PlayingScreen({
           </div>
         )}
 
-        {/* Respuestas:
-            - boolean/multiple => auto-validación, sin botones ✓/✗, mostrar banner del líder
-            - texto => validación manual con botones ✓/✗ */}
+        {/* Respuestas: */}
         {q?.type !== "text" ? (
           <>
             {currentRoom.kingAnswer &&
@@ -626,7 +629,20 @@ export default function PlayingScreen({
                 </div>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 9,
+                  maxHeight: "40vh",
+                  overflowY: "auto",
+                  overscrollBehavior: "contain",
+                  maskImage:
+                    "linear-gradient(to bottom, black 85%, transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, black 85%, transparent 100%)",
+                }}
+              >
                 {currentRoom.currentAnswers?.length ? (
                   currentRoom.currentAnswers.map((ans) => (
                     <div
@@ -734,6 +750,7 @@ export default function PlayingScreen({
                     <button
                       onClick={() => handleValidate(ans.aspirantId, true)}
                       disabled={validating.has(ans.aspirantId)}
+                      aria-label={`Marcar respuesta de ${ans.aspirantName} como correcta`}
                       style={{
                         background: "var(--c-success)",
                         border: "none",
@@ -761,7 +778,7 @@ export default function PlayingScreen({
                         alignItems: "center",
                       }}
                     >
-                      <X size={17} color="#fff" />
+                      <X size={17} color="#fff" aria-hidden="true" />
                     </button>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X, Settings, Zap, Star, Check, Layers } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation.js";
 import { QUESTION_CATEGORIES } from "../constants/questionCategories.js";
+import Spinner from "../components/Spinner.jsx"
 
 function Toggle({ enabled, onClick, color = "purple" }) {
   const bg = enabled
@@ -185,7 +186,12 @@ function CategorySelector({ selected, onChange }) {
 }
 
 /* ─── GameConfigModal ──────────────────────────────────────────────────── */
-export default function GameConfigModal({ config, onClose, onSave }) {
+export default function GameConfigModal({
+  config,
+  onClose,
+  onSave,
+  loading = false,
+}) {
   const { t } = useTranslation();
   const [local, setLocal] = useState({
     penaltyEnabled: false,
@@ -194,7 +200,6 @@ export default function GameConfigModal({ config, onClose, onSave }) {
     ...config,
   });
   const isCustom = local.mode === "custom";
-
   const modeOptions = [
     {
       value: "generic",
@@ -374,6 +379,9 @@ export default function GameConfigModal({ config, onClose, onSave }) {
               border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: 16,
               padding: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
             }}
           >
             <CategorySelector
@@ -728,7 +736,15 @@ export default function GameConfigModal({ config, onClose, onSave }) {
           onClick={() => onSave(local)}
           style={{ fontSize: 15 }}
         >
-          <Check size={17} /> {t("config.saveButton")}
+          {loading ? (
+            <>
+              <Spinner size={16} /> Guardando...
+            </>
+          ) : (
+            <>
+              <Check size={17} /> {t("config.saveButton")}
+            </>
+          )}
         </button>
       </div>
     </div>
