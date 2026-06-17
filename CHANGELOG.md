@@ -28,6 +28,7 @@
  - Asignacion de avatares y textos alternativos.
  - Mala reconección en diversas situaciones. 
  - Solución de varios problemas de rendimiento.
+ - polling adaptativo.
 
 ### Nuevo
  - Modo hover y link al portafolio en los creditos del juego.
@@ -35,6 +36,7 @@
  - nueva opción de mostrar respuestas despues de cada ronda
  - Agregado Spinner de carga para acciones demorosas.
  - Agregado pantalla de reconeccion.
+ - SSE edge function.
  
 
 ---

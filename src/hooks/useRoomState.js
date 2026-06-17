@@ -4,6 +4,7 @@ import { GAME_STATE, ROOM_STATUS, PLAYER_ROLE, GAME_MODE, POLL_INTERVAL_BY_STATE
 import { derivePlayerRole, isPlayerInRoom } from "../utils/room.js";
 import { saveSession, clearSession, clearAnsweredQuestions, clearStaleAnsweredQuestions, saveAnsweredQuestions, loadAnsweredQuestions } from "../utils/session.js";
 import useErrorQueue from "./useErrorQueue.js";
+import useSSE from "./useSSE.js";
 
 function buildRoomKey(code) { return `room_${code}`; }
 
@@ -265,7 +266,6 @@ export default function useRoomState() {
   useEffect(() => {
     if (gameState === GAME_STATE.MENU || !roomCode) {
       clearTimeout(pollTimerRef.current);
-      pollIntervalRef.current = POLL_BASE_MS;
       failCountRef.current = 0;
       return;
     }
@@ -386,6 +386,29 @@ export default function useRoomState() {
     setPlayerRole, setAnsweredQuestions, setGameState,
     lastHashRef,
   ]);
+
+  // ── Callback para mensajes SSE ────────────────────────────────────────────
+  const handleSSEMessage = useCallback((room) => {
+    const gs = stateRef.current.gameState;
+    const role = stateRef.current.playerRole;
+    const name = stateRef.current.playerName;
+    const code = stateRef.current.roomCode;
+
+    const newHash = roomHash(room);
+    if (newHash === lastHashRef.current) return;
+
+    lastHashRef.current = newHash;
+    setCurrentRoom(room);
+    handleRoomTransition(room, gs, role, name, code);
+  }, [handleRoomTransition]);
+
+  // ── Conexión SSE ──────────────────────────────────────────────────────────
+  useSSE({
+    roomCode: roomCode,
+    gameState: gameState,
+    onMessage: handleSSEMessage,
+    enabled: gameState !== GAME_STATE.MENU && !!roomCode,
+  });
 
   return {
     gameState, roomCode, playerName, playerRole,

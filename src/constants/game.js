@@ -50,12 +50,12 @@ export const ANSWERED_KEY_PREFIX = "vr_answered";
 export const POLL_INTERVAL_BY_STATE = {
   ["menu"]: 0,
   ["lobby"]: 5_000,
-  ["picking_king"]: 1_500,
-  ["king_reveal"]: 3_000,
-  ["playing"]: 1_500,
-  ["round_review"]: 2_000,
-  ["waiting_question"]: 2_000,
-  ["creating_question"]: 4_000,
+  ["picking_king"]: 10_000,
+  ["king_reveal"]: 10_000,
+  ["playing"]: 10_000,
+  ["round_review"]: 10_000,
+  ["waiting_question"]: 10_000,
+  ["creating_question"]: 10_000,
   ["results"]: 5_000,
 };
 
