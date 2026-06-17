@@ -1,5 +1,8 @@
-import { withRoom, redis, setCors } from "./_withRoom.js";
-import { ensureScores } from "./_roomLogic.js";
+import { setCors } from "../../lib/helpers.js";
+import { ensureScores } from "../../lib/roomlogic.js";
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   setCors(res);

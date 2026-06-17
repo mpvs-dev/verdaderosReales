@@ -1,8 +1,9 @@
-import { withRoom, setCors } from "./_withRoom.js";
+import { withRoom } from "../../lib/withRoom.js";
+import { setCors } from "../../lib/helpers.js";
 import {
   getQuestionPoints, markValidated,
   tryAdvanceRound, sanitizeRoom,
-} from "./_roomLogic.js";
+} from "../../lib/roomlogic.js";
 
 export default async function handler(req, res) {
   setCors(res);
